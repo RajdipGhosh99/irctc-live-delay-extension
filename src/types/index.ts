@@ -57,6 +57,7 @@ export interface MultiProviderSettings {
   fetchOnHover: boolean;
   autoFetchAllTrains?: boolean;      // Auto-fetch status for all trains on search result pages
   cacheTtlMinutes: number;
+  maxCacheSizeMb?: number;           // Max cache storage quota in MB (default: 150 MB)
   showFloatingHUD: boolean;
   providers: Record<ProviderId, ProviderConfig>;
   schemaVersion: '1.5.0-iso';

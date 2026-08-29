@@ -12,6 +12,7 @@
   },
   "permissions": [
     "storage",
+    "unlimitedStorage",
     "scripting",
     "tabs"
   ],

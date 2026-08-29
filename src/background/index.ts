@@ -71,6 +71,7 @@ async function getStoredSettings(): Promise<MultiProviderSettings> {
       fetchOnHover: false,
       autoFetchAllTrains: saved.autoFetchAllTrains !== undefined ? saved.autoFetchAllTrains : DEFAULT_SETTINGS.autoFetchAllTrains,
       cacheTtlMinutes: saved.cacheTtlMinutes || DEFAULT_SETTINGS.cacheTtlMinutes,
+      maxCacheSizeMb: saved.maxCacheSizeMb || DEFAULT_SETTINGS.maxCacheSizeMb || 150,
       showFloatingHUD: saved.showFloatingHUD !== undefined ? saved.showFloatingHUD : DEFAULT_SETTINGS.showFloatingHUD,
       schemaVersion: '1.5.0-iso',
       providers: mergedProviders,
@@ -78,6 +79,45 @@ async function getStoredSettings(): Promise<MultiProviderSettings> {
   } catch (err) {
     console.error('[Background] Failed to read settings from storage:', err);
     return DEFAULT_SETTINGS;
+  }
+}
+
+const MAX_CACHE_BYTES = 150 * 1024 * 1024; // 150 Megabytes Storage Cache
+
+async function pruneCacheIfExceedsLimit(maxBytes = MAX_CACHE_BYTES): Promise<void> {
+  try {
+    const all = await chrome.storage.local.get(null);
+    const cacheKeys = Object.keys(all).filter((k) => k.startsWith(STORAGE_KEY_CACHE_PREFIX));
+
+    let totalBytes = 0;
+    const records: { key: string; expiresAt: number; bytes: number }[] = [];
+
+    for (const key of cacheKeys) {
+      const val = all[key];
+      const str = JSON.stringify(val);
+      const bytes = str.length * 2; // UTF-16 approximate bytes
+      totalBytes += bytes;
+      records.push({ key, expiresAt: val?.expiresAt || 0, bytes });
+    }
+
+    if (totalBytes > maxBytes) {
+      console.log(`[Cache Manager] Cache storage (${(totalBytes / 1024 / 1024).toFixed(2)} MB) exceeded ${maxBytes / 1024 / 1024} MB. Pruning oldest entries...`);
+      records.sort((a, b) => a.expiresAt - b.expiresAt);
+
+      const keysToRemove: string[] = [];
+      for (const rec of records) {
+        if (totalBytes <= maxBytes * 0.85) break;
+        keysToRemove.push(rec.key);
+        totalBytes -= rec.bytes;
+      }
+
+      if (keysToRemove.length > 0) {
+        await chrome.storage.local.remove(keysToRemove);
+        console.log(`[Cache Manager] Pruned ${keysToRemove.length} cache entries.`);
+      }
+    }
+  } catch (err) {
+    console.warn('[Cache Manager] Failed during pruning:', err);
   }
 }
 
@@ -111,7 +151,7 @@ async function getFromCache(trainNumber: string, travelDate?: string): Promise<T
   }
 }
 
-async function saveToCache(data: TrainDelayData, travelDate?: string, ttlMinutes = 15): Promise<void> {
+async function saveToCache(data: TrainDelayData, travelDate?: string, ttlMinutes = 15, maxMb = 150): Promise<void> {
   try {
     const key = getCacheKey(data.trainNumber, travelDate);
     const ttlMs = (ttlMinutes || 15) * 60 * 1000;
@@ -133,6 +173,7 @@ async function saveToCache(data: TrainDelayData, travelDate?: string, ttlMinutes
       expiresAtIso,
     };
     await chrome.storage.local.set({ [key]: record });
+    await pruneCacheIfExceedsLimit((maxMb || 150) * 1024 * 1024);
   } catch (err) {
     console.warn('[Background] Failed to save cache:', err);
   }
@@ -391,6 +432,26 @@ async function handleMessage(message: ExtensionMessage, sendResponse: (res: any)
       sendResponse({ success: true, count: keys.length, isoTimestamp: getIso8601Timestamp() });
     } catch (err) {
       sendResponse({ success: false, error: 'Failed to clear cache' });
+    }
+  } else if (message.type === 'GET_CACHE_STATS') {
+    try {
+      const all = await chrome.storage.local.get(null);
+      const cacheKeys = Object.keys(all).filter((k) => k.startsWith(STORAGE_KEY_CACHE_PREFIX));
+      let totalBytes = 0;
+      for (const key of cacheKeys) {
+        totalBytes += JSON.stringify(all[key]).length * 2;
+      }
+      const kb = (totalBytes / 1024).toFixed(1);
+      const mb = (totalBytes / (1024 * 1024)).toFixed(2);
+      sendResponse({
+        success: true,
+        count: cacheKeys.length,
+        totalBytes,
+        formattedSize: totalBytes > 1024 * 1024 ? `${mb} MB` : `${kb} KB`,
+        maxCacheSizeMb: 150,
+      });
+    } catch {
+      sendResponse({ success: false });
     }
   } else if (message.type === 'OPEN_OPTIONS_PAGE') {
     try {

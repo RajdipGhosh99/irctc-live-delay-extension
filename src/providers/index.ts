@@ -52,6 +52,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   fetchOnHover: false,
   autoFetchAllTrains: false,
   cacheTtlMinutes: 15,
+  maxCacheSizeMb: 150,
   showFloatingHUD: true,
   schemaVersion: '1.5.0-iso',
   providers: {

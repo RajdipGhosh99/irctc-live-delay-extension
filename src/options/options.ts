@@ -482,9 +482,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    chrome.storage.local.get(null, (all) => {
-      const keys = Object.keys(all).filter((k) => k.startsWith('irctc_delay_'));
-      cacheRecordsCount.textContent = `${keys.length}`;
+    chrome.runtime.sendMessage({ type: 'GET_CACHE_STATS' } as ExtensionMessage, (res) => {
+      if (res?.success) {
+        cacheRecordsCount.textContent = `${res.count} records (${res.formattedSize} / 150 MB)`;
+      } else {
+        chrome.storage.local.get(null, (all) => {
+          const keys = Object.keys(all).filter((k) => k.startsWith('train_delay_cache_') || k.startsWith('irctc_delay_'));
+          cacheRecordsCount.textContent = `${keys.length} records`;
+        });
+      }
     });
   }
 
