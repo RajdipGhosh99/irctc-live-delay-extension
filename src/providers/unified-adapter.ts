@@ -138,16 +138,9 @@ export function normalizeUnifiedTrainResponse(
     }
     if (irctcInstance.trainPosition) {
       irctcTrainPositionStr = String(irctcInstance.trainPosition);
-      // Parse Delay: e.g. "Delay: 01:21", "Delay: 17 Mins", "Delay: Right Time"
-      const delayMatch = irctcTrainPositionStr.match(/Delay:\s*(\d{1,2}):(\d{2})/i) || irctcTrainPositionStr.match(/Delay:\s*(\d+)\s*(?:min|mins|m)/i);
-      if (delayMatch) {
-        if (delayMatch[2] !== undefined) {
-          rawJson.delay = parseInt(delayMatch[1], 10) * 60 + parseInt(delayMatch[2], 10);
-        } else {
-          rawJson.delay = parseInt(delayMatch[1], 10);
-        }
-      } else if (/right\s*time|on\s*time/i.test(irctcTrainPositionStr)) {
-        rawJson.delay = 0;
+      const parsedPosDelay = parseDelayToMinutes(irctcTrainPositionStr);
+      if (parsedPosDelay !== 0 || /right\s*time|on\s*time|rt|ontime/i.test(irctcTrainPositionStr)) {
+        rawJson.delay = parsedPosDelay;
       }
 
       // Parse Station: e.g. "Departed from JHARSUGUDA JN(JSG) at 10:56"
@@ -156,6 +149,14 @@ export function normalizeUnifiedTrainResponse(
         rawJson.current_station_name = stnMatch[1].trim();
         rawJson.current_station_code = stnMatch[2].trim();
       }
+    }
+
+    if (irctcInstance.delayInMinutes !== undefined) {
+      rawJson.delay = parseDelayToMinutes(irctcInstance.delayInMinutes);
+    } else if (irctcInstance.delay !== undefined) {
+      rawJson.delay = parseDelayToMinutes(irctcInstance.delay);
+    } else if (irctcInstance.lateMinutes !== undefined) {
+      rawJson.delay = parseDelayToMinutes(irctcInstance.lateMinutes);
     }
   }
 
@@ -215,11 +216,19 @@ export function normalizeUnifiedTrainResponse(
     const rawVal = findFirstValue(rawJson, [field]);
     if (rawVal !== undefined && rawVal !== null && rawVal !== '') {
       const parsed = parseDelayToMinutes(rawVal);
-      if (parsed !== 0 || String(rawVal).includes('0')) {
+      if (parsed !== 0) {
         delayMinutes = parsed;
         delayFound = true;
         break;
       }
+    }
+  }
+
+  if (!delayFound && irctcTrainPositionStr) {
+    const posDelay = parseDelayToMinutes(irctcTrainPositionStr);
+    if (posDelay !== 0) {
+      delayMinutes = posDelay;
+      delayFound = true;
     }
   }
 

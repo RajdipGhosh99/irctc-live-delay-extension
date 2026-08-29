@@ -192,49 +192,76 @@ export function parseDelayToMinutes(delayVal: any): number {
   const str = String(delayVal).trim();
   if (!str) return 0;
 
-  const colonMatch = str.match(/^(\d{1,2}):(\d{2})$/);
-  if (colonMatch) {
-    const hours = parseInt(colonMatch[1], 10) || 0;
-    const mins = parseInt(colonMatch[2], 10) || 0;
-    return hours * 60 + mins;
+  // 1. Right time / On time / Scheduled checks
+  if (/(?:right\s*time|on\s*time|rt|ontime|no\s*delay|on\s*schedule|running\s*on\s*time)/i.test(str) && !/(?:delay|late|behind)/i.test(str)) {
+    return 0;
   }
 
+  // 2. Pure "+HH:MM", "-HH:MM", or "HH:MM" (e.g. "01:21", "+01:21", "-00:15")
+  const pureColonMatch = str.match(/^([+-])?(\d{1,2}):(\d{2})$/);
+  if (pureColonMatch) {
+    const sign = pureColonMatch[1] === '-' ? -1 : 1;
+    const hours = parseInt(pureColonMatch[2], 10) || 0;
+    const mins = parseInt(pureColonMatch[3], 10) || 0;
+    return sign * (hours * 60 + mins);
+  }
+
+  // 3. Pure integers (e.g. "45", "+45", "-15")
   if (/^[+-]?\d+$/.test(str)) {
     return parseInt(str, 10) || 0;
   }
 
+  // 4. Keyword followed by HH:MM: "Delay: 01:21", "Late: 01:21", "Delay 1:21", "Late by 01:21"
+  const keywordHhMmMatch = str.match(/(?:delay|delayed|late|behind|late\s*by|delay\s*by|delaying)\s*(?:is|:)?\s*(\d{1,2}):(\d{2})/i);
+  if (keywordHhMmMatch) {
+    const hours = parseInt(keywordHhMmMatch[1], 10) || 0;
+    const mins = parseInt(keywordHhMmMatch[2], 10) || 0;
+    return hours * 60 + mins;
+  }
+
+  // 5. Keyword followed by "X hr Y min": "Late by 1 hr 21 mins", "Delay: 2 hours 10 mins"
+  const keywordHrMinMatch = str.match(/(?:delay|delayed|late|behind|late\s*by|delay\s*by)\s*(?:is|:)?\s*(\d+)\s*(?:hr|hour|hours|h)\s*(?:and)?\s*(\d+)?\s*(?:min|mins|minute|minutes|m)?/i);
+  if (keywordHrMinMatch) {
+    const hours = parseInt(keywordHrMinMatch[1], 10) || 0;
+    const mins = keywordHrMinMatch[2] ? parseInt(keywordHrMinMatch[2], 10) : 0;
+    return hours * 60 + mins;
+  }
+
+  // 6. Keyword followed by minutes: "Delay: 81 Mins", "Late by 45 mins", "Delay 17 M"
+  const keywordMinMatch = str.match(/(?:delay|delayed|late|behind|late\s*by|delay\s*by)\s*(?:is|:)?\s*(\d+)\s*(?:min|mins|minute|minutes|m)?/i);
+  if (keywordMinMatch) {
+    return parseInt(keywordMinMatch[1], 10) || 0;
+  }
+
+  // 7. General "X hr Y min" anywhere in string
   let totalMinutes = 0;
-  let matched = false;
+  let hasUnitMatch = false;
 
-  const hrMatch = str.match(/(\d+)\s*(?:hr|hour|hours|h)/i);
-  if (hrMatch) {
-    totalMinutes += parseInt(hrMatch[1], 10) * 60;
-    matched = true;
+  const generalHr = str.match(/(\d+)\s*(?:hr|hour|hours|h)\b/i);
+  if (generalHr) {
+    totalMinutes += parseInt(generalHr[1], 10) * 60;
+    hasUnitMatch = true;
   }
 
-  const minMatch = str.match(/(\d+)\s*(?:min|mins|minute|minutes|m)/i);
-  if (minMatch) {
-    totalMinutes += parseInt(minMatch[1], 10);
-    matched = true;
+  const generalMin = str.match(/(\d+)\s*(?:min|mins|minute|minutes|m)\b/i);
+  if (generalMin) {
+    totalMinutes += parseInt(generalMin[1], 10);
+    hasUnitMatch = true;
   }
 
-  if (matched) {
+  if (hasUnitMatch) {
     if (str.includes('early') || str.includes('before') || str.startsWith('-')) {
       return -totalMinutes;
     }
     return totalMinutes;
   }
 
-  const digits = str.match(/(\d+)/);
-  if (digits) {
-    if (str.includes('early') || str.startsWith('-')) {
-      return -(parseInt(digits[0], 10) || 0);
-    }
-    return parseInt(digits[0], 10) || 0;
-  }
-
-  if (/right\s*time|on\s*time|rt|ontime|schedule/i.test(str)) {
-    return 0;
+  // 8. Early keywords: "Early by 15 mins", "Before time by 00:10"
+  const earlyMatch = str.match(/(?:early|before\s*time|ahead)\s*(?:by|is|:)?\s*(\d{1,2}):(\d{2})/i);
+  if (earlyMatch) {
+    const hours = parseInt(earlyMatch[1], 10) || 0;
+    const mins = parseInt(earlyMatch[2], 10) || 0;
+    return -(hours * 60 + mins);
   }
 
   return 0;
