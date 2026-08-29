@@ -6,6 +6,7 @@
 
 import { ProviderConfig, TrainDelayData } from '../types';
 import { normalizeUnifiedTrainResponse } from './unified-adapter';
+import { normalizeDateToIsoDate } from '../utils/iso-utils';
 
 export const IRCTC_OFFICIAL_METADATA = {
   id: 'irctc-official' as const,
@@ -37,15 +38,29 @@ export async function fetchIrctcOfficialStatus(
   const endpoint = config.apiEndpoint || IRCTC_OFFICIAL_METADATA.defaultEndpoint;
   const greq = generateGreqId();
 
-  console.log(`[Official NTES] 🚀 Querying ${endpoint} for Train #${trainNumber}...`);
+  // Convert any format (2026-08-29, 29-08-2026, 20260829) into exact 8-digit "YYYYMMDD" required by IRCTC
+  let formattedJourneyDate: string | null = null;
+  if (travelDate) {
+    const iso = normalizeDateToIsoDate(travelDate);
+    formattedJourneyDate = iso ? iso.replace(/-/g, '') : travelDate.replace(/-/g, '');
+  }
+  if (!formattedJourneyDate) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    formattedJourneyDate = `${year}${month}${day}`;
+  }
+
+  console.log(`[Official NTES] 🚀 Querying ${endpoint} for Train #${trainNumber} (journeyDate: ${formattedJourneyDate})...`);
 
   const payload = {
     trainNumber: trainNumber.trim(),
-    journeyDate: travelDate || null,
+    journeyDate: formattedJourneyDate,
   };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s strict timeout
+  const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s strict timeout
 
   let response: Response;
   try {
@@ -61,9 +76,6 @@ export async function fetchIrctcOfficialStatus(
         'greq': greq,
         'Origin': 'https://www.irctc.co.in',
         'Referer': 'https://www.irctc.co.in/eticket/booking/live-train',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
@@ -71,7 +83,7 @@ export async function fetchIrctcOfficialStatus(
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      throw new Error('Official NTES: Connection timed out (3.5s). Falling over to next provider...');
+      throw new Error('Official NTES: Connection timed out (4s). Falling over to next provider...');
     }
     throw new Error(`Official NTES: Network error (${err.message}). Falling over to next provider...`);
   } finally {

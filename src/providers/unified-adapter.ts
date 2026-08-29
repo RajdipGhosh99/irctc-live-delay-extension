@@ -16,7 +16,7 @@ import {
   getIso8601Date,
   parseDelayToMinutes,
   calculateTimeDiffMinutes,
-} from '../iso-utils';
+} from '../utils/iso-utils';
 
 /**
  * Canonical Data Model for Unified Train Status
@@ -112,6 +112,36 @@ export function normalizeUnifiedTrainResponse(
 ): TrainDelayData {
   if (!rawJson || typeof rawJson !== 'object') {
     throw new Error(`${providerName}: Empty or invalid payload received from API.`);
+  }
+
+  // 0. Handle Official IRCTC NTES vInstanceList structure
+  let irctcTrainPositionStr: string | undefined;
+  const irctcInstance = Array.isArray(rawJson.vInstanceList) && rawJson.vInstanceList.length > 0 ? rawJson.vInstanceList[0] : null;
+  if (irctcInstance) {
+    if (!rawJson.trainName && irctcInstance.trainName) {
+      rawJson.trainName = irctcInstance.trainName;
+    }
+    if (irctcInstance.trainPosition) {
+      irctcTrainPositionStr = String(irctcInstance.trainPosition);
+      // Parse Delay: e.g. "Delay: 01:21", "Delay: 17 Mins", "Delay: Right Time"
+      const delayMatch = irctcTrainPositionStr.match(/Delay:\s*(\d{1,2}):(\d{2})/i) || irctcTrainPositionStr.match(/Delay:\s*(\d+)\s*(?:min|mins|m)/i);
+      if (delayMatch) {
+        if (delayMatch[2] !== undefined) {
+          rawJson.delay = parseInt(delayMatch[1], 10) * 60 + parseInt(delayMatch[2], 10);
+        } else {
+          rawJson.delay = parseInt(delayMatch[1], 10);
+        }
+      } else if (/right\s*time|on\s*time/i.test(irctcTrainPositionStr)) {
+        rawJson.delay = 0;
+      }
+
+      // Parse Station: e.g. "Departed from JHARSUGUDA JN(JSG) at 10:56"
+      const stnMatch = irctcTrainPositionStr.match(/(?:from|at)\s+([A-Za-z0-9\s]+?)\s*\(([A-Z0-9]+)\)/i);
+      if (stnMatch) {
+        rawJson.current_station_name = stnMatch[1].trim();
+        rawJson.current_station_code = stnMatch[2].trim();
+      }
+    }
   }
 
   // 1. Unified Train Number Resolution
@@ -233,7 +263,9 @@ export function normalizeUnifiedTrainResponse(
   const isOnTime = delayMinutes <= 5 && delayMinutes >= -5;
 
   let statusSummary: string;
-  if (!isStarted && delayMinutes === 0 && (!currentStationName || currentStationName === 'Origin' || currentStationName === 'En Route')) {
+  if (irctcTrainPositionStr && irctcTrainPositionStr.length > 5) {
+    statusSummary = irctcTrainPositionStr;
+  } else if (!isStarted && delayMinutes === 0 && (!currentStationName || currentStationName === 'Origin' || currentStationName === 'En Route')) {
     statusSummary = 'Scheduled (Not Started Yet)';
   } else if (isOnTime) {
     statusSummary = delayMinutes < 0 ? `Running ${Math.abs(delayMinutes)} mins Early` : 'Running Right Time';
