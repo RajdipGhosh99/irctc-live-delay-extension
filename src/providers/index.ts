@@ -47,7 +47,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   extensionEnabled: true,
   disabledSites: [],
   sitePositions: DEFAULT_SITE_POSITIONS,
-  activeProvider: 'rapidapi-irctc1',
+  activeProvider: 'irctc-official',
   autoFailover: true,
   fetchOnHover: false,
   autoFetchAllTrains: false,

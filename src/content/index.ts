@@ -33,37 +33,75 @@ interface InjectedWidget {
 }
 const activeWidgets = new Map<string, InjectedWidget>();
 
-let isBatchFetching = false;
-let autoFetchDebounceTimer: any = null;
+// Robust non-blocking Queue System for batch and progressive auto-fetching
+const autoFetchQueue = new Set<InjectedWidget>();
+let isQueueProcessing = false;
+
+async function processAutoFetchQueue() {
+  if (isQueueProcessing) return;
+  isQueueProcessing = true;
+
+  try {
+    while (autoFetchQueue.size > 0) {
+      const widget = autoFetchQueue.values().next().value;
+      if (!widget) break;
+      autoFetchQueue.delete(widget);
+
+      if (!widget.hasFetched) {
+        console.log(`[Live Delay Tracker] ⚡ Auto-fetching Train #${widget.trainNumber} (Remaining in queue: ${autoFetchQueue.size})...`);
+        await widget.fetchStatus(false);
+        // Stagger by 180ms for smooth non-blocking execution
+        await new Promise((res) => setTimeout(res, 180));
+      }
+    }
+  } catch (err) {
+    console.error('[Live Delay Tracker] Error in auto-fetch queue:', err);
+  } finally {
+    isQueueProcessing = false;
+    if (autoFetchQueue.size > 0) {
+      processAutoFetchQueue();
+    }
+  }
+}
+
+function enqueueAutoFetch(widgets?: InjectedWidget[] | InjectedWidget) {
+  if (!isExtensionEnabled || !isSiteEnabled || !isAutoFetchAll) return;
+
+  if (Array.isArray(widgets)) {
+    widgets.forEach((w) => {
+      if (!w.hasFetched) autoFetchQueue.add(w);
+    });
+  } else if (widgets) {
+    if (!widgets.hasFetched) autoFetchQueue.add(widgets);
+  } else {
+    activeWidgets.forEach((w) => {
+      if (!w.hasFetched) autoFetchQueue.add(w);
+    });
+  }
+
+  processAutoFetchQueue();
+}
 
 /**
  * Batches and fetches live running status for all detected train cards on the page
  */
 async function autoFetchAllPageTrains(forceRefresh = false) {
   if (!isExtensionEnabled || !isSiteEnabled) return;
-  if (isBatchFetching) return;
-  isBatchFetching = true;
 
   processTrainCards();
 
-  const list = Array.from(activeWidgets.values());
-  console.log(`[Live Delay Tracker] ⚡ Auto-fetching status for ${list.length} trains on page (force=${forceRefresh})...`);
-
-  try {
+  if (forceRefresh) {
+    const list = Array.from(activeWidgets.values());
+    console.log(`[Live Delay Tracker] ⚡ Force-fetching all ${list.length} trains on page...`);
     for (let i = 0; i < list.length; i++) {
       const widget = list[i];
-      if (forceRefresh || !widget.hasFetched) {
-        widget.fetchStatus(forceRefresh);
-        if (i < list.length - 1) {
-          // Stagger by 200ms for smooth non-blocking execution
-          await new Promise((res) => setTimeout(res, 200));
-        }
+      widget.fetchStatus(true);
+      if (i < list.length - 1) {
+        await new Promise((res) => setTimeout(res, 180));
       }
     }
-  } catch (err) {
-    console.error('[Live Delay Tracker] Auto-fetch error:', err);
-  } finally {
-    isBatchFetching = false;
+  } else {
+    enqueueAutoFetch();
   }
 }
 
@@ -699,6 +737,9 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
   };
 
   activeWidgets.set(trainNumber, widget);
+  if (isAutoFetchAll) {
+    enqueueAutoFetch(widget);
+  }
   return widget;
 }
 
@@ -712,7 +753,6 @@ function processTrainCards() {
     '.train-name, .trainName, .train-number, .trainNumber, [data-cy*="train"], [data-testid*="train"], .single-train-detail, .train-heading strong, .railway-train-name, .boldFont.font16'
   );
 
-  let newInjected = false;
   candidateElements.forEach((el) => {
     if (processedElements.has(el)) return;
     if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
@@ -723,15 +763,11 @@ function processTrainCards() {
     if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
       processedElements.add(el);
       injectDelayWidget(el, trainNumber, currentSitePosition);
-      newInjected = true;
     }
   });
 
-  if (newInjected && isAutoFetchAll) {
-    if (autoFetchDebounceTimer) clearTimeout(autoFetchDebounceTimer);
-    autoFetchDebounceTimer = setTimeout(() => {
-      autoFetchAllPageTrains(false);
-    }, 450);
+  if (isAutoFetchAll) {
+    enqueueAutoFetch();
   }
 }
 
