@@ -60,7 +60,7 @@ export async function fetchIrctcOfficialStatus(
   };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s strict timeout
+  const timeoutId = setTimeout(() => controller.abort(), 6500); // 6.5s timeout
 
   let response: Response;
   try {
@@ -83,7 +83,7 @@ export async function fetchIrctcOfficialStatus(
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      throw new Error('Official NTES: Connection timed out (4s). Falling over to next provider...');
+      throw new Error('Official NTES: Connection timed out (6.5s). Falling over to next provider...');
     }
     throw new Error(`Official NTES: Network error (${err.message}). Falling over to next provider...`);
   } finally {

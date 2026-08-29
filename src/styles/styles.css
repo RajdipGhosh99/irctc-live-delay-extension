@@ -241,6 +241,52 @@
   white-space: nowrap !important;
 }
 
+/* 3-Card Multi-Metric Delay Grid (Today, Today Avg, Month Avg) */
+.irctc-delay-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 5px !important;
+  margin: 6px 0 8px 0 !important;
+  background: #f8fafc !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.irctc-stat-box {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  background: #ffffff !important;
+  padding: 4px 2px !important;
+  border-radius: 6px !important;
+  border: 1px solid #f1f5f9 !important;
+}
+
+.irctc-stat-title {
+  font-size: 8.5px !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2px !important;
+  margin-bottom: 2px !important;
+}
+
+.irctc-stat-val {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  color: #0f172a !important;
+  line-height: 1.1 !important;
+}
+
+.irctc-stat-sub {
+  font-size: 8px !important;
+  color: #94a3b8 !important;
+  margin-top: 2px !important;
+}
+
 .irctc-delay-popover-row {
   display: flex !important;
   justify-content: space-between !important;

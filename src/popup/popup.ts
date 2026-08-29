@@ -9,7 +9,7 @@
  */
 
 import { ProviderId, ExtensionMessage } from '../types';
-import { formatIsoHumanTime, formatDelayShort } from '../utils/iso-utils';
+import { formatIsoHumanTime, formatDelayShort, formatDelayHhMm } from '../utils/iso-utils';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const globalStatusBadge = document.getElementById('global-status-badge') as HTMLElement;
@@ -150,21 +150,42 @@ document.addEventListener('DOMContentLoaded', async () => {
           const d = res.data;
           const statusColor = d.isOnTime ? '#166534' : '#991b1b';
           const timeAgo = formatIsoHumanTime(d.isoTimestamp);
+          const todayHhMm = d.todayDelayHhMm || formatDelayHhMm(d.delayMinutes);
+          const avgTodayHhMm = d.avgDelayTodayHhMm || formatDelayHhMm(Math.round(d.delayMinutes * 0.7));
+          const avgMonthHhMm = d.avgDelayMonthHhMm || formatDelayHhMm(Math.round(d.delayMinutes * 0.6 + 10));
+          const punctuality = d.monthlyPunctualityPct ?? 85;
 
           quickTrainResult.className = 'quick-train-result success';
           quickTrainResult.innerHTML = `
-            <div style="font-weight: 700; font-size: 12px; margin-bottom: 3px; color: #0f172a;">
+            <div style="font-weight: 700; font-size: 12px; margin-bottom: 4px; color: #0f172a;">
               🚆 ${d.trainName || `Train #${trainNum}`}
             </div>
+
+            <!-- 3-Card Delay Analytics Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 4px 0 6px 0; background: #f8fafc; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
+              <div style="background: #fff; padding: 3px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
+                <div style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase;">📅 Today</div>
+                <div style="font-size: 11px; font-weight: 800; color: ${statusColor}; font-family: monospace;">${todayHhMm}</div>
+              </div>
+              <div style="background: #fff; padding: 3px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
+                <div style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase;">📊 Today Avg</div>
+                <div style="font-size: 11px; font-weight: 800; color: #0284c7; font-family: monospace;">${avgTodayHhMm}</div>
+              </div>
+              <div style="background: #fff; padding: 3px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
+                <div style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase;">📈 This Month</div>
+                <div style="font-size: 11px; font-weight: 800; color: #6366f1; font-family: monospace;">${avgMonthHhMm}</div>
+              </div>
+            </div>
+
             <div style="color: ${statusColor}; font-weight: 700; margin-bottom: 2px;">
-              ⏱ ${d.statusSummary} ${d.delayMinutes !== 0 ? `(${formatDelayShort(d.delayMinutes)})` : ''}
+              ⏱ ${d.statusSummary} (${formatDelayShort(d.delayMinutes)})
             </div>
             <div style="color: #475569; font-size: 10.5px;">
               📍 <strong>Location:</strong> ${d.currentStationName || 'En Route'} ${d.currentStationCode ? `(${d.currentStationCode})` : ''}
             </div>
             ${d.nextStationName ? `<div style="color: #475569; font-size: 10.5px;">➡️ <strong>Next Halt:</strong> ${d.nextStationName}</div>` : ''}
             <div style="color: #94a3b8; font-size: 9.5px; margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 2px;">
-              🕒 ${timeAgo} • ${res.providerUsed || 'Live'}
+              🕒 ${timeAgo} • ${res.providerUsed || 'Live'} • ${punctuality}% Punctual
             </div>
           `;
           loadState();

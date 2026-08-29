@@ -65,6 +65,14 @@ export interface TrainDelayData {
   trainNumber: string;
   trainName?: string;
   delayMinutes: number;
+  delayHhMm?: string;               // e.g. "+01:21"
+  todayDelayMinutes?: number;       // Today's live delay minutes
+  todayDelayHhMm?: string;          // Today's live delay in HH:MM (e.g. "+01:21")
+  avgDelayTodayMinutes?: number;    // Average delay across today's halts
+  avgDelayTodayHhMm?: string;       // Average delay today in HH:MM (e.g. "+00:45")
+  avgDelayMonthMinutes?: number;    // Average delay over past 30 days / this month
+  avgDelayMonthHhMm?: string;       // Average monthly delay in HH:MM (e.g. "+01:10")
+  monthlyPunctualityPct?: number;   // On-time percentage this month (e.g. 84%)
   isOnTime: boolean;
   currentStationName?: string;
   currentStationCode?: string;

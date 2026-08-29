@@ -261,29 +261,37 @@ export function calculateTimeDiffMinutes(scheduledTime?: string, actualTime?: st
 }
 
 /**
- * Formats delay in minutes to a clean, compact badge label (e.g. "+1h 21m", "+45m", "-15m", "On Time")
+ * Formats delay in minutes to exact "+HH:MM" or "-HH:MM" (e.g. "+01:21", "+00:25", "00:00", "-00:15")
+ */
+export function formatDelayHhMm(delayMinutes: number, withSign = true): string {
+  if (isNaN(delayMinutes) || delayMinutes === null || delayMinutes === undefined) {
+    return '00:00';
+  }
+  const isEarly = delayMinutes < 0;
+  const absMin = Math.abs(Math.round(delayMinutes));
+  const hours = Math.floor(absMin / 60);
+  const mins = absMin % 60;
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(mins).padStart(2, '0');
+
+  if (absMin === 0) {
+    return '00:00';
+  }
+  if (!withSign) {
+    return `${hh}:${mm}`;
+  }
+  const sign = isEarly ? '-' : '+';
+  return `${sign}${hh}:${mm}`;
+}
+
+/**
+ * Formats delay in minutes to a clean, compact badge label in HH:MM (e.g. "+01:21", "+00:25", "-01:15", "On Time")
  */
 export function formatDelayShort(delayMinutes: number): string {
   if (isNaN(delayMinutes) || (delayMinutes <= 5 && delayMinutes >= -5)) {
     return 'On Time';
   }
-
-  const isEarly = delayMinutes < 0;
-  const absMin = Math.abs(delayMinutes);
-  const sign = isEarly ? '-' : '+';
-
-  if (absMin < 60) {
-    return `${sign}${absMin}m`;
-  }
-
-  const hours = Math.floor(absMin / 60);
-  const remainderMins = absMin % 60;
-
-  if (remainderMins === 0) {
-    return `${sign}${hours}h`;
-  }
-
-  return `${sign}${hours}h ${remainderMins}m`;
+  return formatDelayHhMm(delayMinutes, true);
 }
 
 /**
