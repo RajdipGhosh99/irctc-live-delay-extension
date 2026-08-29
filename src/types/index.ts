@@ -55,6 +55,7 @@ export interface MultiProviderSettings {
   activeProvider: ProviderId;
   autoFailover: boolean;
   fetchOnHover: boolean;
+  autoFetchAllTrains?: boolean;      // Auto-fetch status for all trains on search result pages
   cacheTtlMinutes: number;
   showFloatingHUD: boolean;
   providers: Record<ProviderId, ProviderConfig>;

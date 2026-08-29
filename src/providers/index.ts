@@ -50,6 +50,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   activeProvider: 'rapidapi-irctc1',
   autoFailover: true,
   fetchOnHover: false,
+  autoFetchAllTrains: false,
   cacheTtlMinutes: 15,
   showFloatingHUD: true,
   schemaVersion: '1.5.0-iso',

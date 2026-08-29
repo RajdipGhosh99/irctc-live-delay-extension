@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sitesGrid = document.getElementById('sites-grid') as HTMLElement;
   const primaryProviderSelect = document.getElementById('primary-provider-select') as HTMLSelectElement;
   const autoFailoverSwitch = document.getElementById('auto-failover-switch') as HTMLInputElement;
+  const autoFetchAllSwitch = document.getElementById('auto-fetch-all-switch') as HTMLInputElement;
   const cacheTtlSelect = document.getElementById('cache-ttl-select') as HTMLSelectElement;
   const showHudSwitch = document.getElementById('show-hud-switch') as HTMLInputElement;
   const saveAllBtn = document.getElementById('save-all-btn') as HTMLButtonElement;
@@ -491,6 +492,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     masterSwitch.checked = settings.extensionEnabled !== false;
     primaryProviderSelect.value = settings.activeProvider || 'rapidapi-irctc1';
     autoFailoverSwitch.checked = settings.autoFailover !== false;
+    if (autoFetchAllSwitch) autoFetchAllSwitch.checked = settings.autoFetchAllTrains === true;
     cacheTtlSelect.value = `${settings.cacheTtlMinutes || 15}`;
     showHudSwitch.checked = settings.showFloatingHUD !== false;
 
@@ -532,6 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       sitePositions,
       activeProvider: primaryProviderSelect.value as ProviderId,
       autoFailover: autoFailoverSwitch.checked,
+      autoFetchAllTrains: autoFetchAllSwitch ? autoFetchAllSwitch.checked : false,
       fetchOnHover: false,
       cacheTtlMinutes: parseInt(cacheTtlSelect.value, 10) || 15,
       showFloatingHUD: showHudSwitch.checked,

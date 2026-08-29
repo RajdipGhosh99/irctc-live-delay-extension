@@ -69,6 +69,7 @@ async function getStoredSettings(): Promise<MultiProviderSettings> {
       activeProvider: saved.activeProvider || DEFAULT_SETTINGS.activeProvider,
       autoFailover: saved.autoFailover !== undefined ? saved.autoFailover : DEFAULT_SETTINGS.autoFailover,
       fetchOnHover: false,
+      autoFetchAllTrains: saved.autoFetchAllTrains !== undefined ? saved.autoFetchAllTrains : DEFAULT_SETTINGS.autoFetchAllTrains,
       cacheTtlMinutes: saved.cacheTtlMinutes || DEFAULT_SETTINGS.cacheTtlMinutes,
       showFloatingHUD: saved.showFloatingHUD !== undefined ? saved.showFloatingHUD : DEFAULT_SETTINGS.showFloatingHUD,
       schemaVersion: '1.5.0-iso',

@@ -14,6 +14,9 @@ import { formatIsoHumanTime, formatDelayShort, formatDelayHhMm } from '../utils/
 document.addEventListener('DOMContentLoaded', async () => {
   const globalStatusBadge = document.getElementById('global-status-badge') as HTMLElement;
   const popupMasterSwitch = document.getElementById('popup-master-switch') as HTMLInputElement;
+  const popupAutoFetchSwitch = document.getElementById('popup-auto-fetch-switch') as HTMLInputElement;
+  const autoFetchToggleText = document.getElementById('auto-fetch-toggle-text') as HTMLElement;
+  const fetchPageTrainsBtn = document.getElementById('fetch-page-trains-btn') as HTMLButtonElement;
   const masterToggleText = document.getElementById('master-toggle-text') as HTMLElement;
   const currentSiteLabel = document.getElementById('current-site-label') as HTMLElement;
   const siteToggleBtn = document.getElementById('site-toggle-btn') as HTMLButtonElement;
@@ -76,6 +79,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isGlobalActive = loadedSettings.extensionEnabled !== false;
     popupMasterSwitch.checked = isGlobalActive;
 
+    const isAutoFetch = loadedSettings.autoFetchAllTrains === true;
+    if (popupAutoFetchSwitch) popupAutoFetchSwitch.checked = isAutoFetch;
+    if (autoFetchToggleText) {
+      autoFetchToggleText.textContent = isAutoFetch ? 'Auto-fetching all visible trains' : 'Click-to-fetch (On-demand)';
+    }
+
     if (isGlobalActive) {
       globalStatusBadge.textContent = 'Active ✅';
       globalStatusBadge.className = 'badge badge-active';
@@ -101,6 +110,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadState();
       }
     );
+  });
+
+  // Auto-Fetch Switch Toggle
+  popupAutoFetchSwitch?.addEventListener('change', () => {
+    const autoFetch = popupAutoFetchSwitch.checked;
+    chrome.runtime.sendMessage(
+      {
+        type: 'SAVE_SETTINGS',
+        payload: { autoFetchAllTrains: autoFetch },
+      } as ExtensionMessage,
+      () => {
+        loadState();
+      }
+    );
+  });
+
+  // Fetch All Statuses on Current Tab Button
+  fetchPageTrainsBtn?.addEventListener('click', () => {
+    fetchPageTrainsBtn.disabled = true;
+    fetchPageTrainsBtn.textContent = '⏳ Batch Fetching...';
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { type: 'AUTO_FETCH_PAGE_TRAINS', forceRefresh: true },
+          (res) => {
+            fetchPageTrainsBtn.disabled = false;
+            fetchPageTrainsBtn.textContent = res?.count ? `✅ Fetched ${res.count} Trains!` : '✅ Triggered!';
+            setTimeout(() => {
+              fetchPageTrainsBtn.textContent = '⚡ Fetch All Statuses on Current Tab';
+            }, 2500);
+            loadState();
+          }
+        );
+      } else {
+        fetchPageTrainsBtn.disabled = false;
+        fetchPageTrainsBtn.textContent = '⚡ Fetch All Statuses on Current Tab';
+      }
+    });
   });
 
   // Current Site Toggle

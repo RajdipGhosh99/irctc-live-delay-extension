@@ -16,6 +16,7 @@ const destroy$ = new Subject<void>();
 
 let isExtensionEnabled = true;
 let isSiteEnabled = true;
+let isAutoFetchAll = false;
 let currentSitePosition: BadgePosition = 'beside-name';
 const currentHostname = window.location.hostname.toLowerCase();
 
@@ -27,9 +28,37 @@ interface InjectedWidget {
   badge: HTMLElement;
   popover: HTMLElement;
   trainNumber: string;
+  hasFetched: boolean;
   fetchStatus: (forceRefresh?: boolean) => Promise<void>;
 }
 const activeWidgets = new Map<string, InjectedWidget>();
+
+let isBatchFetching = false;
+let autoFetchDebounceTimer: any = null;
+
+/**
+ * Batches and fetches live running status for all detected train cards on the page
+ */
+async function autoFetchAllPageTrains(forceRefresh = false) {
+  if (isBatchFetching) return;
+  isBatchFetching = true;
+
+  try {
+    const list = Array.from(activeWidgets.values());
+    for (let i = 0; i < list.length; i++) {
+      const widget = list[i];
+      if (forceRefresh || !widget.hasFetched) {
+        widget.fetchStatus(forceRefresh);
+        if (i < list.length - 1) {
+          // Stagger by 220ms for smooth non-blocking execution
+          await new Promise((res) => setTimeout(res, 220));
+        }
+      }
+    }
+  } finally {
+    isBatchFetching = false;
+  }
+}
 
 /**
  * Creates an RxJS Observable wrapping DOM MutationObserver
@@ -295,18 +324,23 @@ function injectAutoWelcomeHUD() {
         </div>
         <div class="irctc-hud-body" aria-live="polite">
           <div id="irctc-hud-status-text">
-            💡 <strong>On-Demand Mode:</strong> Click any <strong>[Check ↻]</strong> button beside a train name to fetch live status. Zero automatic calls on hover.
+            ${isAutoFetchAll
+              ? '⚡ <strong>Auto-Fetch Active:</strong> Live delay status and delay analytics are automatically loading for all trains on this page.'
+              : '💡 <strong>Live Delay Ready:</strong> Click any <strong>[Check ↻]</strong> button beside a train name, or click <strong>Fetch All</strong> to load all trains.'}
           </div>
           <div class="irctc-hud-status-badge">
-            <span>●</span> Zero Automatic Calls • 100% On-Demand
+            <span>●</span> ${isAutoFetchAll ? '⚡ Auto-Fetch Enabled' : '100% On-Demand'}
           </div>
         </div>
         <div class="irctc-hud-actions">
-          <button class="irctc-hud-btn-primary" id="irctc-hud-config-btn" type="button" aria-label="Open Token Settings Dashboard">
-            ⚙️ Token Settings
+          <button class="irctc-hud-btn-primary" id="irctc-hud-fetch-all-btn" type="button" aria-label="Fetch live delay for all trains on this page" style="background: #0284c7;">
+            ⚡ Fetch All (${activeWidgets.size})
+          </button>
+          <button class="irctc-hud-btn-secondary" id="irctc-hud-config-btn" type="button" aria-label="Open Token Settings Dashboard">
+            ⚙️ Settings
           </button>
           <button class="irctc-hud-btn-secondary" id="irctc-hud-gotit-btn" type="button" aria-label="Acknowledge HUD">
-            Got it
+            ✕
           </button>
         </div>
         <div class="irctc-hud-dev-footer">
@@ -326,6 +360,25 @@ function injectAutoWelcomeHUD() {
       e.stopPropagation();
       e.preventDefault();
       hudWrapper.remove();
+    });
+
+    hudWrapper.querySelector('#irctc-hud-fetch-all-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const btn = hudWrapper.querySelector<HTMLButtonElement>('#irctc-hud-fetch-all-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Fetching...';
+      }
+      autoFetchAllPageTrains(true).then(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = `✅ Fetched (${activeWidgets.size})`;
+          setTimeout(() => {
+            if (btn) btn.textContent = `⚡ Fetch All (${activeWidgets.size})`;
+          }, 2500);
+        }
+      });
     });
 
     hudWrapper.querySelector('#irctc-hud-config-btn')?.addEventListener('click', (e) => {
@@ -562,6 +615,9 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
       }
     } finally {
       wrapper.classList.remove('irctc-refreshing');
+      if (widget) {
+        widget.hasFetched = hasFetchedOnce;
+      }
     }
   };
 
@@ -631,6 +687,7 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
     badge,
     popover,
     trainNumber,
+    hasFetched: false,
     fetchStatus,
   };
 
@@ -648,6 +705,7 @@ function processTrainCards() {
     '.train-name, .trainName, .train-number, .trainNumber, [data-cy*="train"], [data-testid*="train"], .single-train-detail, .train-heading strong, .railway-train-name, .boldFont.font16'
   );
 
+  let newInjected = false;
   candidateElements.forEach((el) => {
     if (processedElements.has(el)) return;
     if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
@@ -658,8 +716,16 @@ function processTrainCards() {
     if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
       processedElements.add(el);
       injectDelayWidget(el, trainNumber, currentSitePosition);
+      newInjected = true;
     }
   });
+
+  if (newInjected && isAutoFetchAll) {
+    if (autoFetchDebounceTimer) clearTimeout(autoFetchDebounceTimer);
+    autoFetchDebounceTimer = setTimeout(() => {
+      autoFetchAllPageTrains(false);
+    }, 450);
+  }
 }
 
 /**
@@ -671,6 +737,7 @@ async function init() {
     if (settingsRes && settingsRes.success && settingsRes.data) {
       const settings: any = settingsRes.data;
       isExtensionEnabled = settings.extensionEnabled !== false;
+      isAutoFetchAll = settings.autoFetchAllTrains === true;
 
       const disabledSites: string[] = settings.disabledSites || [];
       isSiteEnabled = !disabledSites.some((disabled) => currentHostname.includes(disabled.toLowerCase()));
@@ -702,12 +769,26 @@ async function init() {
         processTrainCards();
       });
 
-    // 3. Listen for dynamic settings updates from Options dashboard
+    // 3. Listen for message from Popup to trigger batch page fetch
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+      if (message.type === 'AUTO_FETCH_PAGE_TRAINS') {
+        console.log('[Content] 🚀 Triggering batch fetch for all trains on page...');
+        autoFetchAllPageTrains(message.forceRefresh ?? false).then(() => {
+          sendResponse({ success: true, count: activeWidgets.size });
+        });
+        return true; // Keep channel open for async response
+      }
+    });
+
+    // 4. Listen for dynamic settings updates from Options dashboard
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === 'local' && changes['irctc_delay_multi_settings']) {
         const newSettings = changes['irctc_delay_multi_settings'].newValue;
         if (newSettings) {
           isExtensionEnabled = newSettings.extensionEnabled !== false;
+          const wasAutoFetch = isAutoFetchAll;
+          isAutoFetchAll = newSettings.autoFetchAllTrains === true;
+
           const disabledSites: string[] = newSettings.disabledSites || [];
           isSiteEnabled = !disabledSites.some((disabled: string) => currentHostname.includes(disabled.toLowerCase()));
 
@@ -724,6 +805,9 @@ async function init() {
             removeAllInjectedUI();
           } else {
             processTrainCards();
+            if (!wasAutoFetch && isAutoFetchAll) {
+              autoFetchAllPageTrains(false);
+            }
           }
         }
       }
