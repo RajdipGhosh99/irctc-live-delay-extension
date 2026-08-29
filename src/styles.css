@@ -199,12 +199,14 @@
   color: #1e293b !important;
   z-index: 10000 !important;
   opacity: 0 !important;
+  display: none !important;
   pointer-events: none !important;
   transform: translateY(-4px) scale(0.97) !important;
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.irctc-delay-wrapper:hover .irctc-delay-popover,
+/* Only display popover on hover when data has been fetched or during active refresh */
+.irctc-delay-wrapper.has-data:hover .irctc-delay-popover,
 .irctc-delay-wrapper.irctc-refreshing .irctc-delay-popover,
 .irctc-delay-wrapper.irctc-pinned .irctc-delay-popover {
   opacity: 1 !important;

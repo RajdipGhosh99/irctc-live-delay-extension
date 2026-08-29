@@ -363,31 +363,39 @@ function updateBadgeUI(
   badge.setAttribute('aria-live', 'polite');
 
   if (state === 'idle') {
+    wrapper.classList.remove('has-data');
     badge.setAttribute('aria-label', `Check Live Delay for train number ${trainNumber}`);
     badge.innerHTML = `<span aria-hidden="true">🚆</span><span>Check</span><span class="irctc-badge-reload-icon" title="Click to fetch live delay" aria-hidden="true">↻</span>`;
+    popover.innerHTML = '';
     popover.style.display = 'none';
   } else if (state === 'no-key') {
+    wrapper.classList.remove('has-data');
     badge.setAttribute('aria-label', 'Add free API key to view delay');
     badge.innerHTML = `<span aria-hidden="true">🔑</span><span>Add Key</span>`;
+    popover.innerHTML = '';
     popover.style.display = 'none';
   } else if (state === 'loading') {
     badge.setAttribute('aria-label', 'Fetching live delay status...');
     badge.innerHTML = `<span class="irctc-delay-spinner" aria-hidden="true"></span><span>...</span>`;
     // If refreshing an already open popover, do NOT hide it!
     if (!isRefreshingInPlace) {
+      wrapper.classList.remove('has-data');
       popover.style.display = 'none';
     }
   } else if (state === 'on-time' && data) {
+    wrapper.classList.add('has-data');
     const label = formatDelayShort(data.delayMinutes);
     badge.setAttribute('aria-label', `Train ${trainNumber} is ${data.statusSummary}`);
     badge.innerHTML = `<span aria-hidden="true">⏱</span><span>${label}</span><span class="irctc-badge-reload-icon" title="Refresh Live Delay" aria-hidden="true">↻</span>`;
     renderPopover(popover, trainNumber, data, providerUsed, travelDate);
   } else if (state === 'delayed' && data) {
+    wrapper.classList.add('has-data');
     const label = formatDelayShort(data.delayMinutes);
     badge.setAttribute('aria-label', `Train ${trainNumber} is delayed by ${data.statusSummary}`);
     badge.innerHTML = `<span aria-hidden="true">⏱</span><span>${label}</span><span class="irctc-badge-reload-icon" title="Refresh Live Delay" aria-hidden="true">↻</span>`;
     renderPopover(popover, trainNumber, data, providerUsed, travelDate);
   } else if (state === 'error') {
+    wrapper.classList.add('has-data');
     const isQuota = errorMessage?.includes('Quota') || errorMessage?.includes('quota') || errorMessage?.includes('RATE_LIMIT') || errorMessage?.includes('429');
     badge.setAttribute('aria-label', isQuota ? 'API quota limit reached' : 'Error fetching train delay');
     badge.innerHTML = `<span aria-hidden="true">⚠️</span><span>${isQuota ? 'Quota Full' : 'Retry'}</span><span class="irctc-badge-reload-icon" aria-hidden="true">↻</span>`;
