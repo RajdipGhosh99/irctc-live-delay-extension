@@ -171,7 +171,7 @@ function extractTrainNumber(text: string): string | null {
  */
 function findCardContainer(element: HTMLElement): HTMLElement {
   const specificCard = element.closest<HTMLElement>(
-    '.single-train-detail, app-train-avl-enq, .train-card, .rail-card, .railway-card, [data-cy*="trainCard"], [data-testid*="train-card"], .train-box, .trainItem, .train-item, tr'
+    '.single-train-detail, app-train-avl-enq, .train-card, .rail-card, .railway-card, [data-cy*="trainCard"], [data-testid*="train-card"], .train-box, .trainItem, .train-item, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .card-train, .train-details, tr, .card'
   );
   if (specificCard) return specificCard;
 
@@ -184,7 +184,7 @@ function findCardContainer(element: HTMLElement): HTMLElement {
       break;
     }
 
-    if (curr.offsetHeight >= 45 && curr.offsetWidth >= 200) {
+    if (curr.offsetHeight >= 40 && curr.offsetWidth >= 180) {
       return curr;
     }
     curr = curr.parentElement;
@@ -206,7 +206,9 @@ function findTrainNameAnchor(card: HTMLElement, fallbackEl: HTMLElement): HTMLEl
   }
 
   if (currentHostname.includes('confirmtkt')) {
-    const ctName = card.querySelector<HTMLElement>('.train-name, .train-title, h3, h4, .train-name-cntnr');
+    const ctName = card.querySelector<HTMLElement>(
+      '.train-name, .train-title, h3, h4, .train-name-cntnr, [class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainTitle" i], [class*="trainHeader" i], [class*="trainNumber" i], .train-no, .train-info, [class*="train_name" i]'
+    );
     if (ctName) return ctName;
   }
 
@@ -216,7 +218,7 @@ function findTrainNameAnchor(card: HTMLElement, fallbackEl: HTMLElement): HTMLEl
   }
 
   const generalName = card.querySelector<HTMLElement>(
-    '.train-name, .trainName, .train_name, .train-title, [class*="train-name"], [class*="trainName"]'
+    '.train-name, .trainName, .train_name, .train-title, [class*="train-name" i], [class*="trainName" i], [class*="trainTitle" i], [class*="train-title" i], h3, h4'
   );
   if (generalName) return generalName;
 
@@ -366,6 +368,7 @@ function isTrainSearchPage(): boolean {
   const href = window.location.href.toLowerCase();
 
   if (
+    currentHostname.includes('confirmtkt') ||
     path.includes('train-list') ||
     path.includes('train_list') ||
     path.includes('train-search') ||
@@ -374,6 +377,8 @@ function isTrainSearchPage(): boolean {
     path.includes('booking') ||
     path.includes('train-schedule') ||
     path.includes('train_running_status') ||
+    path.includes('rrs') ||
+    path.includes('seat-availability') ||
     path.includes('eticket') ||
     path.includes('nget') ||
     href.includes('train') ||
@@ -1035,7 +1040,17 @@ function processTrainCards() {
   if (!isExtensionEnabled || !isSiteEnabled) return;
 
   const candidateElements = document.querySelectorAll<HTMLElement>(
-    '.train-name, .trainName, .train-number, .trainNumber, [data-cy*="train"], [data-testid*="train"], .single-train-detail, .train-heading, .train-heading strong, .railway-train-name, .boldFont.font16, app-train-avl-enq, tr'
+    // General & Vendor Specific Train Selectors
+    '.train-name, .trainName, .train-number, .trainNumber, .train-title, .trainTitle, .train-name-cntnr, ' +
+    '[class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainNumber" i], [class*="trainTitle" i], [class*="trainHeader" i], ' +
+    // Makemytrip Selectors
+    '[data-cy*="train"], [data-testid*="train"], .railway-train-name, .boldFont.font16, ' +
+    // ConfirmTkt Selectors
+    '.train-item, .train-card, .card-train, .train-details, .train_item, .train_card, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .train-info-section, .train-block, ' +
+    // IRCTC Selectors
+    '.single-train-detail, .train-heading, .train-heading strong, app-train-avl-enq, tr, ' +
+    // Universal Heading & Data Attribute Matchers
+    'h3, h4, h5, [data-train-number], [data-train-no]'
   );
 
   candidateElements.forEach((el) => {
