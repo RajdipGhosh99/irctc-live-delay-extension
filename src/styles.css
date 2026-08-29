@@ -182,20 +182,21 @@
   color: #92400e !important;
 }
 
-/* Floating Glassmorphism Popover Tooltip */
+/* Floating Glassmorphism Popover Tooltip (Expanded 320px Width) */
 .irctc-delay-popover {
   position: absolute !important;
-  top: calc(100% + 5px) !important;
+  top: calc(100% + 6px) !important;
   left: 0 !important;
-  width: 250px !important;
-  padding: 10px 12px !important;
+  width: 320px !important;
+  max-width: 92vw !important;
+  padding: 12px 14px !important;
   background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: var(--irctc-glass-blur) !important;
   -webkit-backdrop-filter: var(--irctc-glass-blur) !important;
   border: 1px solid var(--irctc-glass-border) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16) !important;
-  font-size: 11px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  font-size: 11.5px !important;
   color: #1e293b !important;
   z-index: 10000 !important;
   opacity: 0 !important;
@@ -203,6 +204,7 @@
   pointer-events: none !important;
   transform: translateY(-4px) scale(0.97) !important;
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
 }
 
 /* Only display popover on hover when data has been fetched or during active refresh */
@@ -219,25 +221,25 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  margin-bottom: 6px !important;
+  margin-bottom: 8px !important;
   border-bottom: 1px solid #f1f5f9 !important;
-  padding-bottom: 4px !important;
+  padding-bottom: 6px !important;
 }
 
 .irctc-delay-popover-title {
   font-weight: 700 !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   color: #0f172a !important;
 }
 
 .irctc-delay-source-tag {
-  font-size: 9px !important;
-  padding: 2px 5px !important;
+  font-size: 9.5px !important;
+  padding: 2px 6px !important;
   border-radius: 4px !important;
   background: #f1f5f9 !important;
   color: #475569 !important;
   font-weight: 600 !important;
-  max-width: 130px !important;
+  max-width: 140px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -247,10 +249,10 @@
 .irctc-delay-stats-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  gap: 5px !important;
-  margin: 6px 0 8px 0 !important;
+  gap: 6px !important;
+  margin: 6px 0 10px 0 !important;
   background: #f8fafc !important;
-  padding: 6px !important;
+  padding: 7px 6px !important;
   border-radius: 8px !important;
   border: 1px solid #e2e8f0 !important;
 }
@@ -261,22 +263,23 @@
   align-items: center !important;
   text-align: center !important;
   background: #ffffff !important;
-  padding: 4px 2px !important;
+  padding: 6px 4px !important;
   border-radius: 6px !important;
   border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
 }
 
 .irctc-stat-title {
   font-size: 8.5px !important;
   color: #64748b !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.2px !important;
-  margin-bottom: 2px !important;
+  letter-spacing: 0.3px !important;
+  margin-bottom: 3px !important;
 }
 
 .irctc-stat-val {
-  font-size: 11.5px !important;
+  font-size: 12.5px !important;
   font-weight: 800 !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   color: #0f172a !important;
@@ -284,9 +287,9 @@
 }
 
 .irctc-stat-sub {
-  font-size: 8px !important;
+  font-size: 8.5px !important;
   color: #94a3b8 !important;
-  margin-top: 2px !important;
+  margin-top: 3px !important;
 }
 
 .irctc-delay-popover-row {

@@ -103,19 +103,20 @@ function findCardContainer(element: HTMLElement): HTMLElement {
  */
 function findTrainNameAnchor(card: HTMLElement, fallbackEl: HTMLElement): HTMLElement {
   if (currentHostname.includes('makemytrip')) {
+    // MMT specific selectors for train name
     const mmtName = card.querySelector<HTMLElement>(
-      '.train-name, [data-cy="trainName"], .railway-train-name, .trainName, .boldFont.font16, .train-name-wrap span:first-child'
+      '.train-name-wrap .boldFont, [data-cy="trainName"], .train-name, .railway-train-name, .trainName, .boldFont.font16, .train-name-wrap span:first-child'
     );
     if (mmtName) return mmtName;
   }
 
   if (currentHostname.includes('confirmtkt')) {
-    const ctName = card.querySelector<HTMLElement>('.train-name, .train-title, h3, h4');
+    const ctName = card.querySelector<HTMLElement>('.train-name, .train-title, h3, h4, .train-name-cntnr');
     if (ctName) return ctName;
   }
 
   if (currentHostname.includes('irctc')) {
-    const irctcName = card.querySelector<HTMLElement>('.train-heading strong, .form-group strong');
+    const irctcName = card.querySelector<HTMLElement>('.train-heading strong, .form-group strong, .train-name');
     if (irctcName) return irctcName;
   }
 
@@ -614,8 +615,11 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
       nameAnchor.parentElement?.appendChild(wrapper);
     }
   } else {
-    // Default: 'beside-name'
-    if (nameAnchor && nameAnchor !== targetElement) {
+    // Default: 'beside-name' -> Placed directly beside the Train Name text on the exact same row
+    if (nameAnchor) {
+      nameAnchor.style.display = 'inline-flex';
+      nameAnchor.style.alignItems = 'center';
+      nameAnchor.style.flexWrap = 'nowrap';
       nameAnchor.appendChild(wrapper);
     } else {
       targetElement.appendChild(wrapper);
