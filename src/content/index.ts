@@ -1027,6 +1027,15 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
         headingContainer.style.display = 'inline-flex';
         headingContainer.style.alignItems = 'center';
         headingContainer.appendChild(wrapper);
+      } else if (currentVendorId === 'confirmtkt') {
+        // ConfirmTkt React layout: Insert adjacent to train title without disturbing flex/grid
+        if (nameAnchor.nextSibling) {
+          nameAnchor.parentNode?.insertBefore(wrapper, nameAnchor.nextSibling);
+        } else if (nameAnchor.parentElement) {
+          nameAnchor.parentElement.appendChild(wrapper);
+        } else {
+          nameAnchor.appendChild(wrapper);
+        }
       } else {
         nameAnchor.style.display = 'inline-flex';
         nameAnchor.style.alignItems = 'center';
@@ -1060,18 +1069,19 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
 function processTrainCards() {
   if (!isExtensionEnabled || !isSiteEnabled) return;
 
+  // 1. Primary Targeted Query
   const candidateElements = document.querySelectorAll<HTMLElement>(
     // General & Vendor Specific Train Selectors
     '.train-name, .trainName, .train-number, .trainNumber, .train-title, .trainTitle, .train-name-cntnr, ' +
-    '[class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainNumber" i], [class*="trainTitle" i], [class*="trainHeader" i], ' +
+    '[class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainNumber" i], [class*="trainTitle" i], [class*="trainHeader" i], [class*="train_name" i], [class*="train_number" i], ' +
     // Makemytrip Selectors
     '[data-cy*="train"], [data-testid*="train"], .railway-train-name, .boldFont.font16, ' +
-    // ConfirmTkt Selectors
-    '.train-item, .train-card, .card-train, .train-details, .train_item, .train_card, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .train-info-section, .train-block, ' +
+    // ConfirmTkt Selectors (supports /rbooking/ and /rrs/)
+    '.train-item, .train-card, .card-train, .train-details, .train_item, .train_card, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .train-info-section, .train-block, [class*="trainBlock" i], [class*="trainDetails" i], [class*="TrainCard" i], [class*="TrainItem" i], ' +
     // IRCTC Selectors
     '.single-train-detail, .train-heading, .train-heading strong, app-train-avl-enq, tr, ' +
     // Universal Heading & Data Attribute Matchers
-    'h3, h4, h5, [data-train-number], [data-train-no]'
+    'h3, h4, h5, [data-train-number], [data-train-no], [data-trainno]'
   );
 
   candidateElements.forEach((el) => {
@@ -1086,6 +1096,31 @@ function processTrainCards() {
       injectDelayWidget(el, trainNumber, currentSitePosition);
     }
   });
+
+  // 2. Secondary Pass for ConfirmTkt / React Dynamic SPAs: Search any card with 5-digit train numbers
+  if (activeWidgets.size === 0 || currentHostname.includes('confirmtkt')) {
+    const allCards = document.querySelectorAll<HTMLElement>(
+      'div[class*="card" i], div[class*="item" i], div[class*="row" i], div[class*="container" i], article, section, li'
+    );
+    allCards.forEach((card) => {
+      if (processedElements.has(card)) return;
+      if (card.querySelector('.irctc-delay-wrapper') || card.closest('.irctc-delay-wrapper') || card.closest('#irctc-live-hud')) return;
+
+      const text = card.innerText || card.textContent || '';
+      const trainNumber = extractTrainNumber(text, card);
+      if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
+        const specificEl = card.querySelector<HTMLElement>(
+          'h3, h4, h5, p, span, div[class*="title" i], div[class*="name" i], div[class*="header" i]'
+        ) || card;
+
+        if (!processedElements.has(specificEl) && !specificEl.querySelector('.irctc-delay-wrapper')) {
+          processedElements.add(card);
+          processedElements.add(specificEl);
+          injectDelayWidget(specificEl, trainNumber, currentSitePosition);
+        }
+      }
+    });
+  }
 
   if (isAutoFetchAll) {
     enqueueAutoFetch();
