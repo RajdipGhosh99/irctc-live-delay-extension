@@ -812,9 +812,9 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
         </div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title" title="Average delay on ${dayOfWeekName}s over past 4 weeks">📊 4W ${dayOfWeekName} Avg</div>
+        <div class="irctc-stat-title" title="Historical average delay on ${dayOfWeekName}s over past 4 weeks">📊 Today Avg</div>
         <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
-        <div class="irctc-stat-sub">${dayOfWeekName}s Pattern</div>
+        <div class="irctc-stat-sub">Last 4 Weeks</div>
       </div>
       <div class="irctc-stat-box">
         <div class="irctc-stat-title" title="Overall 30-day average delay and punctuality">📈 30-Day Avg</div>

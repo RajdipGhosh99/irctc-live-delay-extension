@@ -239,9 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div style="font-size: 7.5px; color: ${d.isOnTime ? '#15803d' : '#b91c1c'}; font-weight: 700;">${d.isOnTime ? 'On Time' : `${d.delayMinutes}m Late`}</div>
               </div>
               <div style="background: #fff; padding: 4px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
-                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📊 4W Day Avg</div>
+                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📊 Today Avg</div>
                 <div style="font-size: 11.5px; font-weight: 800; color: #0284c7; font-family: monospace;">${avgTodayHhMm}</div>
-                <div style="font-size: 7.5px; color: #94a3b8;">Day Pattern</div>
+                <div style="font-size: 7.5px; color: #94a3b8;">Last 4 Weeks</div>
               </div>
               <div style="background: #fff; padding: 4px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
                 <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📈 30-Day Avg</div>
