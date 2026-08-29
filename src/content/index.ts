@@ -304,14 +304,34 @@ function extractTravelDateFromUI(card?: HTMLElement): string | undefined {
   return undefined;
 }
 
+function isExtensionContextValid(): boolean {
+  try {
+    return typeof chrome !== 'undefined' && Boolean(chrome.runtime && chrome.runtime.id);
+  } catch {
+    return false;
+  }
+}
+
 function sendMessageToBackground(message: ExtensionMessage): Promise<any> {
   return new Promise((resolve) => {
+    if (!isExtensionContextValid()) {
+      resolve({
+        success: false,
+        error: 'Extension was reloaded. Please refresh this page.',
+        isContextInvalid: true,
+      });
+      return;
+    }
+
     try {
       chrome.runtime.sendMessage(message, (response) => {
         if (chrome.runtime.lastError) {
+          const rawErr = chrome.runtime.lastError.message || '';
+          const isInvalid = rawErr.includes('context invalidated') || rawErr.includes('Extension reloaded');
           resolve({
             success: false,
-            error: chrome.runtime.lastError.message || 'Extension context invalidated. Please refresh the page.',
+            error: isInvalid ? 'Extension was reloaded. Please refresh this page.' : rawErr,
+            isContextInvalid: isInvalid,
           });
           return;
         }
@@ -320,7 +340,8 @@ function sendMessageToBackground(message: ExtensionMessage): Promise<any> {
     } catch (err) {
       resolve({
         success: false,
-        error: err instanceof Error ? err.message : 'Message dispatch failed',
+        error: 'Extension was reloaded. Please refresh this page.',
+        isContextInvalid: true,
       });
     }
   });
@@ -568,7 +589,29 @@ function updateBadgeUI(
     renderPopover(popover, trainNumber, data, providerUsed, travelDate);
   } else if (state === 'error') {
     wrapper.classList.add('has-data');
+    const isContextInvalid = errorMessage?.includes('reloaded') || errorMessage?.includes('context invalidated');
     const isQuota = errorMessage?.includes('Quota') || errorMessage?.includes('quota') || errorMessage?.includes('RATE_LIMIT') || errorMessage?.includes('429');
+
+    if (isContextInvalid) {
+      badge.setAttribute('aria-label', 'Extension reloaded. Click to refresh page.');
+      badge.innerHTML = `<span aria-hidden="true">🔄</span><span>Reload Page</span>`;
+      popover.innerHTML = `
+        <div class="irctc-delay-popover-header">
+          <span class="irctc-delay-popover-title">🔄 Extension Updated</span>
+        </div>
+        <div class="irctc-delay-val" style="color: #0284c7; font-size: 11.5px; text-align: left; margin: 6px 0; line-height: 1.4;">
+          The extension was updated in the background.<br/>Please refresh this browser tab to activate live tracking.
+        </div>
+        <div class="irctc-popover-btn-row">
+          <button class="irctc-delay-refresh-btn" type="button" onclick="window.location.reload()" style="background: #0284c7; color: white;">
+            🔄 Refresh Tab Now
+          </button>
+        </div>
+      `;
+      popover.style.display = 'block';
+      return;
+    }
+
     badge.setAttribute('aria-label', isQuota ? 'API quota limit reached' : 'Error fetching train delay');
     badge.innerHTML = `<span aria-hidden="true">⚠️</span><span>${isQuota ? 'Quota Full' : 'Retry'}</span><span class="irctc-badge-reload-icon" aria-hidden="true">↻</span>`;
     popover.innerHTML = `
