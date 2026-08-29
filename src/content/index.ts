@@ -693,30 +693,24 @@ function shortenLiveLocation(raw: string): string {
   // 1. Remove redundant trailing delay text like ". Delay: 01:21", ". Late: 15 Mins", etc.
   str = str.replace(/[\.\,]\s*(?:Delay|Late|Delayed|Running\s*late)[\:\s]*.*$/i, '').trim();
 
-  // 2. Shorten "Arrived at STATION(CODE) at TIME" -> "Arr @ CODE (TIME)" or "Arr @ STATION (TIME)"
-  const arrMatch = str.match(/Arrived\s+at\s+([A-Za-z0-9\s]+?)(?:\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
+  // 2. Format "Arrived at STATION(CODE) at TIME" -> "Arrived at STATION (TIME)"
+  const arrMatch = str.match(/Arrived\s+at\s+([A-Za-z0-9\s]+?)(?:\s*\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
   if (arrMatch) {
-    const code = arrMatch[2] || arrMatch[1].trim();
+    const stn = arrMatch[1].trim();
     const time = arrMatch[3];
-    return `Arr @ ${code} (${time})`;
+    return `Arrived at ${stn} (${time})`;
   }
 
-  // 3. Shorten "Departed from STATION(CODE) at TIME" -> "Dep @ CODE (TIME)" or "Dep @ STATION (TIME)"
-  const depMatch = str.match(/Departed\s+from\s+([A-Za-z0-9\s]+?)(?:\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
+  // 3. Format "Departed from STATION(CODE) at TIME" -> "Departed from STATION (TIME)"
+  const depMatch = str.match(/Departed\s+from\s+([A-Za-z0-9\s]+?)(?:\s*\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
   if (depMatch) {
-    const code = depMatch[2] || depMatch[1].trim();
+    const stn = depMatch[1].trim();
     const time = depMatch[3];
-    return `Dep @ ${code} (${time})`;
+    return `Departed from ${stn} (${time})`;
   }
 
-  // 4. Shorten general prefixes and station suffixes
-  str = str
-    .replace(/^Arrived\s+at\s+/i, 'Arr @ ')
-    .replace(/^Departed\s+from\s+/i, 'Dep @ ')
-    .replace(/^Passed\s+through\s+/i, 'Passed @ ')
-    .replace(/\s+JN\b/gi, ' Jn')
-    .replace(/\s+CANTT\b/gi, ' Cantt')
-    .replace(/\s+CENTRAL\b/gi, ' Ctrl');
+  // 4. Clean up "at TIME" suffix if present
+  str = str.replace(/\s+at\s+(\d{1,2}:\d{2})\b/i, ' ($1)');
 
   return str;
 }
