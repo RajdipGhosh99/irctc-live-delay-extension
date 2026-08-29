@@ -704,23 +704,30 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
 
   // 1. Live location & Next Platform strip
   let liveLocationSummary = '';
-  if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
+  if (data.statusSummary && /departed|arrived|passed|late|delay|in\s*transit/i.test(data.statusSummary)) {
+    liveLocationSummary = `📍 ${data.statusSummary}`;
+  } else if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started') {
     const nextPf = data.nextStationPlatform ? ` (${data.nextStationPlatform}${data.nextStationHaltMinutes ? ` • ${data.nextStationHaltMinutes}m stop` : ''})` : '';
     liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ Next: ${data.nextStationName}${nextPf}`;
-  } else if (data.currentStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
+  } else if (data.currentStationName && data.currentStationName !== 'Not Started') {
     liveLocationSummary = `📍 Current: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
-  } else if (data.statusSummary) {
+  } else if (data.statusSummary && !data.statusSummary.includes('Scheduled (Not Started Yet)')) {
     liveLocationSummary = `📍 ${data.statusSummary}`;
   } else {
-    liveLocationSummary = '📍 Not Started Yet';
+    liveLocationSummary = '📍 Not Started Yet (Origin)';
   }
 
   // 2. Route Progress Bar Text
   const progressPct = data.routeProgressPct ?? 0;
   const stopsLeft = data.remainingStationsCount !== undefined ? `${data.remainingStationsCount} stops left` : '';
-  const progressText = progressPct > 0
-    ? `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`
-    : '🏁 Trip Not Started Yet';
+  let progressText = '🏁 Trip Not Started Yet';
+  if (progressPct > 0) {
+    if (data.totalStations && data.totalStations > 0) {
+      progressText = `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`;
+    } else {
+      progressText = '🚆 Journey In Progress (Live)';
+    }
+  }
 
   // 3. Travel Intelligence & Delay Trend strip (Simple English)
   const trendText = data.delayTrendText || (data.isOnTime ? '🟢 Running on schedule' : '🟢 Steady pace');

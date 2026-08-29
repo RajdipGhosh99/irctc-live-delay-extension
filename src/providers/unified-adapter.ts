@@ -233,19 +233,29 @@ export function normalizeUnifiedTrainResponse(
   }
 
   // 5. Journey Started State & Station List Traversal
-  const isStarted = rawJson.data?.is_train_started !== false &&
-    rawJson.is_train_started !== false &&
-    rawJson.data?.train_start_date !== null;
-
   const stationList = extractStationList(rawJson);
+  const visitedStationsList = stationList.filter((s: any) =>
+    s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived ||
+    s.station_status === 'DEPARTED' || s.station_status === 'ARRIVED' ||
+    s.is_current || s.isCurrent
+  );
+
+  const isExplicitlyNotStarted =
+    rawJson.data?.is_train_started === false ||
+    rawJson.is_train_started === false ||
+    (irctcTrainPositionStr && /not\s*started\s*yet|yet\s*to\s*start|train\s*has\s*not\s*started/i.test(irctcTrainPositionStr));
+
+  const isStarted = !isExplicitlyNotStarted && (
+    rawJson.data?.is_train_started === true ||
+    rawJson.is_train_started === true ||
+    visitedStationsList.length > 0 ||
+    delayMinutes !== 0 ||
+    Boolean(irctcTrainPositionStr && /departed|arrived|passed|late|delay|in\s*transit/i.test(irctcTrainPositionStr)) ||
+    Boolean(currentStationName && currentStationName !== 'Not Started' && currentStationName !== 'Origin')
+  );
+
   if (stationList.length > 0) {
-    // Find active / visited stations
-    const visited = stationList.filter((s: any) =>
-      s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived ||
-      s.station_status === 'DEPARTED' || s.station_status === 'ARRIVED' ||
-      s.is_current || s.isCurrent
-    );
-    const activeStn = visited.length > 0 ? visited[visited.length - 1] : stationList[0];
+    const activeStn = visitedStationsList.length > 0 ? visitedStationsList[visitedStationsList.length - 1] : stationList[0];
 
     if (activeStn) {
       if (!currentStationName || currentStationName === 'En Route' || currentStationName === 'Not Started') {
@@ -304,16 +314,14 @@ export function normalizeUnifiedTrainResponse(
 
   // 7. Journey Progress & Remaining Stops
   const totalStations = stationList.length;
-  const visitedStationsList = stationList.filter((s: any) =>
-    s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived ||
-    s.station_status === 'DEPARTED' || s.station_status === 'ARRIVED' ||
-    s.is_current || s.isCurrent
-  );
   const visitedCount = visitedStationsList.length;
   const remainingStationsCount = totalStations > 0 ? Math.max(0, totalStations - visitedCount) : undefined;
-  const routeProgressPct = totalStations > 0 && isStarted
-    ? Math.min(100, Math.max(5, Math.round((visitedCount / totalStations) * 100)))
-    : 0;
+  let routeProgressPct = 0;
+  if (totalStations > 0 && isStarted) {
+    routeProgressPct = Math.min(100, Math.max(5, Math.round((visitedCount / totalStations) * 100)));
+  } else if (isStarted) {
+    routeProgressPct = 50;
+  }
 
   // 8. Unified Journey Status & Multi-Metric Delay Calculations (Today, Today's Avg, Month Avg)
   const now = new Date();
