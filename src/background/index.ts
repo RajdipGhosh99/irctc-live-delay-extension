@@ -121,14 +121,14 @@ async function pruneCacheIfExceedsLimit(maxBytes = MAX_CACHE_BYTES): Promise<voi
   }
 }
 
-function getCacheKey(trainNumber: string, travelDate?: string): string {
-  const dateKey = travelDate || getIso8601Date();
-  return `${STORAGE_KEY_CACHE_PREFIX}${trainNumber}_${dateKey}`;
+function getCacheKey(trainNumber: string): string {
+  const cleanNumber = String(trainNumber).trim();
+  return `${STORAGE_KEY_CACHE_PREFIX}${cleanNumber}`;
 }
 
-async function getFromCache(trainNumber: string, travelDate?: string): Promise<TrainDelayData | null> {
+async function getFromCache(trainNumber: string): Promise<TrainDelayData | null> {
   try {
-    const key = getCacheKey(trainNumber, travelDate);
+    const key = getCacheKey(trainNumber);
     const result = await chrome.storage.local.get(key);
     const record: CacheRecord | undefined = result[key];
 
@@ -143,7 +143,7 @@ async function getFromCache(trainNumber: string, travelDate?: string): Promise<T
       ...record.data,
       fetchedTimestamp: record.timestamp || record.data.fetchedTimestamp || Date.now(),
       isoTimestamp: record.isoTimestamp || record.data.isoTimestamp || getIso8601Timestamp(),
-      isoDate: record.data.isoDate || travelDate || getIso8601Date(),
+      isoDate: record.data.isoDate || getIso8601Date(),
       source: 'cache',
     };
   } catch {
@@ -151,9 +151,9 @@ async function getFromCache(trainNumber: string, travelDate?: string): Promise<T
   }
 }
 
-async function saveToCache(data: TrainDelayData, travelDate?: string, ttlMinutes = 15, maxMb = 150): Promise<void> {
+async function saveToCache(data: TrainDelayData, ttlMinutes = 15, maxMb = 150): Promise<void> {
   try {
-    const key = getCacheKey(data.trainNumber, travelDate);
+    const key = getCacheKey(data.trainNumber);
     const ttlMs = (ttlMinutes || 15) * 60 * 1000;
     const now = Date.now();
     const nowIso = getIso8601Timestamp();
@@ -165,7 +165,7 @@ async function saveToCache(data: TrainDelayData, travelDate?: string, ttlMinutes
         ...data,
         fetchedTimestamp: now,
         isoTimestamp: nowIso,
-        isoDate: travelDate || getIso8601Date(),
+        isoDate: data.isoDate || getIso8601Date(),
       },
       timestamp: now,
       isoTimestamp: nowIso,
@@ -215,11 +215,11 @@ pruneExpiredCache();
 async function handleMessage(message: ExtensionMessage, sendResponse: (res: any) => void): Promise<void> {
   if (message.type === 'FETCH_TRAIN_DELAY') {
     const { trainNumber, forceRefresh, travelDate, providerOverride } = message.payload;
-    const cacheKey = getCacheKey(trainNumber, travelDate);
+    const cacheKey = getCacheKey(trainNumber);
 
     console.log(`[Background] 📨 Received FETCH_TRAIN_DELAY for train #${trainNumber} (forceRefresh=${Boolean(forceRefresh)})`);
 
-    // 1. Check in-flight promise coalescing
+    // 1. Check in-flight promise coalescing by train number
     if (inFlightRequests.has(cacheKey) && !forceRefresh) {
       console.log(`[Background] Coalescing request for train #${trainNumber}`);
       const response = await inFlightRequests.get(cacheKey)!;
@@ -234,11 +234,11 @@ async function handleMessage(message: ExtensionMessage, sendResponse: (res: any)
 
     const settings = await getStoredSettings();
 
-    // 2. Local Cache Check
+    // 2. Train Number Local Cache Check (Instant Hit with 0 API calls)
     if (!forceRefresh) {
-      const cached = await getFromCache(trainNumber, travelDate);
+      const cached = await getFromCache(trainNumber);
       if (cached) {
-        console.log(`[Background] Returning cached status for train #${trainNumber}`);
+        console.log(`[Background] ⚡ Cache HIT for train #${trainNumber} (0 API Calls)`);
         sendResponse({
           success: true,
           data: cached,
@@ -255,7 +255,7 @@ async function handleMessage(message: ExtensionMessage, sendResponse: (res: any)
         console.log(`[Background] Executing multi-provider fetch for train #${trainNumber}...`);
         const result = await executeMultiProviderFetch(trainNumber, settings, travelDate, providerOverride, Boolean(forceRefresh));
         await chrome.storage.local.set({ [STORAGE_KEY_SETTINGS]: settings });
-        await saveToCache(result.data, travelDate, settings.cacheTtlMinutes);
+        await saveToCache(result.data, settings.cacheTtlMinutes, settings.maxCacheSizeMb || 150);
 
         return {
           success: true,
