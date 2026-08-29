@@ -814,7 +814,7 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
       <div class="irctc-stat-box">
         <div class="irctc-stat-title">📊 ${dayOfWeekName}s Avg</div>
         <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
-        <div class="irctc-stat-sub">Past 1 Month</div>
+        <div class="irctc-stat-sub">Last 4 Weeks</div>
       </div>
       <div class="irctc-stat-box">
         <div class="irctc-stat-title">📈 1-Mo Avg</div>
