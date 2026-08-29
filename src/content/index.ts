@@ -20,6 +20,27 @@ let isAutoFetchAll = false;
 let currentSitePosition: BadgePosition = 'beside-name';
 const currentHostname = window.location.hostname.toLowerCase();
 
+function getVendorId(hostname: string): string {
+  const h = hostname.toLowerCase();
+  if (h.includes('irctc')) return 'irctc';
+  if (h.includes('makemytrip')) return 'mmt';
+  if (h.includes('confirmtkt')) return 'confirmtkt';
+  if (h.includes('ixigo')) return 'ixigo';
+  if (h.includes('cleartrip')) return 'cleartrip';
+  if (h.includes('goibibo')) return 'goibibo';
+  if (h.includes('paytm')) return 'paytm';
+  if (h.includes('easemytrip')) return 'easemytrip';
+  if (h.includes('railyatri')) return 'railyatri';
+  return 'generic';
+}
+
+const currentVendorId = getVendorId(currentHostname);
+try {
+  document.documentElement.setAttribute('data-irctc-vendor', currentVendorId);
+} catch {
+  // Ignore in SSR/isolated DOM test contexts
+}
+
 // WeakSet for O(1) evaluated DOM elements without memory leaks
 let processedElements = new WeakSet<HTMLElement>();
 
@@ -635,8 +656,9 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
   if (nameAnchor) processedElements.add(nameAnchor);
 
   const wrapper = document.createElement('span');
-  wrapper.className = `irctc-delay-wrapper position-${position}`;
+  wrapper.className = `irctc-delay-wrapper vendor-${currentVendorId} position-${position}`;
   wrapper.setAttribute('data-train-number', trainNumber);
+  wrapper.setAttribute('data-vendor', currentVendorId);
 
   const badge = document.createElement('button');
   badge.type = 'button';

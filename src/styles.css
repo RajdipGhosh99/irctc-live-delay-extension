@@ -549,3 +549,117 @@
   transform: translateY(-2px) !important;
   box-shadow: 0 14px 28px -5px rgba(0, 0, 0, 0.3) !important;
 }
+
+/* ==========================================================================
+   VENDOR-SPECIFIC ADAPTIVE CSS LAYOUTS
+   ========================================================================== */
+
+/* 1. IRCTC Official (irctc.co.in) - Angular & Bootstrap 3 Grid */
+.irctc-delay-wrapper.vendor-irctc {
+  margin-left: 10px !important;
+  margin-right: 6px !important;
+  vertical-align: middle !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+.irctc-delay-wrapper.vendor-irctc .irctc-delay-badge {
+  height: 22px !important;
+  padding: 2px 9px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  letter-spacing: 0.2px !important;
+  box-shadow: 0 1px 4px rgba(30, 58, 138, 0.15) !important;
+}
+.irctc-delay-wrapper.vendor-irctc .irctc-delay-popover {
+  top: calc(100% + 8px) !important;
+  left: 0 !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28), 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 2. MakeMyTrip (makemytrip.com) - React Flex Train Listing */
+.irctc-delay-wrapper.vendor-mmt {
+  margin-left: 8px !important;
+  margin-right: 4px !important;
+  vertical-align: middle !important;
+  align-self: center !important;
+}
+.irctc-delay-wrapper.vendor-mmt .irctc-delay-badge {
+  height: 20px !important;
+  padding: 2px 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+}
+.irctc-delay-wrapper.vendor-mmt.position-card-header-right {
+  margin-left: auto !important;
+  margin-right: 12px !important;
+}
+
+/* 3. ConfirmTkt (confirmtkt.com) - Card-Based Layout */
+.irctc-delay-wrapper.vendor-confirmtkt {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+.irctc-delay-wrapper.vendor-confirmtkt .irctc-delay-badge {
+  height: 21px !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 4. Ixigo (ixigo.com) - Material Chip Format */
+.irctc-delay-wrapper.vendor-ixigo {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+.irctc-delay-wrapper.vendor-ixigo .irctc-delay-badge {
+  height: 22px !important;
+  padding: 2px 9px !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+}
+
+/* 5. ClearTrip (cleartrip.com) - Minimalist Row Format */
+.irctc-delay-wrapper.vendor-cleartrip {
+  margin-left: 10px !important;
+  vertical-align: middle !important;
+}
+.irctc-delay-wrapper.vendor-cleartrip .irctc-delay-badge {
+  height: 20px !important;
+  padding: 1px 7px !important;
+  font-size: 10.5px !important;
+  border-radius: 4px !important;
+}
+
+/* 6. Goibibo (goibibo.com) - Train Listing Rows */
+.irctc-delay-wrapper.vendor-goibibo {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+.irctc-delay-wrapper.vendor-goibibo .irctc-delay-badge {
+  height: 20px !important;
+  padding: 2px 8px !important;
+  font-size: 10.5px !important;
+}
+
+/* 7. Paytm (paytm.com) - Light Cyan/Blue Rail Cards */
+.irctc-delay-wrapper.vendor-paytm {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+.irctc-delay-wrapper.vendor-paytm .irctc-delay-badge {
+  height: 21px !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+}
+
+/* 8. EaseMyTrip & RailYatri */
+.irctc-delay-wrapper.vendor-easemytrip,
+.irctc-delay-wrapper.vendor-railyatri {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
