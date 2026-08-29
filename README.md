@@ -133,6 +133,18 @@ Feel free to check the [Issues page](https://github.com/RajdipGhosh99/irctc-live
 
 ---
 
+## 🔒 Privacy Policy
+
+**Last Updated:** August 29, 2026
+
+Live Train Delay Tracker is committed to protecting your privacy:
+- **Zero Personal Data Collection:** The extension does not collect, track, transmit, sell, or share any personal data, browsing history, cookies, or user credentials.
+- **Local Storage Usage:** The `storage` and `unlimitedStorage` permissions are used strictly on your local machine to cache live train status (with 15-minute TTL) and save your custom API token preferences.
+- **Permissions:** The `tabs` and `scripting` permissions and host access patterns (`irctc.co.in`, `confirmtkt.com`, etc.) are used exclusively to inject interactive delay badges into train search results.
+- **Zero Remote Code:** No remote scripts, `eval()`, or external executable code are used. All assets are self-contained.
+
+---
+
 ## 📄 License & Copyleft Protection
 
 Distributed under the **GNU General Public License v3.0 (GPL-3.0)** (Strict Copyleft / Share-Alike).
