@@ -260,6 +260,59 @@ export function calculateTimeDiffMinutes(scheduledTime?: string, actualTime?: st
   return diff;
 }
 
+/**
+ * Formats delay in minutes to a clean, compact badge label (e.g. "+1h 21m", "+45m", "-15m", "On Time")
+ */
+export function formatDelayShort(delayMinutes: number): string {
+  if (isNaN(delayMinutes) || (delayMinutes <= 5 && delayMinutes >= -5)) {
+    return 'On Time';
+  }
+
+  const isEarly = delayMinutes < 0;
+  const absMin = Math.abs(delayMinutes);
+  const sign = isEarly ? '-' : '+';
+
+  if (absMin < 60) {
+    return `${sign}${absMin}m`;
+  }
+
+  const hours = Math.floor(absMin / 60);
+  const remainderMins = absMin % 60;
+
+  if (remainderMins === 0) {
+    return `${sign}${hours}h`;
+  }
+
+  return `${sign}${hours}h ${remainderMins}m`;
+}
+
+/**
+ * Formats delay in minutes to human-readable verbose text (e.g. "Running 1 hr 21 mins Late", "Running 2 hrs Late", "Running 25 mins Late", "Running Right Time")
+ */
+export function formatDelayLong(delayMinutes: number): string {
+  if (isNaN(delayMinutes) || (delayMinutes <= 5 && delayMinutes >= -5)) {
+    return delayMinutes < 0 ? `Running ${Math.abs(delayMinutes)} mins Early` : 'Running Right Time';
+  }
+
+  const isEarly = delayMinutes < 0;
+  const absMin = Math.abs(delayMinutes);
+  const direction = isEarly ? 'Early' : 'Late';
+
+  if (absMin < 60) {
+    return `Running ${absMin} mins ${direction}`;
+  }
+
+  const hours = Math.floor(absMin / 60);
+  const remainderMins = absMin % 60;
+  const hrStr = hours === 1 ? '1 hr' : `${hours} hrs`;
+
+  if (remainderMins === 0) {
+    return `Running ${hrStr} ${direction}`;
+  }
+
+  return `Running ${hrStr} ${remainderMins} mins ${direction}`;
+}
+
 export class CircuitBreaker {
   private failures = 0;
   private lastFailureTime = 0;

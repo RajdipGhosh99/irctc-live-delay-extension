@@ -16,6 +16,7 @@ import {
   getIso8601Date,
   parseDelayToMinutes,
   calculateTimeDiffMinutes,
+  formatDelayLong,
 } from '../utils/iso-utils';
 
 /**
@@ -267,10 +268,8 @@ export function normalizeUnifiedTrainResponse(
     statusSummary = irctcTrainPositionStr;
   } else if (!isStarted && delayMinutes === 0 && (!currentStationName || currentStationName === 'Origin' || currentStationName === 'En Route')) {
     statusSummary = 'Scheduled (Not Started Yet)';
-  } else if (isOnTime) {
-    statusSummary = delayMinutes < 0 ? `Running ${Math.abs(delayMinutes)} mins Early` : 'Running Right Time';
   } else {
-    statusSummary = `Running ${delayMinutes} mins Late`;
+    statusSummary = formatDelayLong(delayMinutes);
   }
 
   return {

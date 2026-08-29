@@ -9,7 +9,7 @@
  */
 
 import { ProviderId, ExtensionMessage } from '../types';
-import { formatIsoHumanTime } from '../utils/iso-utils';
+import { formatIsoHumanTime, formatDelayShort } from '../utils/iso-utils';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const globalStatusBadge = document.getElementById('global-status-badge') as HTMLElement;
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               🚆 ${d.trainName || `Train #${trainNum}`}
             </div>
             <div style="color: ${statusColor}; font-weight: 700; margin-bottom: 2px;">
-              ⏱ ${d.statusSummary} ${d.delayMinutes !== 0 ? `(${d.delayMinutes > 0 ? '+' : ''}${d.delayMinutes}m)` : ''}
+              ⏱ ${d.statusSummary} ${d.delayMinutes !== 0 ? `(${formatDelayShort(d.delayMinutes)})` : ''}
             </div>
             <div style="color: #475569; font-size: 10.5px;">
               📍 <strong>Location:</strong> ${d.currentStationName || 'En Route'} ${d.currentStationCode ? `(${d.currentStationCode})` : ''}

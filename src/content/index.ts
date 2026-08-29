@@ -7,9 +7,8 @@
 
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-import '../styles/styles.css';
 import { ExtensionMessage, DelayResponse, TrainDelayData, BadgePosition } from '../types';
-import { formatIsoHumanTime, getIso8601Timestamp, normalizeDateToIsoDate } from '../utils/iso-utils';
+import { formatIsoHumanTime, getIso8601Timestamp, normalizeDateToIsoDate, formatDelayShort, formatDelayLong } from '../utils/iso-utils';
 
 console.log('[Live Train Delay Tracker by Rajdip Ghosh - Enterprise Edition] Initializing on:', window.location.hostname);
 
@@ -379,14 +378,14 @@ function updateBadgeUI(
       popover.style.display = 'none';
     }
   } else if (state === 'on-time' && data) {
-    const isEarly = data.delayMinutes < 0;
-    const label = isEarly ? `-${Math.abs(data.delayMinutes)}m` : 'On Time';
+    const label = formatDelayShort(data.delayMinutes);
     badge.setAttribute('aria-label', `Train ${trainNumber} is ${data.statusSummary}`);
     badge.innerHTML = `<span aria-hidden="true">⏱</span><span>${label}</span><span class="irctc-badge-reload-icon" title="Refresh Live Delay" aria-hidden="true">↻</span>`;
     renderPopover(popover, trainNumber, data, providerUsed, travelDate);
   } else if (state === 'delayed' && data) {
-    badge.setAttribute('aria-label', `Train ${trainNumber} is delayed by ${data.delayMinutes} minutes`);
-    badge.innerHTML = `<span aria-hidden="true">⏱</span><span>+${data.delayMinutes}m</span><span class="irctc-badge-reload-icon" title="Refresh Live Delay" aria-hidden="true">↻</span>`;
+    const label = formatDelayShort(data.delayMinutes);
+    badge.setAttribute('aria-label', `Train ${trainNumber} is delayed by ${data.statusSummary}`);
+    badge.innerHTML = `<span aria-hidden="true">⏱</span><span>${label}</span><span class="irctc-badge-reload-icon" title="Refresh Live Delay" aria-hidden="true">↻</span>`;
     renderPopover(popover, trainNumber, data, providerUsed, travelDate);
   } else if (state === 'error') {
     const isQuota = errorMessage?.includes('Quota') || errorMessage?.includes('quota') || errorMessage?.includes('RATE_LIMIT') || errorMessage?.includes('429');
