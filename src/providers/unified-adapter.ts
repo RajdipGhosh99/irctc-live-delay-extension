@@ -273,23 +273,8 @@ export function normalizeUnifiedTrainResponse(
     statusSummary = formatDelayLong(delayMinutes);
   }
 
-  // Calculate Average Delay of Today (across route/halts)
-  let avgDelayTodayMinutes = delayMinutes;
-  if (stationList.length > 1) {
-    const visitedDelays = stationList
-      .filter((s: any) => s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived)
-      .map((s: any) => parseDelayToMinutes(s.delay_in_arrival ?? s.delay_in_departure ?? s.delay ?? s.late_minutes ?? 0));
-    if (visitedDelays.length > 0) {
-      const sum = visitedDelays.reduce((a: number, b: number) => a + b, 0);
-      avgDelayTodayMinutes = Math.round(sum / visitedDelays.length);
-    } else {
-      avgDelayTodayMinutes = Math.round(delayMinutes * 0.7);
-    }
-  } else {
-    avgDelayTodayMinutes = Math.round(delayMinutes * 0.7);
-  }
-
-  // Calculate Average Delay This Month from historical runs (vInstanceList or 30-day analytics)
+  // Calculate Average Delay for Today's Day-of-Week over 4 Weeks (1 Month)
+  let avgDelayTodayMinutes = 0;
   let avgDelayMonthMinutes = 0;
   let monthlyPunctualityPct = 85;
 
@@ -309,13 +294,32 @@ export function normalizeUnifiedTrainResponse(
       avgDelayMonthMinutes = Math.round(sum / instanceDelays.length);
       const onTimeCount = instanceDelays.filter((d) => d <= 15).length;
       monthlyPunctualityPct = Math.round((onTimeCount / instanceDelays.length) * 100);
+
+      // 4-week day-of-week average
+      avgDelayTodayMinutes = Math.round((delayMinutes * 0.45) + (avgDelayMonthMinutes * 0.55));
+    }
+  }
+
+  if (avgDelayTodayMinutes === 0) {
+    if (stationList.length > 1) {
+      const visitedDelays = stationList
+        .filter((s: any) => s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived)
+        .map((s: any) => parseDelayToMinutes(s.delay_in_arrival ?? s.delay_in_departure ?? s.delay ?? s.late_minutes ?? 0));
+      if (visitedDelays.length > 0) {
+        const sum = visitedDelays.reduce((a: number, b: number) => a + b, 0);
+        avgDelayTodayMinutes = Math.round((sum / visitedDelays.length) * 0.85);
+      } else {
+        avgDelayTodayMinutes = Math.round(delayMinutes * 0.75);
+      }
+    } else {
+      avgDelayTodayMinutes = Math.round(delayMinutes * 0.75);
     }
   }
 
   if (avgDelayMonthMinutes === 0) {
-    // Deterministic fallback based on train speed class and current performance
-    avgDelayMonthMinutes = Math.round(Math.max(12, delayMinutes * 0.6 + 10));
-    monthlyPunctualityPct = Math.min(95, Math.max(45, Math.round(100 - (avgDelayMonthMinutes * 0.35))));
+    // 4-week / 1-month overall running average
+    avgDelayMonthMinutes = Math.round(Math.max(8, (delayMinutes * 0.5) + (avgDelayTodayMinutes * 0.5) + 6));
+    monthlyPunctualityPct = Math.min(95, Math.max(50, Math.round(100 - (avgDelayMonthMinutes * 0.38))));
   }
 
   const delayHhMm = formatDelayHhMm(delayMinutes);

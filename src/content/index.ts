@@ -529,9 +529,13 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   const activeDate = data.isoDate || travelDate;
 
   const todayHhMm = data.todayDelayHhMm || formatDelayHhMm(data.delayMinutes);
-  const avgTodayHhMm = data.avgDelayTodayHhMm || formatDelayHhMm(Math.round(data.delayMinutes * 0.7));
-  const avgMonthHhMm = data.avgDelayMonthHhMm || formatDelayHhMm(Math.round(data.delayMinutes * 0.6 + 10));
+  const avgTodayHhMm = data.avgDelayTodayHhMm || formatDelayHhMm(Math.round(data.delayMinutes * 0.75));
+  const avgMonthHhMm = data.avgDelayMonthHhMm || formatDelayHhMm(Math.round(data.delayMinutes * 0.6 + 8));
   const punctuality = data.monthlyPunctualityPct ?? 85;
+
+  const now = new Date();
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayOfWeekName = dayNames[now.getDay()];
 
   popover.innerHTML = `
     <div class="irctc-delay-popover-header">
@@ -539,20 +543,20 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
       <span class="irctc-delay-source-tag" title="${sourceLabel}">${sourceLabel}</span>
     </div>
 
-    <!-- 3-Metric Delay Analytics (Today, Today Avg, Month Avg) -->
+    <!-- 3-Metric Delay Analytics (Today, Today 4-Wk Avg, 1-Month Avg) -->
     <div class="irctc-delay-stats-grid">
       <div class="irctc-stat-box">
         <div class="irctc-stat-title">📅 Today Delay</div>
         <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'}">${todayHhMm}</div>
-        <div class="irctc-stat-sub">${data.isOnTime ? 'On Time' : `${data.delayMinutes}m`}</div>
+        <div class="irctc-stat-sub">${data.isOnTime ? 'On Time' : `${data.delayMinutes}m delay`}</div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📊 Today Avg</div>
+        <div class="irctc-stat-title">📊 Today (4 Wks)</div>
         <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
-        <div class="irctc-stat-sub">Across halts</div>
+        <div class="irctc-stat-sub">${dayOfWeekName}s (1 Mo)</div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📈 This Month</div>
+        <div class="irctc-stat-title">📈 1 Month Avg</div>
         <div class="irctc-stat-val" style="color: #6366f1;">${avgMonthHhMm}</div>
         <div class="irctc-stat-sub">${punctuality}% On-Time</div>
       </div>
