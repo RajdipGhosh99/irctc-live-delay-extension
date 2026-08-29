@@ -1100,7 +1100,7 @@ function processTrainCards() {
   // 2. Secondary Pass for ConfirmTkt / React Dynamic SPAs: Search any card with 5-digit train numbers
   if (activeWidgets.size === 0 || currentHostname.includes('confirmtkt')) {
     const allCards = document.querySelectorAll<HTMLElement>(
-      'div[class*="card" i], div[class*="item" i], div[class*="row" i], div[class*="container" i], article, section, li'
+      '#app div, #app section, #app article, div[class*="card" i], div[class*="item" i], div[class*="row" i], div[class*="container" i], article, section, li'
     );
     allCards.forEach((card) => {
       if (processedElements.has(card)) return;
