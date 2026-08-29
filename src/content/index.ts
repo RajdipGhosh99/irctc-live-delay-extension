@@ -1056,46 +1056,48 @@ function processTrainCards() {
     // IRCTC Selectors
     '.single-train-detail, .train-heading, .train-heading strong, app-train-avl-enq, tr, ' +
     // Universal Heading & Data Attribute Matchers
-    'h3, h4, h5, [data-train-number], [data-train-no], [data-trainno]'
+    'h1, h2, h3, h4, h5, [data-train-number], [data-train-no], [data-trainno]'
   );
 
   candidateElements.forEach((el) => {
     if (processedElements.has(el)) return;
     if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
 
-    const text = el.innerText || el.textContent || '';
+    const text = (el.innerText || el.textContent || '').trim();
+    if (text.length > 200) return; // Ignore large outer wrapper containers
+
     const trainNumber = extractTrainNumber(text, el) || el.getAttribute('data-train-number') || el.getAttribute('data-train-no');
 
     if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
-      processedElements.add(el);
-      injectDelayWidget(el, trainNumber, currentSitePosition);
+      if (!activeWidgets.has(trainNumber) || !document.contains(activeWidgets.get(trainNumber)!.wrapper)) {
+        processedElements.add(el);
+        injectDelayWidget(el, trainNumber, currentSitePosition);
+      }
     }
   });
 
-  // 2. Secondary Pass for ConfirmTkt / React Dynamic SPAs: Search any card with 5-digit train numbers
-  if (activeWidgets.size === 0 || currentHostname.includes('confirmtkt')) {
-    const allCards = document.querySelectorAll<HTMLElement>(
-      '#app div, #app section, #app article, div[class*="card" i], div[class*="item" i], div[class*="row" i], div[class*="container" i], article, section, li'
-    );
-    allCards.forEach((card) => {
-      if (processedElements.has(card)) return;
-      if (card.querySelector('.irctc-delay-wrapper') || card.closest('.irctc-delay-wrapper') || card.closest('#irctc-live-hud')) return;
+  // 2. Comprehensive Deep Leaf Scan for ConfirmTkt / React Dynamic SPAs
+  // Directly targets all short text nodes (h1-h6, p, span, strong, b, a, div) containing 5-digit train numbers
+  const leafCandidates = document.querySelectorAll<HTMLElement>(
+    'h1, h2, h3, h4, h5, h6, p, span, strong, b, a, [class*="title" i], [class*="name" i], [class*="number" i], [class*="header" i]'
+  );
 
-      const text = card.innerText || card.textContent || '';
-      const trainNumber = extractTrainNumber(text, card);
+  leafCandidates.forEach((el) => {
+    if (processedElements.has(el)) return;
+    if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
+
+    const text = (el.innerText || el.textContent || '').trim();
+    // Only inspect elements with short, title-like text length (under 90 chars) to strictly prevent matching outer wrappers
+    if (text.length > 0 && text.length <= 90) {
+      const trainNumber = extractTrainNumber(text, el);
       if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
-        const specificEl = card.querySelector<HTMLElement>(
-          'h3, h4, h5, p, span, div[class*="title" i], div[class*="name" i], div[class*="header" i]'
-        ) || card;
-
-        if (!processedElements.has(specificEl) && !specificEl.querySelector('.irctc-delay-wrapper')) {
-          processedElements.add(card);
-          processedElements.add(specificEl);
-          injectDelayWidget(specificEl, trainNumber, currentSitePosition);
+        if (!activeWidgets.has(trainNumber) || !document.contains(activeWidgets.get(trainNumber)!.wrapper)) {
+          processedElements.add(el);
+          injectDelayWidget(el, trainNumber, currentSitePosition);
         }
       }
-    });
-  }
+    }
+  });
 
   if (isAutoFetchAll) {
     enqueueAutoFetch();
