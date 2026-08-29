@@ -610,25 +610,28 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
 }
 
 /**
- * Injects an Ultra-Compact On-Demand Interactive Badge (Strict Single Badge per Train Card)
+ * Injects an Ultra-Compact On-Demand Interactive Badge (Strict Single Badge per Train)
  */
 function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, position: BadgePosition = 'beside-name'): InjectedWidget | null {
+  // If an active widget for this train number is already in the document, skip!
+  const existing = activeWidgets.get(trainNumber);
+  if (existing && document.contains(existing.wrapper)) {
+    return existing;
+  }
+
   const cardContainer = findCardContainer(targetElement);
   const nameAnchor = findTrainNameAnchor(cardContainer, targetElement);
 
-  // Strict Single-Badge Guarantee per Card / Train: Prevent multiple status badges on IRCTC / MMT
   if (
-    cardContainer.querySelector('.irctc-delay-wrapper') ||
-    cardContainer.hasAttribute('data-irctc-delay-injected') ||
-    nameAnchor.querySelector('.irctc-delay-wrapper')
+    nameAnchor.querySelector('.irctc-delay-wrapper') ||
+    targetElement.querySelector('.irctc-delay-wrapper') ||
+    targetElement.closest('.irctc-delay-wrapper')
   ) {
-    return activeWidgets.get(trainNumber) || null;
+    return existing || null;
   }
 
   targetElement.setAttribute('data-delay-injected', 'true');
-  cardContainer.setAttribute('data-irctc-delay-injected', 'true');
   processedElements.add(targetElement);
-  processedElements.add(cardContainer);
   if (nameAnchor) processedElements.add(nameAnchor);
 
   const wrapper = document.createElement('span');
@@ -788,30 +791,18 @@ function processTrainCards() {
   if (!isExtensionEnabled || !isSiteEnabled) return;
 
   const candidateElements = document.querySelectorAll<HTMLElement>(
-    '.train-name, .trainName, .train-number, .trainNumber, [data-cy*="train"], [data-testid*="train"], .single-train-detail, .train-heading, .train-heading strong, .railway-train-name, .boldFont.font16, app-train-avl-enq'
+    '.train-name, .trainName, .train-number, .trainNumber, [data-cy*="train"], [data-testid*="train"], .single-train-detail, .train-heading, .train-heading strong, .railway-train-name, .boldFont.font16, app-train-avl-enq, tr'
   );
 
   candidateElements.forEach((el) => {
     if (processedElements.has(el)) return;
     if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
 
-    const card = findCardContainer(el);
-    if (card) {
-      if (card.hasAttribute('data-irctc-delay-injected') || card.querySelector('.irctc-delay-wrapper')) {
-        processedElements.add(el);
-        return;
-      }
-    }
-
     const text = el.innerText || el.textContent || '';
     const trainNumber = extractTrainNumber(text) || el.getAttribute('data-train-number') || el.getAttribute('data-train-no');
 
     if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
       processedElements.add(el);
-      if (card) {
-        card.setAttribute('data-irctc-delay-injected', 'true');
-        processedElements.add(card);
-      }
       injectDelayWidget(el, trainNumber, currentSitePosition);
     }
   });
