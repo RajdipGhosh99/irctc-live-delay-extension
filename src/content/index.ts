@@ -21,7 +21,7 @@ let currentSitePosition: BadgePosition = 'beside-name';
 const currentHostname = window.location.hostname.toLowerCase();
 
 // WeakSet for O(1) evaluated DOM elements without memory leaks
-const processedElements = new WeakSet<HTMLElement>();
+let processedElements = new WeakSet<HTMLElement>();
 
 interface InjectedWidget {
   wrapper: HTMLElement;
@@ -631,7 +631,7 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
 
   let hasFetchedOnce = false;
   let currentDelayData: TrainDelayData | null = null;
-  const card = findCardContainer(targetElement);
+  let widget: InjectedWidget;
 
   const fetchStatus = async (forceRefresh = false) => {
     const isRefreshing = hasFetchedOnce && forceRefresh;
@@ -643,8 +643,7 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
       refreshBtn.innerHTML = '<span class="irctc-delay-spinner"></span> Refreshing...';
     }
 
-    // Dynamically extract the selected travel date from the UI at click time
-    const selectedTravelDate = extractTravelDateFromUI(card);
+    const selectedTravelDate = extractTravelDateFromUI(cardContainer);
     if (selectedTravelDate) {
       console.log(`[Live Train Delay Tracker] 📅 Extracted Journey Date for Train #${trainNumber}:`, selectedTravelDate);
     }
@@ -654,6 +653,7 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
     try {
       const res = await requestTrainDelay(trainNumber, forceRefresh, selectedTravelDate);
       hasFetchedOnce = true;
+      if (widget) widget.hasFetched = true;
       console.log(`[Live Train Delay Tracker] 📥 Response for Train #${trainNumber}:`, res);
 
       if (res.success && res.data) {
@@ -666,10 +666,13 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
       } else if (!res.success) {
         updateBadgeUI(wrapper, badge, popover, trainNumber, 'error', undefined, res.error);
       }
+    } catch (err) {
+      console.error('[Live Delay Tracker] Request failed:', err);
     } finally {
       wrapper.classList.remove('irctc-refreshing');
+      hasFetchedOnce = true;
       if (widget) {
-        widget.hasFetched = hasFetchedOnce;
+        widget.hasFetched = true;
       }
     }
   };
@@ -711,12 +714,16 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
     }
   });
 
-  // Placement based on configuration
-  const nameAnchor = findTrainNameAnchor(card, targetElement);
+  const cardContainer = findCardContainer(targetElement);
+  const nameAnchor = findTrainNameAnchor(cardContainer, targetElement);
 
   if (position === 'card-header-right') {
-    const headerRow = card.querySelector<HTMLElement>('.makeFlex.spaceBetween, .trainHeading, .train-name-wrap, .train-header, .header') || nameAnchor.parentElement || card;
-    headerRow.appendChild(wrapper);
+    const header = cardContainer.querySelector<HTMLElement>('.train-heading, .card-header, .header, .train-name-wrap, .railway-card-header');
+    if (header) {
+      header.appendChild(wrapper);
+    } else {
+      nameAnchor.parentElement?.appendChild(wrapper);
+    }
   } else if (position === 'below-name') {
     if (nameAnchor.nextSibling) {
       nameAnchor.parentElement?.insertBefore(wrapper, nameAnchor.nextSibling);
@@ -735,7 +742,7 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
     }
   }
 
-  const widget: InjectedWidget = {
+  widget = {
     wrapper,
     badge,
     popover,
@@ -784,6 +791,16 @@ function processTrainCards() {
  */
 async function init() {
   try {
+    // 1. Direct local storage read for instantaneous zero-delay settings hydration
+    const localStore = await chrome.storage.local.get('irctc_delay_multi_settings');
+    const directSettings = localStore['irctc_delay_multi_settings'];
+    if (directSettings) {
+      isExtensionEnabled = directSettings.extensionEnabled !== false;
+      isAutoFetchAll = directSettings.autoFetchAllTrains === true;
+      const disabledSites: string[] = directSettings.disabledSites || [];
+      isSiteEnabled = !disabledSites.some((disabled: string) => currentHostname.includes(disabled.toLowerCase()));
+    }
+
     const settingsRes = await sendMessageToBackground({ type: 'GET_SETTINGS' });
     if (settingsRes && settingsRes.success && settingsRes.data) {
       const settings: any = settingsRes.data;
@@ -809,34 +826,66 @@ async function init() {
       return;
     }
 
-    // 1. Initial Injection Pass
+    // 2. Initial Injection Pass
     processTrainCards();
     injectAutoWelcomeHUD();
 
-    // 2. Immediate auto-fetch pass on load if enabled
     if (isAutoFetchAll) {
-      console.log(`[Live Delay Tracker] ⚡ Auto-Fetch is active. Scheduling initial load passes...`);
-      setTimeout(() => {
-        autoFetchAllPageTrains(false);
-      }, 300);
-      setTimeout(() => {
-        processTrainCards();
-        autoFetchAllPageTrains(false);
-      }, 1500);
-      setTimeout(() => {
-        processTrainCards();
-        autoFetchAllPageTrains(false);
-      }, 3500);
+      console.log(`[Live Delay Tracker] ⚡ Auto-Fetch is active on load. Triggering batch fetch...`);
+      enqueueAutoFetch();
     }
 
-    // 3. Reactive RxJS Mutation Stream with 200ms debouncing (smooth 60 FPS scrolling)
+    // 3. High-Responsiveness 1-Second Pulse Scanner (Runs for 12 seconds to catch AJAX SPA cards)
+    let scanCount = 0;
+    const scanInterval = setInterval(() => {
+      scanCount++;
+      processTrainCards();
+      if (isAutoFetchAll) {
+        enqueueAutoFetch();
+      }
+      if (scanCount > 12) {
+        clearInterval(scanInterval);
+      }
+    }, 1000);
+
+    // 4. Reactive RxJS Mutation Stream with 180ms debouncing (smooth 60 FPS scrolling)
     createMutationObservable(document.body, { childList: true, subtree: true })
-      .pipe(debounceTime(200), takeUntil(destroy$))
+      .pipe(debounceTime(180), takeUntil(destroy$))
       .subscribe(() => {
         processTrainCards();
       });
 
-    // 3. Listen for message from Popup to trigger batch page fetch
+    // 5. SPA Route Change Interception (MakeMyTrip / ConfirmTkt client-side search without page reload)
+    const handleSpaRouteChange = () => {
+      console.log('[Live Delay Tracker] 🌐 SPA Route changed:', window.location.href);
+      processedElements = new WeakSet<HTMLElement>();
+      activeWidgets.clear();
+      autoFetchQueue.clear();
+      setTimeout(() => {
+        processTrainCards();
+        if (isAutoFetchAll) {
+          enqueueAutoFetch();
+        }
+      }, 500);
+    };
+
+    window.addEventListener('popstate', handleSpaRouteChange);
+    window.addEventListener('hashchange', handleSpaRouteChange);
+
+    const origPushState = history.pushState;
+    history.pushState = function (...args) {
+      const result = origPushState.apply(this, args);
+      handleSpaRouteChange();
+      return result;
+    };
+    const origReplaceState = history.replaceState;
+    history.replaceState = function (...args) {
+      const result = origReplaceState.apply(this, args);
+      handleSpaRouteChange();
+      return result;
+    };
+
+    // 6. Listen for message from Popup to trigger batch page fetch
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === 'AUTO_FETCH_PAGE_TRAINS') {
         console.log('[Content] 🚀 Triggering batch fetch for all trains on page...');
@@ -847,7 +896,7 @@ async function init() {
       }
     });
 
-    // 4. Listen for dynamic settings updates from Options dashboard
+    // 7. Listen for dynamic settings updates from Options dashboard
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === 'local' && changes['irctc_delay_multi_settings']) {
         const newSettings = changes['irctc_delay_multi_settings'].newValue;
