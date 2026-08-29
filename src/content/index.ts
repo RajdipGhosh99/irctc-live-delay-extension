@@ -640,9 +640,8 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   popover.style.display = 'block';
   popover.setAttribute('role', 'tooltip');
   const isCached = data.source === 'cache';
-  const sourceLabel = isCached ? '⚡ Cached (0 API Calls)' : `🌐 ${providerUsed || data.providerName || 'Live'}`;
+  const sourceLabel = isCached ? '⚡ Cached (0 Calls)' : `🌐 ${providerUsed || data.providerName || 'Live'}`;
   const fetchedTimeLabel = formatIsoHumanTime(data.isoTimestamp || getIso8601Timestamp(new Date(data.fetchedTimestamp || Date.now())));
-  const activeDate = data.isoDate || travelDate;
 
   const todayHhMm = data.todayDelayHhMm || formatDelayHhMm(data.delayMinutes);
   const avgTodayHhMm = data.avgDelayTodayHhMm || formatDelayHhMm(Math.round(data.delayMinutes * 0.75));
@@ -653,76 +652,66 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayOfWeekName = dayNames[now.getDay()];
 
+  // Crisp live location strip (No duplicate delay summary)
+  let liveLocationSummary = '';
+  if (data.currentStationName && data.nextStationName) {
+    liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ ${data.nextStationName}`;
+  } else if (data.currentStationName) {
+    liveLocationSummary = `📍 Current: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
+  } else {
+    liveLocationSummary = data.statusSummary || 'Train En Route';
+  }
+
   popover.innerHTML = `
+    <!-- Crisp Header -->
     <div class="irctc-delay-popover-header">
-      <span class="irctc-delay-popover-title">Train #${trainNumber}</span>
+      <span class="irctc-delay-popover-title" title="${data.trainName ? `${trainNumber} - ${data.trainName}` : `Train #${trainNumber}`}">
+        🚆 ${trainNumber} ${data.trainName ? `• ${data.trainName}` : ''}
+      </span>
       <span class="irctc-delay-source-tag" title="${sourceLabel}">${sourceLabel}</span>
     </div>
 
-    <!-- 3-Metric Delay Analytics (Today, Today 4-Wk Avg, 1-Month Avg) -->
+    <!-- Live Position Strip -->
+    <div class="irctc-popover-live-strip" title="${liveLocationSummary}">
+      <span>${liveLocationSummary}</span>
+    </div>
+
+    <!-- 3-Metric Delay Analytics (Compact & Non-Duplicate) -->
     <div class="irctc-delay-stats-grid">
       <div class="irctc-stat-box" style="background: ${data.isOnTime ? '#f0fdf4' : '#fef2f2'} !important; border: 1px solid ${data.isOnTime ? '#bbf7d0' : '#fecaca'} !important;">
-        <div class="irctc-stat-title" style="color: ${data.isOnTime ? '#166534' : '#991b1b'} !important; font-weight: 700 !important;">
-          ${data.isOnTime ? '🟢 Today Delay' : '🔴 Today Delay'}
+        <div class="irctc-stat-title" style="color: ${data.isOnTime ? '#166534' : '#991b1b'} !important;">
+          ${data.isOnTime ? '🟢 Today' : '🔴 Today'}
         </div>
-        <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'} !important; font-weight: 800 !important; font-size: 13.5px !important;">
+        <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'} !important;">
           ${todayHhMm}
         </div>
-        <div class="irctc-stat-sub" style="color: ${data.isOnTime ? '#15803d' : '#b91c1c'} !important; font-weight: 700 !important;">
+        <div class="irctc-stat-sub" style="color: ${data.isOnTime ? '#15803d' : '#b91c1c'} !important;">
           ${data.isOnTime ? 'On Time' : `${data.delayMinutes}m Late`}
         </div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📊 Today (4 Wks)</div>
-        <div class="irctc-stat-val" style="color: #0284c7; font-weight: 700;">${avgTodayHhMm}</div>
-        <div class="irctc-stat-sub">${dayOfWeekName}s (1 Mo)</div>
+        <div class="irctc-stat-title">📊 ${dayOfWeekName}s (4W)</div>
+        <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
+        <div class="irctc-stat-sub">4-Wk Avg</div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📈 1 Month Avg</div>
-        <div class="irctc-stat-val" style="color: #6366f1; font-weight: 700;">${avgMonthHhMm}</div>
+        <div class="irctc-stat-title">📈 1-Mo Avg</div>
+        <div class="irctc-stat-val" style="color: #6366f1;">${avgMonthHhMm}</div>
         <div class="irctc-stat-sub">${punctuality}% On-Time</div>
       </div>
     </div>
 
-    <!-- Dedicated Live Status Highlight Box -->
-    <div class="irctc-status-highlight-box" style="background: ${data.isOnTime ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${data.isOnTime ? '#bbf7d0' : '#fecaca'}; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; text-align: left;">
-      <div style="font-size: 10px; font-weight: 700; color: ${data.isOnTime ? '#166534' : '#991b1b'}; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.3px;">
-        ${data.isOnTime ? '🟢 Live Running Status (On Time)' : '🔴 Live Running Status (Delayed)'}
+    <!-- Compact Footer Bar -->
+    <div class="irctc-popover-footer-row">
+      <span class="irctc-popover-timestamp" title="Last updated time">🕒 ${fetchedTimeLabel}</span>
+      <div class="irctc-popover-actions-group">
+        <button class="irctc-mini-btn irctc-copy-status-btn" type="button" aria-label="Copy train status">
+          📋 Copy
+        </button>
+        <button class="irctc-mini-btn irctc-refresh-live-btn" type="button" aria-label="Force refresh live delay status">
+          ↻ Refresh
+        </button>
       </div>
-      <div style="color: ${data.isOnTime ? '#15803d' : '#991b1b'}; font-weight: 700; font-size: 12px; line-height: 1.4; word-break: break-word; overflow-wrap: break-word; white-space: normal;">
-        ${data.statusSummary}
-      </div>
-    </div>
-
-    ${activeDate ? `
-      <div class="irctc-delay-popover-row">
-        <span class="irctc-delay-label">📅 Journey Date:</span>
-        <span class="irctc-delay-val">${activeDate}</span>
-      </div>
-    ` : ''}
-    ${data.currentStationName ? `
-      <div class="irctc-delay-popover-row">
-        <span class="irctc-delay-label">📍 Current Location:</span>
-        <span class="irctc-delay-val">${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}</span>
-      </div>
-    ` : ''}
-    ${data.nextStationName ? `
-      <div class="irctc-delay-popover-row">
-        <span class="irctc-delay-label">➡️ Next Halt:</span>
-        <span class="irctc-delay-val">${data.nextStationName}</span>
-      </div>
-    ` : ''}
-    <div class="irctc-delay-popover-row" style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed rgba(203, 213, 225, 0.7);">
-      <span class="irctc-delay-label">🕒 Fetched At:</span>
-      <span class="irctc-delay-val" style="color: #475569; font-size: 10.5px;">${fetchedTimeLabel}</span>
-    </div>
-    <div class="irctc-popover-btn-row">
-      <button class="irctc-delay-refresh-btn irctc-copy-status-btn" type="button" aria-label="Copy train status to clipboard">
-        📋 Copy Status
-      </button>
-      <button class="irctc-delay-refresh-btn irctc-refresh-live-btn" type="button" aria-label="Force refresh live delay status">
-        ↻ Refresh
-      </button>
     </div>
   `;
 }
