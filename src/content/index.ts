@@ -652,10 +652,11 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayOfWeekName = dayNames[now.getDay()];
 
-  // Crisp live location strip (No duplicate delay summary)
+  // 1. Live location & Next Platform strip
   let liveLocationSummary = '';
   if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
-    liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ ${data.nextStationName}`;
+    const nextPf = data.nextStationPlatform ? ` (${data.nextStationPlatform}${data.nextStationHaltMinutes ? ` • ${data.nextStationHaltMinutes}m stop` : ''})` : '';
+    liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ Next: ${data.nextStationName}${nextPf}`;
   } else if (data.currentStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
     liveLocationSummary = `📍 Current: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
   } else if (data.statusSummary) {
@@ -663,6 +664,17 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   } else {
     liveLocationSummary = '📍 Not Started Yet';
   }
+
+  // 2. Route Progress Bar Text
+  const progressPct = data.routeProgressPct ?? 0;
+  const stopsLeft = data.remainingStationsCount !== undefined ? `${data.remainingStationsCount} stops left` : '';
+  const progressText = progressPct > 0
+    ? `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`
+    : '🏁 Trip Not Started Yet';
+
+  // 3. Travel Intelligence & Delay Trend strip (Simple English)
+  const trendText = data.delayTrendText || (data.isOnTime ? '🟢 Running on schedule' : '🟢 Steady pace');
+  const riskTag = data.reliabilityTag || (punctuality >= 85 ? '🛡️ Usually On-Time' : '⚠️ Delay Risk');
 
   popover.innerHTML = `
     <!-- Crisp Header -->
@@ -676,6 +688,16 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     <!-- Live Position Strip -->
     <div class="irctc-popover-live-strip" title="${liveLocationSummary}">
       <span>${liveLocationSummary}</span>
+    </div>
+
+    <!-- Journey Progress Micro-Bar -->
+    <div class="irctc-progress-bar-wrap">
+      <div class="irctc-progress-bar-track">
+        <div class="irctc-progress-bar-fill" style="width: ${progressPct}%;"></div>
+      </div>
+      <div class="irctc-progress-bar-sub">
+        <span>${progressText}</span>
+      </div>
     </div>
 
     <!-- 3-Metric Delay Analytics (Compact & Non-Duplicate) -->
@@ -701,6 +723,12 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
         <div class="irctc-stat-val" style="color: #6366f1;">${avgMonthHhMm}</div>
         <div class="irctc-stat-sub">${punctuality}% On-Time</div>
       </div>
+    </div>
+
+    <!-- Smart Passenger Insights (Simple English) -->
+    <div class="irctc-insights-strip">
+      <span class="irctc-insight-pill" title="Speed and delay trend">${trendText}</span>
+      <span class="irctc-insight-pill" title="Historical punctuality and booking risk">${riskTag}</span>
     </div>
 
     <!-- Compact Footer Bar -->

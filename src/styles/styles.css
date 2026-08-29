@@ -265,11 +265,41 @@
   border: 1px solid #e2e8f0 !important;
   border-radius: 6px !important;
   padding: 4px 7px !important;
-  margin-bottom: 6px !important;
+  margin-bottom: 5px !important;
   line-height: 1.35 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+}
+
+/* Journey Progress Micro-Bar */
+.irctc-progress-bar-wrap {
+  margin: 5px 0 6px 0 !important;
+}
+
+.irctc-progress-bar-track {
+  width: 100% !important;
+  height: 4px !important;
+  background: #e2e8f0 !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+}
+
+.irctc-progress-bar-fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #0284c7, #06b6d4) !important;
+  border-radius: 4px !important;
+  transition: width 0.3s ease !important;
+}
+
+.irctc-progress-bar-sub {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  margin-top: 2px !important;
 }
 
 /* 3-Card Multi-Metric Delay Grid (Today, Today Avg, Month Avg) */
@@ -277,7 +307,7 @@
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 5px !important;
-  margin: 6px 0 !important;
+  margin: 5px 0 !important;
   background: #f8fafc !important;
   padding: 6px 5px !important;
   border-radius: 8px !important;
@@ -319,13 +349,37 @@
   font-weight: 600 !important;
 }
 
+/* Passenger Travel Insights Strip (Simple English) */
+.irctc-insights-strip {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  margin: 5px 0 4px 0 !important;
+}
+
+.irctc-insight-pill {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 !important;
+  text-align: center !important;
+}
+
 /* Compact Footer Row */
 .irctc-popover-footer-row {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  margin-top: 6px !important;
-  padding-top: 5px !important;
+  margin-top: 5px !important;
+  padding-top: 4px !important;
   border-top: 1px dashed rgba(203, 213, 225, 0.7) !important;
 }
 

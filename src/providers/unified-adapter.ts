@@ -260,9 +260,63 @@ export function normalizeUnifiedTrainResponse(
     }
   }
 
-  // 6. Unified Journey Status & Multi-Metric Delay Calculations (Today, Today's Avg, Month Avg)
+  // 6. Next Station Platform & Halt Duration
+  let nextStationPlatform: string | undefined;
+  let nextStationHaltMinutes: number | undefined;
+  if (stationList.length > 0) {
+    const upcomingStn = stationList.find((s: any) => !s.has_departed && !s.has_arrived && !s.hasDeparted && !s.hasArrived);
+    if (upcomingStn) {
+      const rawPf = upcomingStn.platform_number || upcomingStn.platform || upcomingStn.Platform || upcomingStn.pfNo || upcomingStn.pf;
+      if (rawPf && String(rawPf).trim() !== '' && String(rawPf).trim() !== '0') {
+        nextStationPlatform = `PF ${String(rawPf).replace(/platform|pf/i, '').trim()}`;
+      }
+      const rawHalt = upcomingStn.halt_minutes || upcomingStn.haltTime || upcomingStn.halt || upcomingStn.halt_time;
+      if (rawHalt) {
+        const parsedHalt = parseInt(String(rawHalt), 10);
+        if (!isNaN(parsedHalt) && parsedHalt > 0) {
+          nextStationHaltMinutes = parsedHalt;
+        }
+      }
+    }
+  }
+
+  // 7. Journey Progress & Remaining Stops
+  const totalStations = stationList.length;
+  const visitedStationsList = stationList.filter((s: any) =>
+    s.has_departed || s.has_arrived || s.hasDeparted || s.hasArrived ||
+    s.station_status === 'DEPARTED' || s.station_status === 'ARRIVED' ||
+    s.is_current || s.isCurrent
+  );
+  const visitedCount = visitedStationsList.length;
+  const remainingStationsCount = totalStations > 0 ? Math.max(0, totalStations - visitedCount) : undefined;
+  const routeProgressPct = totalStations > 0 && isStarted
+    ? Math.min(100, Math.max(5, Math.round((visitedCount / totalStations) * 100)))
+    : 0;
+
+  // 8. Unified Journey Status & Multi-Metric Delay Calculations (Today, Today's Avg, Month Avg)
   const now = new Date();
   const isOnTime = delayMinutes <= 5 && delayMinutes >= -5;
+
+  // 9. Delay Trend Indicator (Simple English)
+  let delayTrend: 'recovering' | 'increasing' | 'stable' = 'stable';
+  let delayTrendText = isOnTime ? '🟢 Running on schedule' : '🟢 Steady pace';
+
+  if (visitedStationsList.length >= 3) {
+    const prevStn = visitedStationsList[Math.max(0, visitedStationsList.length - 3)];
+    const prevDelay = parseDelayToMinutes(
+      prevStn.delay_in_arrival ?? prevStn.delayInArrival ??
+      prevStn.delay_in_departure ?? prevStn.delayInDeparture ??
+      prevStn.delay ?? prevStn.late_minutes ?? 0
+    );
+    const diff = delayMinutes - prevDelay;
+    if (diff <= -5) {
+      delayTrend = 'recovering';
+      delayTrendText = `🟢 Catching up time (-${Math.abs(diff)}m)`;
+    } else if (diff >= 8) {
+      delayTrend = 'increasing';
+      delayTrendText = `🔴 Delay increasing (+${diff}m)`;
+    }
+  }
 
   let statusSummary: string;
   if (irctcTrainPositionStr && irctcTrainPositionStr.length > 5) {
@@ -319,6 +373,14 @@ export function normalizeUnifiedTrainResponse(
     avgDelayMonthMinutes = Math.max(0, Math.round(avgDelayTodayMinutes * 0.85 + (delayMinutes > 20 ? 5 : 0)));
   }
 
+  // Simple English Reliability Tag for Ticket Booking Decision
+  let reliabilityTag = '🛡️ Usually On-Time';
+  if (monthlyPunctualityPct < 65 || avgDelayMonthMinutes > 50) {
+    reliabilityTag = '🚨 Frequent Delays';
+  } else if (monthlyPunctualityPct < 85 || avgDelayMonthMinutes > 20) {
+    reliabilityTag = '⚠️ Moderate Delay Risk';
+  }
+
   const delayHhMm = formatDelayHhMm(delayMinutes);
   const todayDelayHhMm = delayHhMm;
   const avgTodayDelayHhMm = formatDelayHhMm(avgDelayTodayMinutes);
@@ -340,6 +402,14 @@ export function normalizeUnifiedTrainResponse(
     currentStationName: String(currentStationName || (isStarted ? 'In Transit' : 'Not Started')),
     currentStationCode: String(currentStationCode || ''),
     nextStationName: nextStationName ? String(nextStationName) : undefined,
+    nextStationPlatform,
+    nextStationHaltMinutes,
+    routeProgressPct,
+    totalStations: totalStations > 0 ? totalStations : undefined,
+    remainingStationsCount,
+    delayTrend,
+    delayTrendText,
+    reliabilityTag,
     lastUpdated: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     fetchedTimestamp: now.getTime(),
     isoTimestamp: getIso8601Timestamp(now),

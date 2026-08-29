@@ -79,6 +79,17 @@ export interface TrainDelayData {
   currentStationName?: string;
   currentStationCode?: string;
   nextStationName?: string;
+  nextStationCode?: string;
+  nextStationPlatform?: string;     // e.g. "Platform 3"
+  nextStationHaltMinutes?: number;  // e.g. 5
+  routeProgressPct?: number;        // e.g. 65 (65% completed)
+  totalStations?: number;           // Total stations in route
+  remainingStationsCount?: number;  // Stops left to destination
+  delayTrend?: 'recovering' | 'increasing' | 'stable';
+  delayTrendText?: string;          // e.g. "Catching up time (-15m)" or "Delay increasing (+20m)"
+  reliabilityTag?: string;          // e.g. "Usually On-Time" or "Moderate Delay Risk"
+  destinationEta?: string;          // e.g. "08:45 AM"
+  destinationStationName?: string;  // e.g. "Howrah Jn"
   lastUpdated: string;
   fetchedTimestamp?: number;
   isoTimestamp: string;
