@@ -1,27 +1,49 @@
-# 🚆 Live Train Delay Tracker (Enterprise ISO/IEC Standard Edition)
+# 🚆 Live Train Delay Tracker (Open Source Edition)
 
 ![Banner](./public/icons/banner.jpg)
 
 <p align="center">
   <img src="./public/icons/icon128.png" width="80" height="80" alt="Extension Logo" />
   <br />
-  <strong>High-performance, fault-tolerant Chrome Extension displaying real-time train running delays directly on IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip, Ixigo, Goibibo, and Paytm.</strong>
+  <strong>Open-source, high-performance Chrome Extension displaying real-time train running delays and historical punctuality directly on IRCTC, ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-blue?style=for-the-badge&logo=github" alt="Author" /></a>
-  <img src="https://img.shields.io/badge/Architecture-Enterprise%20Grade-indigo?style=for-the-badge" alt="Enterprise Architecture" />
-  <img src="https://img.shields.io/badge/ISO%208601-Compliant-brightgreen?style=for-the-badge" alt="ISO 8601" />
-  <img src="https://img.shields.io/badge/ISO%2FIEC%2025010-SQuaRE-purple?style=for-the-badge" alt="ISO 25010" />
-  <img src="https://img.shields.io/badge/ISO%209241--171-WCAG%202.1-orange?style=for-the-badge" alt="ISO 9241" />
+  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0"><img src="https://img.shields.io/badge/Release-v1.5.0-blue?style=for-the-badge" alt="Release v1.5.0" /></a>
+  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-indigo?style=for-the-badge&logo=github" alt="Author" /></a>
   <img src="https://img.shields.io/badge/Manifest-V3-success?style=for-the-badge" alt="Manifest V3" />
+  <img src="https://img.shields.io/badge/TypeScript-5.2-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge" alt="PRs Welcome" />
 </p>
 
 ---
 
-## 🏛️ Executive Product & Engineering Architecture
+## 🌟 Key Features
 
-Built with the rigor of 50+ Years of Experience in high-scale systems architecture:
+- ⚡ **Zero-Friction Live Delay Badges:** Injects interactive `[🚆 Check ↻]` badges directly beside train names on search results pages.
+- 📊 **3-Metric Delay Analytics:**
+  - **`🟢 Today Live`** ➔ Real-time running delay for today's active trip.
+  - **`📊 Today Avg`** ➔ Historical average delay on this specific day of the week across the **Last 4 Weeks**.
+  - **`📈 30-Day Avg`** ➔ Overall 30-day all-days punctuality rate and percentage.
+- 📍 **Crisp Live Station Position:** Short, actionable updates (e.g. `📍 Arrived at NEW DELHI (06:30)` or `📍 Departed from JHARSUGUDA JN (10:56)`).
+- 🚆 **Multi-Portal Support:** Works out-of-the-box on:
+  - ✅ **IRCTC** (`irctc.co.in`)
+  - ✅ **ConfirmTkt** (`confirmtkt.com`)
+  - ✅ **MakeMyTrip** (`makemytrip.com`)
+  - ✅ **ClearTrip** (`cleartrip.com`)
+  - ✅ **Ixigo** (`ixigo.com`)
+  - ✅ **Goibibo** (`goibibo.com`)
+  - ✅ **Paytm Travel** (`paytm.com`)
+  - ✅ **EaseMyTrip** (`easemytrip.com`)
+- 🛡️ **Multi-Token API Rotation Pool:** Automatically rotates across official NTES, RapidAPI IRCTC1, RapidAPI IndianRail, and IndianRailAPI with automatic circuit breaker fallback.
+- 💾 **Smart Local Cache:** 0 duplicate API calls on hover — cached entries load instantaneously with zero network overhead.
+- 🎛️ **Floating HUD with Batch Fetch:** Floating controller pinned to the viewport with `⚡ Fetch All` and tab-specific dismissal.
+- 🔍 **Instant Quick Search Popup:** Look up any 5-digit train number directly from the browser extension popup without visiting any booking website.
+
+---
+
+## 🏛️ Architecture & Data Flow
 
 ```
                                   [ User Interacts ]
@@ -56,43 +78,70 @@ Built with the rigor of 50+ Years of Experience in high-scale systems architectu
 
 ---
 
-## 🌟 Key Enterprise Optimizations
+## 🚀 Quickstart & Developer Setup
 
-### 1. ⚡ Instant Quick Train Lookup (Inside Popup)
-- Type any 5-digit train number (e.g. `12002`, `16223`, `12886`) directly into the extension popup.
-- Get instant live delay, current station, next halt, and exact timestamp without even needing to visit a booking website!
+### Prerequisites
+- Node.js (v18 or higher)
+- npm (v9 or higher)
+- Google Chrome or any Chromium-based browser (Brave, Edge, Arc)
 
-### 2. 🛡️ Circuit Breakers & In-Flight Request Coalescing
-- **In-Flight Coalescing:** If multiple queries fire for the same train in rapid succession, only a single network roundtrip is dispatched.
-- **Circuit Breaker:** If an upstream API provider experiences consecutive 5xx errors or network timeouts, the breaker trips to immediately route traffic to backup providers without latency penalties.
-
-### 3. 🚀 WeakSet DOM Registry & 60 FPS Scrolling
-- High-performance `WeakSet` DOM tracking ensures zero memory leaks and eliminates redundant querySelector scans over long lists of 50+ trains.
-
-### 4. 📋 1-Click WhatsApp Status Sharing
-- Popovers feature a **"📋 Copy Status"** button that formats a ready-to-share message for WhatsApp and SMS:
-  > `🚆 Train #12002 (NDLS HBJ SHTBDI): Running 25 mins Late at AGRA CANTT.`
-
----
-
-## 👨‍💻 Developer & Maintainer
-
-**Rajdip Ghosh**  
-🔗 GitHub: [https://github.com/RajdipGhosh99](https://github.com/RajdipGhosh99)
-
----
-
-## 🚀 Build & Install
-
+### 1. Clone & Install
 ```bash
-# 1. Open project directory
-cd /Users/rajdip/Desktop/projects/irctc-live-delay-extension
-
-# 2. Build the extension bundle
-npm run build
+git clone https://github.com/RajdipGhosh99/irctc-live-delay-extension.git
+cd irctc-live-delay-extension
+npm install
 ```
 
-### 🔄 Reload in Chrome:
-1. Navigate to `chrome://extensions/`.
-2. Click the **Reload (🔄)** icon on the **Live Train Delay Tracker** card.
-3. Enjoy enterprise-grade performance and instant live train tracking!
+### 2. Build the Extension
+```bash
+# Development build
+npm run dev
+
+# Production build
+npm run build
+
+# Package distribution zip
+npm run package
+```
+
+### 3. Load in Chrome
+1. Open Google Chrome and navigate to `chrome://extensions/`.
+2. Enable **Developer mode** in the top-right corner.
+3. Click **Load unpacked** and select the `dist/` directory.
+4. Open any train booking site (e.g. [ConfirmTkt](https://www.confirmtkt.com) or [IRCTC](https://www.irctc.co.in)) and start tracking!
+
+---
+
+## ⚙️ Configuration & Custom API Keys
+
+1. Right-click the extension icon in Chrome and select **Options** (or click the ⚙️ icon in the popup).
+2. Add your personal RapidAPI or IndianRailAPI tokens for custom failover pools.
+3. Toggle individual portal integrations or customize badge placement (`Beside Name`, `Below Name`, `Card Header Right`).
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are welcome!  
+Feel free to check the [Issues page](https://github.com/RajdipGhosh99/irctc-live-delay-extension/issues) or submit a Pull Request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+
+---
+
+## 👨‍💻 Author & Maintainer
+
+**Rajdip Ghosh**  
+🔗 GitHub: [@RajdipGhosh99](https://github.com/RajdipGhosh99)  
+🌐 Repository: [https://github.com/RajdipGhosh99/irctc-live-delay-extension](https://github.com/RajdipGhosh99/irctc-live-delay-extension)
+
