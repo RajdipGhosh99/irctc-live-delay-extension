@@ -38,21 +38,23 @@ export async function fetchIrctcOfficialStatus(
   const endpoint = config.apiEndpoint || IRCTC_OFFICIAL_METADATA.defaultEndpoint;
   const greq = generateGreqId();
 
-  // Convert any format (2026-08-29, 29-08-2026, 20260829) into exact 8-digit "YYYYMMDD" required by IRCTC
-  let formattedJourneyDate: string | null = null;
+  // Resolve active journey date: If searching for a future date, query today's active run so NTES tracks live status
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const todayYmd = `${year}${month}${day}`;
+
+  let formattedJourneyDate = todayYmd;
   if (travelDate) {
     const iso = normalizeDateToIsoDate(travelDate);
-    formattedJourneyDate = iso ? iso.replace(/-/g, '') : travelDate.replace(/-/g, '');
-  }
-  if (!formattedJourneyDate) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    formattedJourneyDate = `${year}${month}${day}`;
+    const candidateDate = iso ? iso.replace(/-/g, '') : travelDate.replace(/-/g, '');
+    if (candidateDate && candidateDate <= todayYmd) {
+      formattedJourneyDate = candidateDate;
+    }
   }
 
-  console.log(`[Official NTES] 🚀 Querying ${endpoint} for Train #${trainNumber} (journeyDate: ${formattedJourneyDate})...`);
+  console.log(`[Official NTES] 🚀 Querying ${endpoint} for Train #${trainNumber} (activeDate: ${formattedJourneyDate})...`);
 
   const payload = {
     trainNumber: trainNumber.trim(),

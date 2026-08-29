@@ -337,11 +337,37 @@ function openSettingsDashboard(): void {
   sendMessageToBackground({ type: 'OPEN_OPTIONS_PAGE' });
 }
 
+/**
+ * Validates if current page is an active Train Search / Booking listing page
+ */
+function isTrainSearchPage(): boolean {
+  const path = window.location.pathname.toLowerCase();
+  const href = window.location.href.toLowerCase();
+
+  if (
+    path.includes('train-list') ||
+    path.includes('train_list') ||
+    path.includes('train-search') ||
+    path.includes('trains') ||
+    path.includes('railways') ||
+    path.includes('booking') ||
+    path.includes('train-schedule') ||
+    path.includes('train_running_status') ||
+    path.includes('eticket') ||
+    path.includes('nget') ||
+    href.includes('train') ||
+    href.includes('rail')
+  ) {
+    return true;
+  }
+
+  return activeWidgets.size > 0;
+}
+
 function removeAllInjectedUI() {
   document.getElementById('irctc-live-hud')?.remove();
   document.querySelectorAll('.irctc-delay-wrapper').forEach((el) => el.remove());
   document.querySelectorAll('[data-delay-injected]').forEach((el) => el.removeAttribute('data-delay-injected'));
-  document.querySelectorAll('[data-irctc-delay-injected]').forEach((el) => el.removeAttribute('data-irctc-delay-injected'));
   document.querySelectorAll('.irctc-below-name-row').forEach((el) => el.remove());
   activeWidgets.clear();
   autoFetchQueue.clear();
@@ -349,10 +375,32 @@ function removeAllInjectedUI() {
 }
 
 /**
+ * Dynamically updates HUD display: Only visible on train search pages when train numbers exist
+ */
+function updateHUDVisibility() {
+  const existingHud = document.getElementById('irctc-live-hud');
+  const shouldShow = isExtensionEnabled && isSiteEnabled && activeWidgets.size > 0 && isTrainSearchPage();
+
+  if (!shouldShow) {
+    if (existingHud) existingHud.remove();
+    return;
+  }
+
+  if (!existingHud) {
+    injectAutoWelcomeHUD();
+  } else {
+    const fetchAllBtn = existingHud.querySelector<HTMLButtonElement>('#irctc-hud-fetch-all-btn');
+    if (fetchAllBtn && !fetchAllBtn.disabled) {
+      fetchAllBtn.textContent = `⚡ Fetch All (${activeWidgets.size})`;
+    }
+  }
+}
+
+/**
  * Injects Accessible Floating HUD in the bottom-right corner
  */
 function injectAutoWelcomeHUD() {
-  if (!isExtensionEnabled || !isSiteEnabled) return;
+  if (!isExtensionEnabled || !isSiteEnabled || activeWidgets.size === 0 || !isTrainSearchPage()) return;
   if (document.getElementById('irctc-live-hud')) return;
 
   const hudWrapper = document.createElement('div');
@@ -368,7 +416,7 @@ function injectAutoWelcomeHUD() {
       hudWrapper.innerHTML = `
         <div class="irctc-hud-minimized" title="Click to expand Live Delay Tracker" role="button" tabindex="0" aria-label="Expand Live Train Tracker">
           <span aria-hidden="true">🚆</span>
-          <span>Live Delay Active</span>
+          <span>Live Delay Active (${activeWidgets.size})</span>
         </div>
       `;
       hudWrapper.querySelector('.irctc-hud-minimized')?.addEventListener('click', (e) => {
@@ -464,8 +512,8 @@ function injectAutoWelcomeHUD() {
     });
   }
 
-  document.body.appendChild(hudWrapper);
   renderHUD();
+  document.body.appendChild(hudWrapper);
 }
 
 /**
@@ -781,10 +829,17 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
   } else {
     // Default: 'beside-name' -> Placed directly beside the Train Name text on the exact same row
     if (nameAnchor) {
-      nameAnchor.style.display = 'inline-flex';
-      nameAnchor.style.alignItems = 'center';
-      nameAnchor.style.flexWrap = 'nowrap';
-      nameAnchor.appendChild(wrapper);
+      if (currentVendorId === 'irctc') {
+        const headingContainer = nameAnchor.closest<HTMLElement>('.train-heading, .form-group') || nameAnchor.parentElement || nameAnchor;
+        headingContainer.style.display = 'inline-flex';
+        headingContainer.style.alignItems = 'center';
+        headingContainer.appendChild(wrapper);
+      } else {
+        nameAnchor.style.display = 'inline-flex';
+        nameAnchor.style.alignItems = 'center';
+        nameAnchor.style.flexWrap = 'nowrap';
+        nameAnchor.appendChild(wrapper);
+      }
     } else {
       targetElement.appendChild(wrapper);
     }
@@ -832,6 +887,8 @@ function processTrainCards() {
   if (isAutoFetchAll) {
     enqueueAutoFetch();
   }
+
+  updateHUDVisibility();
 }
 
 /**
@@ -876,7 +933,7 @@ async function init() {
 
     // 2. Initial Injection Pass
     processTrainCards();
-    injectAutoWelcomeHUD();
+    updateHUDVisibility();
 
     if (isAutoFetchAll) {
       console.log(`[Live Delay Tracker] ⚡ Auto-Fetch is active on load. Triggering batch fetch...`);
@@ -979,7 +1036,7 @@ async function init() {
               removeAllInjectedUI();
             }
             processTrainCards();
-            injectAutoWelcomeHUD();
+            updateHUDVisibility();
             if (!wasAutoFetch && isAutoFetchAll) {
               autoFetchAllPageTrains(false);
             }
