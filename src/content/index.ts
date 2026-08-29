@@ -398,9 +398,55 @@ function removeAllInjectedUI() {
 /**
  * Dynamically updates HUD display: Only visible on train search pages when train numbers exist
  */
+const TAB_HUD_DISMISSED_KEY = 'irctc_hud_dismissed_session';
+const TAB_HUD_MINIMIZED_KEY = 'irctc_hud_minimized_session';
+
+function isHudDismissedOnThisTab(): boolean {
+  try {
+    return sessionStorage.getItem(TAB_HUD_DISMISSED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function setHudDismissedOnThisTab(dismissed = true): void {
+  try {
+    if (dismissed) {
+      sessionStorage.setItem(TAB_HUD_DISMISSED_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(TAB_HUD_DISMISSED_KEY);
+    }
+  } catch {}
+}
+
+function isHudMinimizedOnThisTab(): boolean {
+  try {
+    return sessionStorage.getItem(TAB_HUD_MINIMIZED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function setHudMinimizedOnThisTab(minimized: boolean): void {
+  try {
+    if (minimized) {
+      sessionStorage.setItem(TAB_HUD_MINIMIZED_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(TAB_HUD_MINIMIZED_KEY);
+    }
+  } catch {}
+}
+
+/**
+ * Dynamically updates HUD display: Only visible on train search pages when train numbers exist, isolated strictly per tab
+ */
 function updateHUDVisibility() {
   const existingHud = document.getElementById('irctc-live-hud');
-  const shouldShow = isExtensionEnabled && isSiteEnabled && activeWidgets.size > 0 && isTrainSearchPage();
+  const shouldShow = isExtensionEnabled &&
+                     isSiteEnabled &&
+                     activeWidgets.size > 0 &&
+                     isTrainSearchPage() &&
+                     !isHudDismissedOnThisTab();
 
   if (!shouldShow) {
     if (existingHud) existingHud.remove();
@@ -418,10 +464,10 @@ function updateHUDVisibility() {
 }
 
 /**
- * Injects Accessible Floating HUD in the bottom-right corner
+ * Injects Tab-Specific Accessible Floating HUD in the bottom-right corner
  */
 function injectAutoWelcomeHUD() {
-  if (!isExtensionEnabled || !isSiteEnabled || activeWidgets.size === 0 || !isTrainSearchPage()) return;
+  if (!isExtensionEnabled || !isSiteEnabled || activeWidgets.size === 0 || !isTrainSearchPage() || isHudDismissedOnThisTab()) return;
   if (document.getElementById('irctc-live-hud')) return;
 
   const hudWrapper = document.createElement('div');
@@ -430,7 +476,7 @@ function injectAutoWelcomeHUD() {
   hudWrapper.setAttribute('role', 'region');
   hudWrapper.setAttribute('aria-label', 'Live Train Delay Tracker HUD');
 
-  let isMinimized = false;
+  let isMinimized = isHudMinimizedOnThisTab();
 
   function renderHUD() {
     if (isMinimized) {
@@ -444,6 +490,7 @@ function injectAutoWelcomeHUD() {
         e.stopPropagation();
         e.preventDefault();
         isMinimized = false;
+        setHudMinimizedOnThisTab(false);
         renderHUD();
       });
       return;
@@ -458,7 +505,7 @@ function injectAutoWelcomeHUD() {
           </div>
           <div class="irctc-hud-controls">
             <button class="irctc-hud-btn-icon" id="irctc-hud-min" type="button" title="Minimize" aria-label="Minimize HUD">_</button>
-            <button class="irctc-hud-btn-icon" id="irctc-hud-close" type="button" title="Dismiss" aria-label="Close HUD">✕</button>
+            <button class="irctc-hud-btn-icon" id="irctc-hud-close" type="button" title="Dismiss on this tab" aria-label="Close HUD">✕</button>
           </div>
         </div>
         <div class="irctc-hud-body" aria-live="polite">
@@ -478,7 +525,7 @@ function injectAutoWelcomeHUD() {
           <button class="irctc-hud-btn-secondary" id="irctc-hud-config-btn" type="button" aria-label="Open Token Settings Dashboard">
             ⚙️ Settings
           </button>
-          <button class="irctc-hud-btn-secondary" id="irctc-hud-gotit-btn" type="button" aria-label="Acknowledge HUD">
+          <button class="irctc-hud-btn-secondary" id="irctc-hud-gotit-btn" type="button" aria-label="Dismiss HUD on this tab">
             ✕
           </button>
         </div>
@@ -492,12 +539,14 @@ function injectAutoWelcomeHUD() {
       e.stopPropagation();
       e.preventDefault();
       isMinimized = true;
+      setHudMinimizedOnThisTab(true);
       renderHUD();
     });
 
     hudWrapper.querySelector('#irctc-hud-close')?.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
+      setHudDismissedOnThisTab(true);
       hudWrapper.remove();
     });
 
@@ -529,6 +578,7 @@ function injectAutoWelcomeHUD() {
     hudWrapper.querySelector('#irctc-hud-gotit-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
+      setHudDismissedOnThisTab(true);
       hudWrapper.remove();
     });
   }
