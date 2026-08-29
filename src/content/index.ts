@@ -704,7 +704,14 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
 
   // 1. Live location & Next Platform strip
   let liveLocationSummary = '';
-  if (data.statusSummary && /departed|arrived|passed|late|delay|in\s*transit/i.test(data.statusSummary)) {
+  const isNotStarted =
+    (data.currentStationName === 'Not Started' || data.statusSummary?.includes('Not Started')) &&
+    data.delayMinutes === 0 &&
+    (!data.todayDelayMinutes || data.todayDelayMinutes === 0);
+
+  if (isNotStarted) {
+    liveLocationSummary = '📍 Not Started Yet';
+  } else if (data.statusSummary && /departed|arrived|passed|late|delay/i.test(data.statusSummary)) {
     liveLocationSummary = `📍 ${data.statusSummary}`;
   } else if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started') {
     const nextPf = data.nextStationPlatform ? ` (${data.nextStationPlatform}${data.nextStationHaltMinutes ? ` • ${data.nextStationHaltMinutes}m stop` : ''})` : '';
@@ -714,25 +721,18 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   } else if (data.statusSummary && !data.statusSummary.includes('Scheduled (Not Started Yet)')) {
     liveLocationSummary = `📍 ${data.statusSummary}`;
   } else {
-    liveLocationSummary = '📍 Not Started Yet (Origin)';
+    liveLocationSummary = '📍 Not Started Yet';
   }
 
   // 2. Route Progress Bar Text & Active Trip Detection
-  const isTripRunning =
-    (data.delayMinutes !== 0) ||
-    (data.todayDelayMinutes !== undefined && data.todayDelayMinutes !== 0) ||
-    (data.routeProgressPct !== undefined && data.routeProgressPct > 0) ||
-    Boolean(data.currentStationName && !/not\s*started|origin/i.test(data.currentStationName)) ||
-    Boolean(data.statusSummary && !/not\s*started\s*yet|yet\s*to\s*start|scheduled\s*\(not/i.test(data.statusSummary));
-
   const progressPct = (data.routeProgressPct && data.routeProgressPct > 0) ? data.routeProgressPct : 0;
   const stopsLeft = data.remainingStationsCount !== undefined && data.remainingStationsCount > 0 ? `${data.remainingStationsCount} stops left` : '';
   let progressText = '🏁 Not Started Yet';
 
-  if (isTripRunning) {
+  if (!isNotStarted) {
     if (data.totalStations && data.totalStations > 0 && progressPct > 0) {
       progressText = `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`;
-    } else if (data.currentStationName && !/not\s*started|origin/i.test(data.currentStationName)) {
+    } else if (data.currentStationName && data.currentStationName !== 'Not Started') {
       progressText = `🚆 In Transit: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
     } else {
       progressText = '🚆 In Transit (Live Tracking)';

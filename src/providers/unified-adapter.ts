@@ -240,26 +240,28 @@ export function normalizeUnifiedTrainResponse(
     s.is_current || s.isCurrent
   );
 
-  const isExplicitlyNotStarted =
+  const hasVisitedStns = visitedStationsList.length > 0;
+  const isExplicitNotStarted =
     rawJson.data?.is_train_started === false ||
     rawJson.is_train_started === false ||
-    (irctcTrainPositionStr && /not\s*started\s*yet|yet\s*to\s*start|train\s*has\s*not\s*started/i.test(irctcTrainPositionStr));
+    Boolean(irctcTrainPositionStr && /not\s*started\s*yet|yet\s*to\s*start|train\s*has\s*not\s*started/i.test(irctcTrainPositionStr));
 
-  const isStarted = !isExplicitlyNotStarted && (
+  const isExplicitStarted =
     rawJson.data?.is_train_started === true ||
     rawJson.is_train_started === true ||
-    visitedStationsList.length > 0 ||
-    delayMinutes !== 0 ||
-    Boolean(irctcTrainPositionStr && /departed|arrived|passed|late|delay|in\s*transit/i.test(irctcTrainPositionStr)) ||
-    Boolean(currentStationName && currentStationName !== 'Not Started' && currentStationName !== 'Origin')
+    Boolean(irctcTrainPositionStr && /departed|arrived|passed|running|late|delay/i.test(irctcTrainPositionStr) && !isExplicitNotStarted);
+
+  const isStarted = !isExplicitNotStarted && (
+    isExplicitStarted ||
+    hasVisitedStns ||
+    (delayMinutes !== 0)
   );
 
   if (stationList.length > 0) {
-    const activeStn = visitedStationsList.length > 0 ? visitedStationsList[visitedStationsList.length - 1] : stationList[0];
-
-    if (activeStn) {
+    if (hasVisitedStns) {
+      const activeStn = visitedStationsList[visitedStationsList.length - 1];
       if (!currentStationName || currentStationName === 'En Route' || currentStationName === 'Not Started') {
-        currentStationName = activeStn.station_name || activeStn.stationName || activeStn.StationName || activeStn.stnName || (isStarted ? 'In Transit' : 'Not Started');
+        currentStationName = activeStn.station_name || activeStn.stationName || activeStn.StationName || activeStn.stnName || 'In Transit';
         currentStationCode = activeStn.station_code || activeStn.stationCode || activeStn.StationCode || activeStn.stnCode || '';
       }
 
@@ -282,6 +284,14 @@ export function normalizeUnifiedTrainResponse(
           }
         }
       }
+    } else if (isStarted) {
+      if (!currentStationName || currentStationName === 'En Route' || currentStationName === 'Not Started') {
+        currentStationName = stationList[0]?.station_name || 'In Transit';
+        currentStationCode = stationList[0]?.station_code || '';
+      }
+    } else {
+      currentStationName = 'Not Started';
+      currentStationCode = stationList[0]?.station_code || '';
     }
 
     if (!nextStationName) {
@@ -290,6 +300,8 @@ export function normalizeUnifiedTrainResponse(
         nextStationName = upcoming.station_name || upcoming.stationName || upcoming.StationName || upcoming.stnName || '';
       }
     }
+  } else if (!isStarted) {
+    currentStationName = 'Not Started';
   }
 
   // 6. Next Station Platform & Halt Duration
