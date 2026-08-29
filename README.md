@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="MIT License" /></a>
-  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0"><img src="https://img.shields.io/badge/Release-v1.5.0-blue?style=for-the-badge" alt="Release v1.5.0" /></a>
-  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-indigo?style=for-the-badge&logo=github" alt="Author" /></a>
+  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=for-the-badge" alt="GPL 3.0 License" /></a>
+  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0"><img src="https://img.shields.io/badge/Release-v1.5.0-indigo?style=for-the-badge" alt="Release v1.5.0" /></a>
+  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-blue?style=for-the-badge&logo=github" alt="Author" /></a>
+  <img src="https://img.shields.io/badge/Copyleft-ShareAlike-success?style=for-the-badge" alt="Copyleft ShareAlike" />
   <img src="https://img.shields.io/badge/Manifest-V3-success?style=for-the-badge" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/TypeScript-5.2-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge" alt="PRs Welcome" />
 </p>
 
@@ -133,9 +133,14 @@ Feel free to check the [Issues page](https://github.com/RajdipGhosh99/irctc-live
 
 ---
 
-## 📄 License
+## 📄 License & Copyleft Protection
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+Distributed under the **GNU General Public License v3.0 (GPL-3.0)** (Strict Copyleft / Share-Alike).
+
+> ⚖️ **Open Source Protection Clause:**  
+> This project is 100% free and open-source. Under the terms of the GNU GPLv3, anyone who modifies, extends, forks, or builds derivative software based on this codebase **must also release their derivative work as 100% open-source under the exact same GPL-3.0 license**. Proprietary derivatives, closing the source code, or commercial lock-in are legally prohibited.
+
+See the [`LICENSE`](LICENSE) file for complete legal terms.
 
 ---
 

@@ -3,7 +3,7 @@
   "version": "1.5.0",
   "description": "High-performance, open-source real-time live train delay tracker across IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip, Ixigo, Goibibo, and Paytm.",
   "author": "Rajdip Ghosh <https://github.com/RajdipGhosh99>",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/RajdipGhosh99/irctc-live-delay-extension#readme",
   "repository": {
     "type": "git",
