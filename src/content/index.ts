@@ -718,18 +718,25 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
   const nameAnchor = findTrainNameAnchor(cardContainer, targetElement);
 
   if (position === 'card-header-right') {
-    const header = cardContainer.querySelector<HTMLElement>('.train-heading, .card-header, .header, .train-name-wrap, .railway-card-header');
-    if (header) {
-      header.appendChild(wrapper);
-    } else {
-      nameAnchor.parentElement?.appendChild(wrapper);
-    }
+    const header = cardContainer.querySelector<HTMLElement>('.train-heading, .card-header, .header, .train-name-wrap, .railway-card-header, .single-train-header') || cardContainer;
+    header.style.position = 'relative';
+    header.appendChild(wrapper);
   } else if (position === 'below-name') {
-    if (nameAnchor.nextSibling) {
-      nameAnchor.parentElement?.insertBefore(wrapper, nameAnchor.nextSibling);
-    } else {
-      nameAnchor.parentElement?.appendChild(wrapper);
+    const container = nameAnchor.parentElement || nameAnchor;
+    let belowRow = container.querySelector<HTMLElement>('.irctc-below-name-row');
+    if (!belowRow) {
+      belowRow = document.createElement('div');
+      belowRow.className = 'irctc-below-name-row';
+      belowRow.style.display = 'block';
+      belowRow.style.marginTop = '4px';
+      belowRow.style.marginBottom = '2px';
+      if (nameAnchor.nextSibling) {
+        container.insertBefore(belowRow, nameAnchor.nextSibling);
+      } else {
+        container.appendChild(belowRow);
+      }
     }
+    belowRow.appendChild(wrapper);
   } else {
     // Default: 'beside-name' -> Placed directly beside the Train Name text on the exact same row
     if (nameAnchor) {
@@ -901,6 +908,10 @@ async function init() {
       if (area === 'local' && changes['irctc_delay_multi_settings']) {
         const newSettings = changes['irctc_delay_multi_settings'].newValue;
         if (newSettings) {
+          const oldExtensionEnabled = isExtensionEnabled;
+          const oldSiteEnabled = isSiteEnabled;
+          const oldPos = currentSitePosition;
+
           isExtensionEnabled = newSettings.extensionEnabled !== false;
           const wasAutoFetch = isAutoFetchAll;
           isAutoFetchAll = newSettings.autoFetchAllTrains === true;
@@ -918,9 +929,16 @@ async function init() {
           }
 
           if (!isExtensionEnabled || !isSiteEnabled) {
+            console.log(`[Live Delay Tracker] Extension or portal disabled on ${currentHostname}. Clearing UI...`);
             removeAllInjectedUI();
           } else {
+            // If position changed or extension was re-enabled from disabled state:
+            if (oldPos !== currentSitePosition || !oldSiteEnabled || !oldExtensionEnabled) {
+              console.log(`[Live Delay Tracker] 🔄 Re-hydrating UI (Position: ${currentSitePosition}, SiteEnabled: ${isSiteEnabled})...`);
+              removeAllInjectedUI();
+            }
             processTrainCards();
+            injectAutoWelcomeHUD();
             if (!wasAutoFetch && isAutoFetchAll) {
               autoFetchAllPageTrains(false);
             }

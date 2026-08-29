@@ -159,6 +159,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
       sitesGrid.appendChild(card);
     });
+
+    // Instant auto-save on portal toggle
+    sitesGrid.querySelectorAll<HTMLInputElement>('.site-toggle').forEach((toggle) => {
+      toggle.addEventListener('change', () => {
+        const host = toggle.getAttribute('data-host') || '';
+        const enabled = toggle.checked;
+        saveCurrentSettings(true, `Portal "${host}" ${enabled ? 'Enabled ✅' : 'Disabled ⏸'}`);
+      });
+    });
+
+    // Instant auto-save on position change
+    sitesGrid.querySelectorAll<HTMLSelectElement>('.site-pos-select').forEach((select) => {
+      select.addEventListener('change', () => {
+        const host = select.getAttribute('data-host') || '';
+        const pos = select.value;
+        const posLabel = pos === 'beside-name' ? 'Beside Train Name' : pos === 'card-header-right' ? 'Top-Right of Card' : 'Below Train Name';
+        saveCurrentSettings(true, `📍 ${host} position set to: ${posLabel}`);
+      });
+    });
   }
 
   function renderProviderPools(providers: Record<string, any>) {
@@ -506,12 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderProviderPools(settings.providers || {});
   }
 
-  await loadData();
-
-  saveAllBtn.addEventListener('click', () => {
-    saveAllBtn.disabled = true;
-    saveAllBtn.textContent = 'Saving...';
-
+  function saveCurrentSettings(showToastMessage = true, customMsg?: string) {
     const disabledSites: string[] = [];
     document.querySelectorAll<HTMLInputElement>('.site-toggle').forEach((cb) => {
       const host = cb.getAttribute('data-host');
@@ -548,15 +562,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     chrome.runtime.sendMessage({ type: 'SAVE_SETTINGS', payload } as ExtensionMessage, (res) => {
-      saveAllBtn.disabled = false;
-      saveAllBtn.textContent = '💾 Save All Changes';
       if (res?.success) {
-        showToast('✅ All settings, per-site badge positions, and token pools saved!');
-        loadData();
-      } else {
+        if (showToastMessage) {
+          showToast(customMsg || '✅ Settings updated successfully!');
+        }
+      } else if (showToastMessage) {
         showToast(`❌ ${res?.error || 'Failed to save settings'}`, true);
       }
     });
+  }
+
+  await loadData();
+
+  // Instant Auto-Save on form input changes
+  masterSwitch.addEventListener('change', () => {
+    saveCurrentSettings(true, `Extension ${masterSwitch.checked ? 'Enabled Globally ✅' : 'Disabled ⏸'}`);
+  });
+  primaryProviderSelect.addEventListener('change', () => {
+    saveCurrentSettings(true, `Primary provider set to: ${primaryProviderSelect.options[primaryProviderSelect.selectedIndex].text}`);
+  });
+  autoFailoverSwitch.addEventListener('change', () => {
+    saveCurrentSettings(true, `Auto-Failover ${autoFailoverSwitch.checked ? 'Enabled' : 'Disabled'}`);
+  });
+  autoFetchAllSwitch?.addEventListener('change', () => {
+    saveCurrentSettings(true, `Auto-Fetch on Page Load ${autoFetchAllSwitch.checked ? 'Enabled ⚡' : 'Disabled (On-Demand)'}`);
+  });
+  cacheTtlSelect.addEventListener('change', () => {
+    saveCurrentSettings(true, `Cache TTL set to ${cacheTtlSelect.value} minutes`);
+  });
+  showHudSwitch.addEventListener('change', () => {
+    saveCurrentSettings(true, `Floating HUD ${showHudSwitch.checked ? 'Enabled' : 'Hidden'}`);
+  });
+
+  saveAllBtn.addEventListener('click', () => {
+    saveAllBtn.disabled = true;
+    saveAllBtn.textContent = 'Saving...';
+    saveCurrentSettings(true, '✅ All settings, per-site badge positions, and token pools saved!');
+    setTimeout(() => {
+      saveAllBtn.disabled = false;
+      saveAllBtn.textContent = '💾 Save All Changes';
+    }, 1000);
   });
 
   clearCacheBtn.addEventListener('click', () => {
