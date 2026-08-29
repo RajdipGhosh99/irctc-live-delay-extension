@@ -155,7 +155,7 @@ function extractTrainNumber(text: string, element?: HTMLElement): string | null 
 
     const href = element.getAttribute('href') || (element as HTMLAnchorElement).href;
     if (href) {
-      const hrefMatch = href.match(/\b([0-2]\d{4})\b/);
+      const hrefMatch = href.match(/(?:^|[^\d])([0-2]\d{4})(?=[^\d]|$)/);
       if (hrefMatch) return hrefMatch[1];
     }
   }
@@ -167,18 +167,18 @@ function extractTrainNumber(text: string, element?: HTMLElement): string | null 
   if (parenMatch) return parenMatch[1];
 
   // 2. Check "12002 - " or "12002 | " or "12002 / "
-  const prefixMatch = text.match(/\b([0-2]\d{4})\s*[\-\|\/\:]/);
+  const prefixMatch = text.match(/(?:^|[^\d])([0-2]\d{4})\s*[\-\|\/\:\(]/);
   if (prefixMatch) return prefixMatch[1];
 
   // 3. Check "Train No: 12002" or "Train 12002" or "No. 12002"
   const labelMatch = text.match(/(?:train|trn|no\.?|#)\s*:?\s*([0-2]\d{4})\b/i);
   if (labelMatch) return labelMatch[1];
 
-  // 4. Check standalone 5-digit train number (valid range 01000 - 29999)
-  const standAlone = text.match(/\b([0-2]\d{4})\b/);
-  if (standAlone) {
-    const num = standAlone[1];
-    // Exclude common 5-digit non-train numbers like postal codes or generic years
+  // 4. Universal 5-digit train number (handles direct concatenation like "12904Golden Temple M")
+  const universalMatch = text.match(/(?:^|[^\d])([0-2]\d{4})(?=[^\d]|$)/);
+  if (universalMatch) {
+    const num = universalMatch[1];
+    // Exclude common 5-digit non-train numbers like postal codes or generic round numbers
     if (!num.startsWith('000') && !num.startsWith('999') && num !== '10000' && num !== '20000') {
       return num;
     }
