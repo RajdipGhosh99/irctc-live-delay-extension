@@ -1132,53 +1132,13 @@ function processTrainCards() {
 /**
  * Initializes Content Script and binds reactive event streams
  */
-async function init() {
+function init() {
   try {
-    // 1. Direct local storage read for instantaneous zero-delay settings hydration
-    const localStore = await chrome.storage.local.get('irctc_delay_multi_settings');
-    const directSettings = localStore['irctc_delay_multi_settings'];
-    if (directSettings) {
-      isExtensionEnabled = directSettings.extensionEnabled !== false;
-      isAutoFetchAll = directSettings.autoFetchAllTrains === true;
-      const disabledSites: string[] = directSettings.disabledSites || [];
-      isSiteEnabled = !disabledSites.some((disabled: string) => currentHostname.includes(disabled.toLowerCase()));
-    }
-
-    const settingsRes = await sendMessageToBackground({ type: 'GET_SETTINGS' });
-    if (settingsRes && settingsRes.success && settingsRes.data) {
-      const settings: any = settingsRes.data;
-      isExtensionEnabled = settings.extensionEnabled !== false;
-      isAutoFetchAll = settings.autoFetchAllTrains === true;
-
-      const disabledSites: string[] = settings.disabledSites || [];
-      isSiteEnabled = !disabledSites.some((disabled) => currentHostname.includes(disabled.toLowerCase()));
-
-      if (settings.sitePositions) {
-        for (const [domain, pos] of Object.entries(settings.sitePositions)) {
-          if (currentHostname.includes(domain.toLowerCase())) {
-            currentSitePosition = pos as BadgePosition;
-            break;
-          }
-        }
-      }
-    }
-
-    if (!isExtensionEnabled || !isSiteEnabled) {
-      console.log(`[Live Delay Tracker] Disabled on: ${currentHostname}`);
-      removeAllInjectedUI();
-      return;
-    }
-
-    // 2. Initial Injection Pass
+    // 1. Immediate Synchronous First Pass
     processTrainCards();
     updateHUDVisibility();
 
-    if (isAutoFetchAll) {
-      console.log(`[Live Delay Tracker] ⚡ Auto-Fetch is active on load. Triggering batch fetch...`);
-      enqueueAutoFetch();
-    }
-
-    // 3. High-Responsiveness 1-Second Pulse Scanner (Runs for 12 seconds to catch AJAX SPA cards)
+    // 2. High-Responsiveness 1-Second Pulse Scanner (Runs for 12 seconds to catch AJAX SPA cards)
     let scanCount = 0;
     const scanInterval = setInterval(() => {
       scanCount++;
@@ -1191,19 +1151,76 @@ async function init() {
       }
     }, 1000);
 
-    // Continuous 2.5-second Heartbeat Scanner (Keeps active during all SPA searches and date filter switches)
+    // Continuous 2-second Heartbeat Scanner (Keeps active during all SPA searches and date filter switches)
     setInterval(() => {
       if (isExtensionEnabled && isSiteEnabled) {
         processTrainCards();
       }
-    }, 2500);
+    }, 2000);
 
-    // 4. Reactive RxJS Mutation Stream with 180ms debouncing (smooth 60 FPS scrolling)
+    // 3. Reactive RxJS Mutation Stream with 180ms debouncing (smooth 60 FPS scrolling)
     createMutationObservable(document.body, { childList: true, subtree: true })
       .pipe(debounceTime(180), takeUntil(destroy$))
       .subscribe(() => {
         processTrainCards();
       });
+
+    // 4. Asynchronous Local Storage & Settings Hydration
+    chrome.storage.local.get('irctc_delay_multi_settings').then((localStore) => {
+      const directSettings = localStore['irctc_delay_multi_settings'];
+      if (directSettings) {
+        isExtensionEnabled = directSettings.extensionEnabled !== false;
+        isAutoFetchAll = directSettings.autoFetchAllTrains === true;
+        const disabledSites: string[] = directSettings.disabledSites || [];
+        isSiteEnabled = !disabledSites.some((disabled: string) => currentHostname.includes(disabled.toLowerCase()));
+
+        if (directSettings.sitePositions) {
+          for (const [domain, pos] of Object.entries(directSettings.sitePositions)) {
+            if (currentHostname.includes(domain.toLowerCase())) {
+              currentSitePosition = pos as BadgePosition;
+              break;
+            }
+          }
+        }
+
+        if (!isExtensionEnabled || !isSiteEnabled) {
+          removeAllInjectedUI();
+        } else {
+          processTrainCards();
+          updateHUDVisibility();
+          if (isAutoFetchAll) {
+            enqueueAutoFetch();
+          }
+        }
+      }
+    }).catch(() => {});
+
+    sendMessageToBackground({ type: 'GET_SETTINGS' }).then((settingsRes) => {
+      if (settingsRes && settingsRes.success && settingsRes.data) {
+        const settings: any = settingsRes.data;
+        isExtensionEnabled = settings.extensionEnabled !== false;
+        isAutoFetchAll = settings.autoFetchAllTrains === true;
+
+        const disabledSites: string[] = settings.disabledSites || [];
+        isSiteEnabled = !disabledSites.some((disabled) => currentHostname.includes(disabled.toLowerCase()));
+
+        if (settings.sitePositions) {
+          for (const [domain, pos] of Object.entries(settings.sitePositions)) {
+            if (currentHostname.includes(domain.toLowerCase())) {
+              currentSitePosition = pos as BadgePosition;
+              break;
+            }
+          }
+        }
+
+        if (!isExtensionEnabled || !isSiteEnabled) {
+          removeAllInjectedUI();
+        } else {
+          processTrainCards();
+          updateHUDVisibility();
+        }
+      }
+    }).catch(() => {});
 
     // 5. SPA Route Change Interception (MakeMyTrip / ConfirmTkt client-side search without page reload)
     const handleSpaRouteChange = () => {
