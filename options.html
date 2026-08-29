@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Live Train Delay Tracker - ISO Standard Settings</title>
+  <link rel="stylesheet" href="./src/options.css" />
+</head>
+<body>
+  <!-- Mobile Navigation Bar -->
+  <header class="mobile-nav-header">
+    <div class="mobile-brand">
+      <img src="./icons/icon32.png" alt="Logo" class="mobile-logo" width="28" height="28" />
+      <div>
+        <strong>Train Delay Tracker</strong>
+        <span class="mobile-sub">by Rajdip Ghosh • ISO Standard</span>
+      </div>
+    </div>
+    <button type="button" id="mobile-menu-toggle" class="mobile-menu-btn" aria-label="Toggle Menu" aria-expanded="false">
+      ☰
+    </button>
+  </header>
+
+  <div class="options-layout">
+    <!-- Sidebar / Brand -->
+    <aside class="options-sidebar" id="options-sidebar">
+      <div class="brand">
+        <img src="./icons/icon48.png" alt="Logo" class="brand-logo" width="36" height="36" />
+        <div>
+          <h2>Train Delay Tracker</h2>
+          <span class="version-tag">v1.5.0 • ISO Standard</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Settings Navigation">
+        <a href="#general" class="nav-item active" data-target="general">⚙️ General & Sites</a>
+        <a href="#tokens" class="nav-item" data-target="tokens">🔑 Multi-Provider & Pools</a>
+        <a href="#ondemand" class="nav-item" data-target="ondemand">⚡ Click-to-Fetch & Cache</a>
+      </nav>
+
+      <!-- Developer Profile Card -->
+      <div class="dev-profile-card">
+        <div class="dev-profile-header">
+          <div class="dev-avatar">RG</div>
+          <div class="dev-info">
+            <span class="dev-name">Rajdip Ghosh</span>
+            <span class="dev-title">Extension Author</span>
+          </div>
+        </div>
+        <a href="https://github.com/RajdipGhosh99" target="_blank" rel="noopener noreferrer" class="github-btn" aria-label="Developer GitHub Profile">
+          <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 6px;" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          github.com/RajdipGhosh99 ↗
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="options-content">
+      <header class="content-header">
+        <div>
+          <h1>Extension Settings</h1>
+          <p class="subtitle">ISO/IEC 25010 compliant gateway with Multi-Token Key Pools and automatic failover rotation.</p>
+        </div>
+        <button id="save-all-btn" class="btn btn-primary btn-lg" aria-label="Save all changes">
+          💾 Save All Changes
+        </button>
+      </header>
+
+      <div id="toast-message" class="toast hidden" role="status"></div>
+
+      <!-- Section: General & Master Toggles -->
+      <section id="general" class="settings-card">
+        <div class="card-header">
+          <h3>Master Controls & Per-Site Placement</h3>
+          <p>Configure which booking portals to track and customize the badge position for each portal (e.g. Beside Train Name for MakeMyTrip).</p>
+        </div>
+
+        <div class="toggle-row highlight-row">
+          <div>
+            <strong>Master Extension Switch</strong>
+            <p>Enable or disable live delay tracking everywhere.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="master-switch" checked aria-label="Toggle Master Extension Switch" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <h4 class="sub-heading">Supported Booking Portals & Badge Positioning</h4>
+        <p class="sub-desc">Toggle portals and configure badge location according to available page layout:</p>
+
+        <div class="sites-grid" id="sites-grid">
+          <!-- Dynamically populated per-site cards with enable toggle and badge position selector -->
+        </div>
+      </section>
+
+      <!-- Section: Multi-Token Pools -->
+      <section id="tokens" class="settings-card">
+        <div class="card-header">
+          <div class="header-with-badge">
+            <div>
+              <h3>API Providers & Multi-Token Key Pools</h3>
+              <p>Add multiple free API tokens to multiply your monthly quota (1 token = 500 calls, 2 tokens = 1000 calls).</p>
+            </div>
+            <div class="pool-aggregate-badge" id="total-quota-badge">
+              ⚡ Total Pool: 0 Active Tokens
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="primary-provider-select">Primary Provider to Query First:</label>
+          <select id="primary-provider-select" class="form-control">
+            <option value="rapidapi-irctc1" selected>RapidAPI - IRCTC1 (500 free calls/token/mo - Recommended)</option>
+            <option value="rapidapi-indianrail">RapidAPI - Indian Rail (500 free calls/token/mo)</option>
+            <option value="indianrailapi">IndianRailAPI.com (250 free calls/token/day)</option>
+            <option value="irctc-official">Official IRCTC (NTES Direct)</option>
+            <option value="custom">Custom Reverse Proxy / Self-Hosted</option>
+          </select>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <strong>Automatic Failover Across Providers</strong>
+            <p>If all tokens in the primary provider are exhausted, automatically try backup providers.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="auto-failover-switch" checked aria-label="Toggle Automatic Failover" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- Provider Token Pools Container -->
+        <div class="provider-pools-list" id="provider-pools-container">
+          <!-- Dynamically populated per provider with token list + add token forms -->
+        </div>
+      </section>
+
+      <!-- Section: Click-to-Fetch & Cache Settings -->
+      <section id="ondemand" class="settings-card">
+        <div class="card-header">
+          <h3>Click-to-Fetch & Cache Settings</h3>
+          <p>Zero unexpected API calls — delay info is only fetched when you click on a train badge.</p>
+        </div>
+
+        <div class="toggle-row highlight-row" style="background: #f0fdf4; border-color: #bbf7d0;">
+          <div>
+            <strong style="color: #166534;">Strict Click-to-Fetch Mode Enabled</strong>
+            <p style="color: #15803d;">Hovering does NOT make any API calls. Network requests only occur when you explicitly click a train badge.</p>
+          </div>
+          <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 9999px;">
+            100% On-Demand ⚡
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="cache-ttl-select">Local Cache Retention (Saves API calls):</label>
+          <select id="cache-ttl-select" class="form-control">
+            <option value="10">10 Minutes (Standard)</option>
+            <option value="15" selected>15 Minutes (Recommended)</option>
+            <option value="30">30 Minutes (Maximum Conservation)</option>
+            <option value="60">1 Hour</option>
+          </select>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <strong>Show Floating HUD in Page Corner</strong>
+            <p>Displays the floating status indicator card on train search pages.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="show-hud-switch" checked aria-label="Toggle Floating HUD" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="cache-info-box" style="margin-top: 14px;">
+          <div>
+            <span class="cache-stat" id="cache-records-count">0</span>
+            <span class="cache-label">Cached Train Delay Records (Instant 0 API Calls)</span>
+          </div>
+          <button type="button" id="clear-cache-btn" class="btn btn-secondary" aria-label="Clear Local Storage Cache">
+            🗑 Clear Local Cache
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Interactive Verification & Testing Modal -->
+  <div id="test-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-badge-icon" aria-hidden="true">⚡</span>
+        <div>
+          <h3 id="modal-heading">Should I test your API?</h3>
+          <p class="modal-sub">Verify connection to Indian Railways live status before increasing pool capacity.</p>
+        </div>
+      </div>
+
+      <div class="modal-token-preview">
+        <div class="token-preview-row">
+          <span class="preview-lbl">Provider:</span>
+          <strong id="modal-provider-name">RapidAPI - IRCTC1</strong>
+        </div>
+        <div class="token-preview-row">
+          <span class="preview-lbl">Token Label:</span>
+          <span id="modal-token-label">Account #2</span>
+        </div>
+        <div class="token-preview-row">
+          <span class="preview-lbl">Token Key:</span>
+          <code id="modal-token-masked" class="token-code">••••••••</code>
+        </div>
+      </div>
+
+      <div id="modal-status-box" class="modal-status-box hidden">
+        <div class="modal-status-indicator" id="modal-status-indicator"></div>
+        <span id="modal-status-message">Testing token against train #12002...</span>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="modal-skip-test-btn" class="btn btn-outline">Add without Test</button>
+        <button type="button" id="modal-test-add-btn" class="btn btn-primary">⚡ Yes, Test & Add</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/options.ts"></script>
+</body>
+</html>

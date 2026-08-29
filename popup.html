@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Train Delay Tracker</title>
+  <link rel="stylesheet" href="./src/popup.css" />
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-title">
+        <img src="./icons/icon32.png" alt="Icon" class="header-logo" width="24" height="24" />
+        <div>
+          <h2>Train Delay Tracker</h2>
+          <span class="author-tag">by <strong>Rajdip Ghosh</strong> • ISO Standard</span>
+        </div>
+      </div>
+      <span id="global-status-badge" class="badge badge-active">Active</span>
+    </header>
+
+    <!-- Master Switch -->
+    <div class="toggle-box">
+      <div class="toggle-label-group">
+        <strong>Extension Status</strong>
+        <span id="master-toggle-text">Active globally</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="popup-master-switch" checked aria-label="Toggle Extension" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <!-- Quick Live Train Search Bar -->
+    <div class="quick-tracker-card">
+      <div class="quick-tracker-header">
+        <span>⚡ Quick Train Tracker</span>
+        <span class="quick-tracker-sub">Track any train instantly</span>
+      </div>
+      <div class="quick-tracker-row">
+        <input
+          type="text"
+          id="quick-train-input"
+          class="quick-input"
+          placeholder="Train # (e.g. 12002, 16223)"
+          maxlength="5"
+          pattern="[0-9]*"
+          aria-label="Enter Train Number"
+        />
+        <button type="button" id="quick-train-btn" class="btn btn-primary btn-sm">
+          🔍 Track
+        </button>
+      </div>
+      <div id="quick-train-result" class="quick-train-result hidden" aria-live="polite"></div>
+    </div>
+
+    <!-- Current Site Toggle -->
+    <div id="current-site-box" class="site-box">
+      <span id="current-site-label">Site: Current Tab</span>
+      <button type="button" id="site-toggle-btn" class="btn btn-sm btn-outline">
+        Toggle for this Site
+      </button>
+    </div>
+
+    <!-- Provider Selector -->
+    <div class="form-group">
+      <label for="active-provider-select">Primary API Provider:</label>
+      <select id="active-provider-select" class="select-input">
+        <option value="irctc-official">Official IRCTC (NTES Direct - Free)</option>
+        <option value="rapidapi-irctc1">RapidAPI - IRCTC1 (500 free/mo)</option>
+        <option value="rapidapi-indianrail">RapidAPI - Indian Rail (500 free/mo)</option>
+        <option value="indianrailapi">IndianRailAPI.com (250 free/day)</option>
+        <option value="custom">Custom Proxy / Self-Hosted</option>
+      </select>
+    </div>
+
+    <!-- Dashboard Button -->
+    <button type="button" id="open-options-btn" class="btn btn-dashboard">
+      ⚙️ Open Full Settings Dashboard ↗
+    </button>
+
+    <!-- Cache Management -->
+    <div class="cache-section">
+      <div class="cache-info">
+        <span>⚡ Cached Records:</span>
+        <span id="cache-count">0</span>
+      </div>
+      <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
+        🗑 Clear Cache
+      </button>
+    </div>
+
+    <!-- Developer Footer -->
+    <footer class="popup-footer">
+      <a href="https://github.com/RajdipGhosh99" target="_blank" rel="noopener noreferrer" class="dev-link-box" aria-label="Author GitHub">
+        <div class="dev-avatar-sm">RG</div>
+        <div class="dev-text">
+          <span class="dev-line-1">Created by <strong>Rajdip Ghosh</strong></span>
+          <span class="dev-line-2">github.com/RajdipGhosh99 ↗</span>
+        </div>
+      </a>
+    </footer>
+  </div>
+
+  <script type="module" src="./src/popup.ts"></script>
+</body>
+</html>

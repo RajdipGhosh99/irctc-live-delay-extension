@@ -1,0 +1,19 @@
+{
+  "name": "irctc-live-delay-extension",
+  "version": "1.5.0",
+  "description": "Real-time Live Train Delay Tracker across IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip & Ixigo by Rajdip Ghosh.",
+  "author": "Rajdip Ghosh <https://github.com/RajdipGhosh99>",
+  "homepage": "https://github.com/RajdipGhosh99",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.28",
+    "typescript": "^5.2.2",
+    "vite": "^5.4.2"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "name": "Live Train Delay Tracker",
+  "version": "1.5.0",
+  "description": "Real-time train running delay tracker with Multi-Token API pools, on-demand hover fetching, and site toggles across IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip & Ixigo.",
+  "homepage_url": "https://github.com/RajdipGhosh99",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.irctc.co.in/*",
+    "https://*.makemytrip.com/*",
+    "https://*.confirmtkt.com/*",
+    "https://*.cleartrip.com/*",
+    "https://*.ixigo.com/*",
+    "https://*.goibibo.com/*",
+    "https://*.paytm.com/*",
+    "https://*.easemytrip.com/*",
+    "https://*.railyatri.in/*",
+    "https://*.rapidapi.com/*",
+    "https://*.indianrailapi.com/*",
+    "http://localhost/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Live Train Delay Tracker by Rajdip Ghosh",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.irctc.co.in/*",
+        "https://*.makemytrip.com/*",
+        "https://*.confirmtkt.com/*",
+        "https://*.cleartrip.com/*",
+        "https://*.ixigo.com/*",
+        "https://*.goibibo.com/*",
+        "https://*.paytm.com/*",
+        "https://*.easemytrip.com/*",
+        "https://*.railyatri.in/*"
+      ],
+      "js": ["src/content.ts"],
+      "css": ["src/styles.css"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "options.html",
+        "popup.html",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
