@@ -78,17 +78,30 @@ function sanitizeTrainName(rawName?: string, defaultNumber?: string): string {
 function extractStationList(rawJson: any): any[] {
   if (!rawJson) return [];
 
+  // 1. If split into previous_stations and upcoming_stations (e.g. RapidAPI IRCTC1)
+  if (Array.isArray(rawJson.data?.previous_stations) && Array.isArray(rawJson.data?.upcoming_stations)) {
+    return [...rawJson.data.previous_stations, ...rawJson.data.upcoming_stations];
+  }
+  if (Array.isArray(rawJson.previous_stations) && Array.isArray(rawJson.upcoming_stations)) {
+    return [...rawJson.previous_stations, ...rawJson.upcoming_stations];
+  }
+
+  // 2. Direct array candidates
   const candidates = [
     rawJson.data?.station_details,
-    rawJson.data?.previous_stations,
     rawJson.data?.stations,
     rawJson.data?.stationList,
+    rawJson.data?.previous_stations,
+    rawJson.data?.upcoming_stations,
+    rawJson.data?.Station,
+    rawJson.Train?.Station,
     rawJson.stations,
     rawJson.stationList,
     rawJson.stationData,
     rawJson.StationDetails,
     rawJson.PreviousStations,
     rawJson.Stations,
+    rawJson.Station,
     rawJson.result?.stations,
   ];
 
