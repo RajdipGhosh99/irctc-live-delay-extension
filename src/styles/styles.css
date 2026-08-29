@@ -182,21 +182,21 @@
   color: #92400e !important;
 }
 
-/* Floating Glassmorphism Popover Tooltip (Expanded 320px Width) */
+/* Floating Glassmorphism Popover Tooltip (Spacious 390px Width) */
 .irctc-delay-popover {
   position: absolute !important;
   top: calc(100% + 6px) !important;
   left: 0 !important;
-  width: 320px !important;
-  max-width: 92vw !important;
-  padding: 12px 14px !important;
+  width: 390px !important;
+  max-width: 95vw !important;
+  padding: 14px 16px !important;
   background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: var(--irctc-glass-blur) !important;
   -webkit-backdrop-filter: var(--irctc-glass-blur) !important;
   border: 1px solid var(--irctc-glass-border) !important;
   border-radius: 12px !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
-  font-size: 11.5px !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  font-size: 12px !important;
   color: #1e293b !important;
   z-index: 10000 !important;
   opacity: 0 !important;
@@ -228,18 +228,18 @@
 
 .irctc-delay-popover-title {
   font-weight: 700 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   color: #0f172a !important;
 }
 
 .irctc-delay-source-tag {
-  font-size: 9.5px !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
+  font-size: 10px !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
   background: #f1f5f9 !important;
   color: #475569 !important;
   font-weight: 600 !important;
-  max-width: 140px !important;
+  max-width: 170px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -249,11 +249,11 @@
 .irctc-delay-stats-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  gap: 6px !important;
-  margin: 6px 0 10px 0 !important;
+  gap: 8px !important;
+  margin: 8px 0 12px 0 !important;
   background: #f8fafc !important;
-  padding: 7px 6px !important;
-  border-radius: 8px !important;
+  padding: 9px 8px !important;
+  border-radius: 10px !important;
   border: 1px solid #e2e8f0 !important;
 }
 
@@ -263,23 +263,23 @@
   align-items: center !important;
   text-align: center !important;
   background: #ffffff !important;
-  padding: 6px 4px !important;
-  border-radius: 6px !important;
+  padding: 8px 6px !important;
+  border-radius: 8px !important;
   border: 1px solid #f1f5f9 !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
 }
 
 .irctc-stat-title {
-  font-size: 8.5px !important;
+  font-size: 9px !important;
   color: #64748b !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.3px !important;
+  letter-spacing: 0.4px !important;
   margin-bottom: 3px !important;
 }
 
 .irctc-stat-val {
-  font-size: 12.5px !important;
+  font-size: 14px !important;
   font-weight: 800 !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   color: #0f172a !important;
@@ -287,7 +287,7 @@
 }
 
 .irctc-stat-sub {
-  font-size: 8.5px !important;
+  font-size: 9px !important;
   color: #94a3b8 !important;
   margin-top: 3px !important;
 }
@@ -295,8 +295,8 @@
 .irctc-delay-popover-row {
   display: flex !important;
   justify-content: space-between !important;
-  margin: 3px 0 !important;
-  line-height: 1.35 !important;
+  margin: 4px 0 !important;
+  line-height: 1.4 !important;
 }
 
 .irctc-delay-label {
