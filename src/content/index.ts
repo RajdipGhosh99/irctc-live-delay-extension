@@ -499,7 +499,7 @@ function injectAutoWelcomeHUD() {
 
   const hudWrapper = document.createElement('div');
   hudWrapper.id = 'irctc-live-hud';
-  hudWrapper.className = 'irctc-floating-hud';
+  hudWrapper.className = `irctc-floating-hud vendor-${currentVendorId}`;
   hudWrapper.setAttribute('role', 'region');
   hudWrapper.setAttribute('aria-label', 'Live Train Delay Tracker HUD');
 
@@ -611,7 +611,7 @@ function injectAutoWelcomeHUD() {
   }
 
   renderHUD();
-  document.body.appendChild(hudWrapper);
+  (document.documentElement || document.body).appendChild(hudWrapper);
 }
 
 /**

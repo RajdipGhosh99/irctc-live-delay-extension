@@ -645,15 +645,40 @@
 /* 3. ConfirmTkt (confirmtkt.com) - Card-Based Layout */
 .irctc-delay-wrapper.vendor-confirmtkt {
   margin-left: 8px !important;
+  margin-right: 6px !important;
   vertical-align: middle !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 50 !important;
+  flex-shrink: 0 !important;
 }
 .irctc-delay-wrapper.vendor-confirmtkt .irctc-delay-badge {
-  height: 21px !important;
-  padding: 2px 8px !important;
+  height: 22px !important;
+  padding: 2px 9px !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 6px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* ConfirmTkt-Specific Floating HUD Anchor (Strict Bottom-Right of Viewport) */
+.irctc-floating-hud.vendor-confirmtkt,
+[data-irctc-vendor="confirmtkt"] .irctc-floating-hud {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  left: auto !important;
+  top: auto !important;
+  margin: 0 !important;
+  z-index: 2147483647 !important;
+  transform: none !important;
 }
 
 /* 4. Ixigo (ixigo.com) - Material Chip Format */
