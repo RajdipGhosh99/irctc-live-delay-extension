@@ -142,18 +142,39 @@ function createMutationObservable(target: Node, options: MutationObserverInit): 
 /**
  * Extracts a 5-digit Indian Railways train number from freeform text or data attributes
  */
-function extractTrainNumber(text: string): string | null {
+function extractTrainNumber(text: string, element?: HTMLElement): string | null {
+  if (element) {
+    const dataAttr =
+      element.getAttribute('data-train-number') ||
+      element.getAttribute('data-train-no') ||
+      element.getAttribute('data-trainno') ||
+      element.getAttribute('data-train');
+    if (dataAttr && /^[0-2]\d{4}$/.test(dataAttr.trim())) {
+      return dataAttr.trim();
+    }
+
+    const href = element.getAttribute('href') || (element as HTMLAnchorElement).href;
+    if (href) {
+      const hrefMatch = href.match(/\b([0-2]\d{4})\b/);
+      if (hrefMatch) return hrefMatch[1];
+    }
+  }
+
   if (!text) return null;
 
   // 1. Check parenthesized 5-digit numbers e.g. "(12002)", "( 12002 )", "#12002"
   const parenMatch = text.match(/[\(#\[]\s*([0-2]\d{4})\s*[\)#\]]/);
   if (parenMatch) return parenMatch[1];
 
-  // 2. Check "Train No: 12002" or "Train 12002" or "No. 12002"
+  // 2. Check "12002 - " or "12002 | " or "12002 / "
+  const prefixMatch = text.match(/\b([0-2]\d{4})\s*[\-\|\/\:]/);
+  if (prefixMatch) return prefixMatch[1];
+
+  // 3. Check "Train No: 12002" or "Train 12002" or "No. 12002"
   const labelMatch = text.match(/(?:train|trn|no\.?|#)\s*:?\s*([0-2]\d{4})\b/i);
   if (labelMatch) return labelMatch[1];
 
-  // 3. Check standalone 5-digit train number (valid range 01000 - 29999)
+  // 4. Check standalone 5-digit train number (valid range 01000 - 29999)
   const standAlone = text.match(/\b([0-2]\d{4})\b/);
   if (standAlone) {
     const num = standAlone[1];
@@ -1058,7 +1079,7 @@ function processTrainCards() {
     if (el.closest('.irctc-delay-wrapper') || el.closest('#irctc-live-hud')) return;
 
     const text = el.innerText || el.textContent || '';
-    const trainNumber = extractTrainNumber(text) || el.getAttribute('data-train-number') || el.getAttribute('data-train-no');
+    const trainNumber = extractTrainNumber(text, el) || el.getAttribute('data-train-number') || el.getAttribute('data-train-no');
 
     if (trainNumber && /^[0-2]\d{4}$/.test(trainNumber)) {
       processedElements.add(el);
@@ -1134,6 +1155,13 @@ async function init() {
         clearInterval(scanInterval);
       }
     }, 1000);
+
+    // Continuous 2.5-second Heartbeat Scanner (Keeps active during all SPA searches and date filter switches)
+    setInterval(() => {
+      if (isExtensionEnabled && isSiteEnabled) {
+        processTrainCards();
+      }
+    }, 2500);
 
     // 4. Reactive RxJS Mutation Stream with 180ms debouncing (smooth 60 FPS scrolling)
     createMutationObservable(document.body, { childList: true, subtree: true })
