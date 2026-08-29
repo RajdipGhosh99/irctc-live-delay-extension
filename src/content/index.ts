@@ -192,7 +192,7 @@ function extractTrainNumber(text: string, element?: HTMLElement): string | null 
  */
 function findCardContainer(element: HTMLElement): HTMLElement {
   const specificCard = element.closest<HTMLElement>(
-    '.single-train-detail, app-train-avl-enq, .train-card, .rail-card, .railway-card, [data-cy*="trainCard"], [data-testid*="train-card"], .train-box, .trainItem, .train-item, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .card-train, .train-details, tr, .card'
+    '[id^="train-"], [id*="train-"], .single-train-detail, app-train-avl-enq, .train-card, .rail-card, .railway-card, [data-cy*="trainCard"], [data-testid*="train-card"], .train-box, .trainItem, .train-item, [class*="trainCard" i], [class*="trainItem" i], [class*="train-card" i], [class*="train-item" i], .card-train, .train-details, tr, .card'
   );
   if (specificCard) return specificCard;
 
@@ -201,7 +201,8 @@ function findCardContainer(element: HTMLElement): HTMLElement {
     const cls = (curr.className || '').toString().toLowerCase();
     const id = (curr.id || '').toLowerCase();
 
-    if (cls.includes('train-list') || cls.includes('trains-list') || cls.includes('results') || id === 'root' || id === 'app') {
+    if (id.startsWith('train-') || cls.includes('train-list') || cls.includes('trains-list') || cls.includes('results') || id === 'root' || id === 'app') {
+      if (id.startsWith('train-')) return curr;
       break;
     }
 
@@ -228,7 +229,7 @@ function findTrainNameAnchor(card: HTMLElement, fallbackEl: HTMLElement): HTMLEl
 
   if (currentHostname.includes('confirmtkt')) {
     const ctName = card.querySelector<HTMLElement>(
-      '.train-name, .train-title, h3, h4, .train-name-cntnr, [class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainTitle" i], [class*="trainHeader" i], [class*="trainNumber" i], .train-no, .train-info, [class*="train_name" i]'
+      '.body-sm.truncate, [class*="truncate" i], span.mr-5, .train-name, .train-title, h3, h4, .train-name-cntnr, [class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainTitle" i], [class*="trainHeader" i], [class*="trainNumber" i], .train-no, .train-info, [class*="train_name" i]'
     );
     if (ctName) return ctName;
   }
@@ -1003,13 +1004,20 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
         headingContainer.style.alignItems = 'center';
         headingContainer.appendChild(wrapper);
       } else if (currentVendorId === 'confirmtkt') {
-        // ConfirmTkt React layout: Insert adjacent to train title without disturbing flex/grid
-        if (nameAnchor.nextSibling) {
-          nameAnchor.parentNode?.insertBefore(wrapper, nameAnchor.nextSibling);
-        } else if (nameAnchor.parentElement) {
-          nameAnchor.parentElement.appendChild(wrapper);
+        // ConfirmTkt Tailwind layout: Insert into flex title row right after truncate div
+        const titleDiv = nameAnchor.closest('.truncate, .body-sm') || nameAnchor;
+        const parentFlex = titleDiv.parentElement || nameAnchor.parentElement;
+        if (parentFlex) {
+          parentFlex.style.position = 'relative';
+          parentFlex.style.display = 'flex';
+          parentFlex.style.alignItems = 'center';
+          if (titleDiv.nextSibling) {
+            parentFlex.insertBefore(wrapper, titleDiv.nextSibling);
+          } else {
+            parentFlex.appendChild(wrapper);
+          }
         } else {
-          nameAnchor.appendChild(wrapper);
+          nameAnchor.parentNode?.insertBefore(wrapper, nameAnchor.nextSibling);
         }
       } else {
         nameAnchor.style.display = 'inline-flex';
@@ -1046,6 +1054,8 @@ function processTrainCards() {
 
   // 1. Primary Targeted Query
   const candidateElements = document.querySelectorAll<HTMLElement>(
+    // ConfirmTkt Direct Card IDs
+    '[id^="train-"], [id*="train-"], ' +
     // General & Vendor Specific Train Selectors
     '.train-name, .trainName, .train-number, .trainNumber, .train-title, .trainTitle, .train-name-cntnr, ' +
     '[class*="train-name" i], [class*="train-title" i], [class*="trainName" i], [class*="trainNumber" i], [class*="trainTitle" i], [class*="trainHeader" i], [class*="train_name" i], [class*="train_number" i], ' +
