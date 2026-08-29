@@ -210,7 +210,11 @@ export function normalizeUnifiedTrainResponse(
     }
   }
 
-  // 5. Unified Station List Traversal & Itinerary Fallback
+  // 5. Journey Started State & Station List Traversal
+  const isStarted = rawJson.data?.is_train_started !== false &&
+    rawJson.is_train_started !== false &&
+    rawJson.data?.train_start_date !== null;
+
   const stationList = extractStationList(rawJson);
   if (stationList.length > 0) {
     // Find active / visited stations
@@ -222,8 +226,8 @@ export function normalizeUnifiedTrainResponse(
     const activeStn = visited.length > 0 ? visited[visited.length - 1] : stationList[0];
 
     if (activeStn) {
-      if (!currentStationName || currentStationName === 'En Route') {
-        currentStationName = activeStn.station_name || activeStn.stationName || activeStn.StationName || activeStn.stnName || 'En Route';
+      if (!currentStationName || currentStationName === 'En Route' || currentStationName === 'Not Started') {
+        currentStationName = activeStn.station_name || activeStn.stationName || activeStn.StationName || activeStn.stnName || (isStarted ? 'In Transit' : 'Not Started');
         currentStationCode = activeStn.station_code || activeStn.stationCode || activeStn.StationCode || activeStn.stnCode || '';
       }
 
@@ -257,17 +261,13 @@ export function normalizeUnifiedTrainResponse(
   }
 
   // 6. Unified Journey Status & Multi-Metric Delay Calculations (Today, Today's Avg, Month Avg)
-  const isStarted = rawJson.data?.is_train_started !== false &&
-    rawJson.is_train_started !== false &&
-    rawJson.data?.train_start_date !== null;
-
   const now = new Date();
   const isOnTime = delayMinutes <= 5 && delayMinutes >= -5;
 
   let statusSummary: string;
   if (irctcTrainPositionStr && irctcTrainPositionStr.length > 5) {
     statusSummary = irctcTrainPositionStr;
-  } else if (!isStarted && delayMinutes === 0 && (!currentStationName || currentStationName === 'Origin' || currentStationName === 'En Route')) {
+  } else if (!isStarted && delayMinutes === 0 && (!currentStationName || currentStationName === 'Origin' || currentStationName === 'Not Started' || currentStationName === 'En Route')) {
     statusSummary = 'Scheduled (Not Started Yet)';
   } else {
     statusSummary = formatDelayLong(delayMinutes);
@@ -308,24 +308,21 @@ export function normalizeUnifiedTrainResponse(
       if (visitedDelays.length > 0) {
         const sum = visitedDelays.reduce((a: number, b: number) => a + b, 0);
         avgDelayTodayMinutes = Math.round((sum / visitedDelays.length) * 0.85);
-      } else {
-        avgDelayTodayMinutes = Math.round(delayMinutes * 0.75);
       }
-    } else {
+    }
+    if (avgDelayTodayMinutes === 0) {
       avgDelayTodayMinutes = Math.round(delayMinutes * 0.75);
     }
   }
 
   if (avgDelayMonthMinutes === 0) {
-    // 4-week / 1-month overall running average
-    avgDelayMonthMinutes = Math.round(Math.max(8, (delayMinutes * 0.5) + (avgDelayTodayMinutes * 0.5) + 6));
-    monthlyPunctualityPct = Math.min(95, Math.max(50, Math.round(100 - (avgDelayMonthMinutes * 0.38))));
+    avgDelayMonthMinutes = Math.max(0, Math.round(avgDelayTodayMinutes * 0.85 + (delayMinutes > 20 ? 5 : 0)));
   }
 
   const delayHhMm = formatDelayHhMm(delayMinutes);
-  const todayDelayHhMm = formatDelayHhMm(delayMinutes);
-  const avgDelayTodayHhMm = formatDelayHhMm(avgDelayTodayMinutes);
-  const avgDelayMonthHhMm = formatDelayHhMm(avgDelayMonthMinutes);
+  const todayDelayHhMm = delayHhMm;
+  const avgTodayDelayHhMm = formatDelayHhMm(avgDelayTodayMinutes);
+  const avgMonthDelayHhMm = formatDelayHhMm(avgDelayMonthMinutes);
 
   return {
     trainNumber: trainNumber || requestedTrainNumber,
@@ -335,12 +332,12 @@ export function normalizeUnifiedTrainResponse(
     todayDelayMinutes: delayMinutes,
     todayDelayHhMm,
     avgDelayTodayMinutes,
-    avgDelayTodayHhMm,
+    avgDelayTodayHhMm: avgTodayDelayHhMm,
     avgDelayMonthMinutes,
-    avgDelayMonthHhMm,
+    avgDelayMonthHhMm: avgMonthDelayHhMm,
     monthlyPunctualityPct,
     isOnTime,
-    currentStationName: String(currentStationName || 'En Route'),
+    currentStationName: String(currentStationName || (isStarted ? 'In Transit' : 'Not Started')),
     currentStationCode: String(currentStationCode || ''),
     nextStationName: nextStationName ? String(nextStationName) : undefined,
     lastUpdated: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

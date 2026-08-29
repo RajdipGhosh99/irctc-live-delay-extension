@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               ⏱ ${d.statusSummary} (${formatDelayShort(d.delayMinutes)})
             </div>
             <div style="color: #475569; font-size: 10.5px;">
-              📍 <strong>Location:</strong> ${d.currentStationName || 'En Route'} ${d.currentStationCode ? `(${d.currentStationCode})` : ''}
+              📍 <strong>Location:</strong> ${d.currentStationName && d.currentStationName !== 'Not Started' && d.currentStationName !== 'In Transit' ? `${d.currentStationName} ${d.currentStationCode ? `(${d.currentStationCode})` : ''}` : 'Not Started Yet'}
             </div>
             ${d.nextStationName ? `<div style="color: #475569; font-size: 10.5px;">➡️ <strong>Next Halt:</strong> ${d.nextStationName}</div>` : ''}
             <div style="color: #94a3b8; font-size: 9.5px; margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 2px;">

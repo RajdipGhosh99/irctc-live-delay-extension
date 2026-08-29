@@ -654,12 +654,14 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
 
   // Crisp live location strip (No duplicate delay summary)
   let liveLocationSummary = '';
-  if (data.currentStationName && data.nextStationName) {
+  if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
     liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ ${data.nextStationName}`;
-  } else if (data.currentStationName) {
+  } else if (data.currentStationName && data.currentStationName !== 'Not Started' && data.currentStationName !== 'In Transit') {
     liveLocationSummary = `📍 Current: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
+  } else if (data.statusSummary) {
+    liveLocationSummary = `📍 ${data.statusSummary}`;
   } else {
-    liveLocationSummary = data.statusSummary || 'Train En Route';
+    liveLocationSummary = '📍 Not Started Yet';
   }
 
   popover.innerHTML = `
@@ -826,7 +828,10 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
       e.stopPropagation();
       e.preventDefault();
       if (currentDelayData) {
-        const textToCopy = `🚆 Train #${trainNumber} (${currentDelayData.trainName || 'Train'}): ${currentDelayData.statusSummary} at ${currentDelayData.currentStationName || 'En Route'}.`;
+        const loc = currentDelayData.currentStationName && currentDelayData.currentStationName !== 'Not Started' && currentDelayData.currentStationName !== 'In Transit'
+          ? `at ${currentDelayData.currentStationName}`
+          : `(Not Started Yet)`;
+        const textToCopy = `🚆 Train #${trainNumber} (${currentDelayData.trainName || 'Train'}): ${currentDelayData.statusSummary} ${loc}.`;
         navigator.clipboard.writeText(textToCopy).then(() => {
           const btn = popover.querySelector('.irctc-copy-status-btn');
           if (btn) {
