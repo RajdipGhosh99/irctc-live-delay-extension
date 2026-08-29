@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Live Train Delay Tracker",
   "version": "1.5.0",
-  "description": "Real-time train running delay tracker with Multi-Token API pools, on-demand hover fetching, and site toggles across IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip & Ixigo.",
+  "description": "Real-time live train delay tracker & historical punctuality across IRCTC, ConfirmTkt, MakeMyTrip, ClearTrip & Ixigo.",
   "homepage_url": "https://github.com/RajdipGhosh99",
   "icons": {
     "16": "icons/icon16.png",
