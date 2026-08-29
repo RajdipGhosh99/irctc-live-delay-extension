@@ -1111,14 +1111,22 @@ async function init() {
       return result;
     };
 
-    // 6. Listen for message from Popup to trigger batch page fetch
+    // 6. Listen for message from Popup to trigger batch page fetch or query tab train count
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === 'AUTO_FETCH_PAGE_TRAINS') {
         console.log('[Content] 🚀 Triggering batch fetch for all trains on page...');
         autoFetchAllPageTrains(message.forceRefresh ?? false).then(() => {
           sendResponse({ success: true, count: activeWidgets.size });
         });
-        return true; // Keep channel open for async response
+        return true;
+      } else if (message.type === 'GET_TAB_TRAIN_COUNT') {
+        sendResponse({
+          success: true,
+          count: activeWidgets.size,
+          hostname: currentHostname,
+          isSearchPage: isTrainSearchPage(),
+        });
+        return true;
       }
     });
 

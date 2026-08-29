@@ -77,6 +77,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
     });
+
+    // Query active tab's specific train card count
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(tabs[0].id, { type: 'GET_TAB_TRAIN_COUNT' }, (res) => {
+          if (res?.success && res.count !== undefined && fetchPageTrainsBtn) {
+            if (res.count > 0) {
+              fetchPageTrainsBtn.textContent = `⚡ Fetch All (${res.count} Trains on Tab)`;
+            } else {
+              fetchPageTrainsBtn.textContent = '⚡ Fetch All Statuses (Active Tab)';
+            }
+          }
+        });
+      }
+    });
   }
 
   function updateUI() {
