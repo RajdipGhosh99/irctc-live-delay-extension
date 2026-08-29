@@ -661,19 +661,25 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
 
     <!-- 3-Metric Delay Analytics (Today, Today 4-Wk Avg, 1-Month Avg) -->
     <div class="irctc-delay-stats-grid">
-      <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📅 Today Delay</div>
-        <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'}">${todayHhMm}</div>
-        <div class="irctc-stat-sub">${data.isOnTime ? 'On Time' : `${data.delayMinutes}m delay`}</div>
+      <div class="irctc-stat-box" style="background: ${data.isOnTime ? '#f0fdf4' : '#fef2f2'} !important; border: 1px solid ${data.isOnTime ? '#bbf7d0' : '#fecaca'} !important;">
+        <div class="irctc-stat-title" style="color: ${data.isOnTime ? '#166534' : '#991b1b'} !important; font-weight: 700 !important;">
+          ${data.isOnTime ? '🟢 Today Delay' : '🔴 Today Delay'}
+        </div>
+        <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'} !important; font-weight: 800 !important; font-size: 13.5px !important;">
+          ${todayHhMm}
+        </div>
+        <div class="irctc-stat-sub" style="color: ${data.isOnTime ? '#15803d' : '#b91c1c'} !important; font-weight: 700 !important;">
+          ${data.isOnTime ? 'On Time' : `${data.delayMinutes}m Late`}
+        </div>
       </div>
       <div class="irctc-stat-box">
         <div class="irctc-stat-title">📊 Today (4 Wks)</div>
-        <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
+        <div class="irctc-stat-val" style="color: #0284c7; font-weight: 700;">${avgTodayHhMm}</div>
         <div class="irctc-stat-sub">${dayOfWeekName}s (1 Mo)</div>
       </div>
       <div class="irctc-stat-box">
         <div class="irctc-stat-title">📈 1 Month Avg</div>
-        <div class="irctc-stat-val" style="color: #6366f1;">${avgMonthHhMm}</div>
+        <div class="irctc-stat-val" style="color: #6366f1; font-weight: 700;">${avgMonthHhMm}</div>
         <div class="irctc-stat-sub">${punctuality}% On-Time</div>
       </div>
     </div>
