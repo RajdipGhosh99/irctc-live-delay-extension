@@ -802,7 +802,7 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     <div class="irctc-delay-stats-grid">
       <div class="irctc-stat-box" style="background: ${data.isOnTime ? '#f0fdf4' : '#fef2f2'} !important; border: 1px solid ${data.isOnTime ? '#bbf7d0' : '#fecaca'} !important;">
         <div class="irctc-stat-title" style="color: ${data.isOnTime ? '#166534' : '#991b1b'} !important;">
-          ${data.isOnTime ? '🟢 Today' : '🔴 Today'}
+          ${data.isOnTime ? '🟢 Today Live' : '🔴 Today Live'}
         </div>
         <div class="irctc-stat-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'} !important;">
           ${todayHhMm}
@@ -812,12 +812,12 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
         </div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title" title="${dayOfWeekName} Average over last 4 weeks">📊 ${dayOfWeekName} Avg (Today) - 4W</div>
+        <div class="irctc-stat-title" title="Average delay on ${dayOfWeekName}s over past 4 weeks">📊 4W ${dayOfWeekName} Avg</div>
         <div class="irctc-stat-val" style="color: #0284c7;">${avgTodayHhMm}</div>
-        <div class="irctc-stat-sub">Last 4 Weeks</div>
+        <div class="irctc-stat-sub">${dayOfWeekName}s Pattern</div>
       </div>
       <div class="irctc-stat-box">
-        <div class="irctc-stat-title">📈 1-Mo Avg</div>
+        <div class="irctc-stat-title" title="Overall 30-day average delay and punctuality">📈 30-Day Avg</div>
         <div class="irctc-stat-val" style="color: #6366f1;">${avgMonthHhMm}</div>
         <div class="irctc-stat-sub">${punctuality}% On-Time</div>
       </div>

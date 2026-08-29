@@ -234,17 +234,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             <!-- 3-Card Delay Analytics Grid (Today, Today 4-Wk Avg, 1-Month Avg) -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 4px 0 6px 0; background: #f8fafc; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="background: ${d.isOnTime ? '#f0fdf4' : '#fef2f2'}; padding: 4px 2px; border-radius: 4px; border: 1px solid ${d.isOnTime ? '#bbf7d0' : '#fecaca'};">
-                <div style="font-size: 8px; color: ${d.isOnTime ? '#166534' : '#991b1b'}; font-weight: 700; text-transform: uppercase;">${d.isOnTime ? '🟢 Today' : '🔴 Today'}</div>
+                <div style="font-size: 8px; color: ${d.isOnTime ? '#166534' : '#991b1b'}; font-weight: 700; text-transform: uppercase;">${d.isOnTime ? '🟢 Today Live' : '🔴 Today Live'}</div>
                 <div style="font-size: 11.5px; font-weight: 800; color: ${d.isOnTime ? '#059669' : '#dc2626'}; font-family: monospace;">${todayHhMm}</div>
                 <div style="font-size: 7.5px; color: ${d.isOnTime ? '#15803d' : '#b91c1c'}; font-weight: 700;">${d.isOnTime ? 'On Time' : `${d.delayMinutes}m Late`}</div>
               </div>
               <div style="background: #fff; padding: 4px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
-                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📊 Day Avg (Today) - 4W</div>
+                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📊 4W Day Avg</div>
                 <div style="font-size: 11.5px; font-weight: 800; color: #0284c7; font-family: monospace;">${avgTodayHhMm}</div>
-                <div style="font-size: 7.5px; color: #94a3b8;">Last 4 Weeks</div>
+                <div style="font-size: 7.5px; color: #94a3b8;">Day Pattern</div>
               </div>
               <div style="background: #fff; padding: 4px 2px; border-radius: 4px; border: 1px solid #f1f5f9;">
-                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📈 1 Month</div>
+                <div style="font-size: 8px; color: #64748b; font-weight: 700; text-transform: uppercase;">📈 30-Day Avg</div>
                 <div style="font-size: 11.5px; font-weight: 800; color: #6366f1; font-family: monospace;">${avgMonthHhMm}</div>
                 <div style="font-size: 7.5px; color: #94a3b8;">${punctuality}% On-Time</div>
               </div>
