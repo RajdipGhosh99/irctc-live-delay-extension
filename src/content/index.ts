@@ -347,7 +347,8 @@ function updateBadgeUI(
   data?: TrainDelayData,
   errorMessage?: string,
   providerUsed?: string,
-  travelDate?: string
+  travelDate?: string,
+  isRefreshingInPlace = false
 ) {
   badge.className = `irctc-delay-badge state-${state}`;
   badge.setAttribute('aria-live', 'polite');
@@ -363,7 +364,10 @@ function updateBadgeUI(
   } else if (state === 'loading') {
     badge.setAttribute('aria-label', 'Fetching live delay status...');
     badge.innerHTML = `<span class="irctc-delay-spinner" aria-hidden="true"></span><span>...</span>`;
-    popover.style.display = 'none';
+    // If refreshing an already open popover, do NOT hide it!
+    if (!isRefreshingInPlace) {
+      popover.style.display = 'none';
+    }
   } else if (state === 'on-time' && data) {
     const isEarly = data.delayMinutes < 0;
     const label = isEarly ? `-${Math.abs(data.delayMinutes)}m` : 'On Time';
@@ -387,9 +391,14 @@ function updateBadgeUI(
           ? 'Free RapidAPI quota (500 calls) exhausted for this key.\n\n💡 Solution: Add another free token from a secondary account in Settings to get +500 calls!'
           : (errorMessage || 'Unable to fetch status')}
       </div>
-      <button class="irctc-delay-refresh-btn irctc-config-key-btn" type="button" aria-label="Open Settings Dashboard to add tokens">
-        ⚙️ Add Free Tokens in Settings ↗
-      </button>
+      <div class="irctc-popover-btn-row">
+        <button class="irctc-delay-refresh-btn irctc-refresh-live-btn" type="button" aria-label="Retry live delay status">
+          ↻ Retry Now
+        </button>
+        <button class="irctc-delay-refresh-btn irctc-config-key-btn" type="button" aria-label="Open Settings Dashboard to add tokens">
+          ⚙️ Settings ↗
+        </button>
+      </div>
     `;
     popover.style.display = 'block';
   }
@@ -476,27 +485,40 @@ function injectDelayWidget(targetElement: HTMLElement, trainNumber: string, posi
   const card = findCardContainer(targetElement);
 
   const fetchStatus = async (forceRefresh = false) => {
+    const isRefreshing = hasFetchedOnce && forceRefresh;
+    wrapper.classList.add('irctc-refreshing');
+
+    const refreshBtn = popover.querySelector<HTMLButtonElement>('.irctc-refresh-live-btn');
+    if (refreshBtn) {
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '<span class="irctc-delay-spinner"></span> Refreshing...';
+    }
+
     // Dynamically extract the selected travel date from the UI at click time
     const selectedTravelDate = extractTravelDateFromUI(card);
     if (selectedTravelDate) {
       console.log(`[Live Train Delay Tracker] 📅 Extracted Journey Date for Train #${trainNumber}:`, selectedTravelDate);
     }
     console.log(`[Live Train Delay Tracker] 🚆 Requesting live status for Train #${trainNumber} on Date: ${selectedTravelDate || 'Today'} (forceRefresh=${forceRefresh})...`);
-    updateBadgeUI(wrapper, badge, popover, trainNumber, 'loading');
+    updateBadgeUI(wrapper, badge, popover, trainNumber, 'loading', currentDelayData || undefined, undefined, undefined, selectedTravelDate, isRefreshing);
 
-    const res = await requestTrainDelay(trainNumber, forceRefresh, selectedTravelDate);
-    hasFetchedOnce = true;
-    console.log(`[Live Train Delay Tracker] 📥 Response for Train #${trainNumber}:`, res);
+    try {
+      const res = await requestTrainDelay(trainNumber, forceRefresh, selectedTravelDate);
+      hasFetchedOnce = true;
+      console.log(`[Live Train Delay Tracker] 📥 Response for Train #${trainNumber}:`, res);
 
-    if (res.success && res.data) {
-      currentDelayData = res.data;
-      const state = res.data.isOnTime ? 'on-time' : 'delayed';
-      const providerUsed = (res as any).providerUsed || res.data.providerName;
-      updateBadgeUI(wrapper, badge, popover, trainNumber, state, res.data, undefined, providerUsed, selectedTravelDate);
-    } else if (!res.success && res.requiresApiKey) {
-      updateBadgeUI(wrapper, badge, popover, trainNumber, 'no-key');
-    } else if (!res.success) {
-      updateBadgeUI(wrapper, badge, popover, trainNumber, 'error', undefined, res.error);
+      if (res.success && res.data) {
+        currentDelayData = res.data;
+        const state = res.data.isOnTime ? 'on-time' : 'delayed';
+        const providerUsed = (res as any).providerUsed || res.data.providerName;
+        updateBadgeUI(wrapper, badge, popover, trainNumber, state, res.data, undefined, providerUsed, selectedTravelDate);
+      } else if (!res.success && res.requiresApiKey) {
+        updateBadgeUI(wrapper, badge, popover, trainNumber, 'no-key');
+      } else if (!res.success) {
+        updateBadgeUI(wrapper, badge, popover, trainNumber, 'error', undefined, res.error);
+      }
+    } finally {
+      wrapper.classList.remove('irctc-refreshing');
     }
   };
 

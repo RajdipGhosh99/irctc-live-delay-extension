@@ -185,6 +185,11 @@ async function handleMessage(message: ExtensionMessage, sendResponse: (res: any)
       return;
     }
 
+    if (forceRefresh) {
+      inFlightRequests.delete(cacheKey);
+      await chrome.storage.local.remove(cacheKey);
+    }
+
     const settings = await getStoredSettings();
 
     // 2. Local Cache Check

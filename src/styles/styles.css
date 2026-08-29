@@ -204,10 +204,13 @@
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.irctc-delay-wrapper:hover .irctc-delay-popover {
+.irctc-delay-wrapper:hover .irctc-delay-popover,
+.irctc-delay-wrapper.irctc-refreshing .irctc-delay-popover,
+.irctc-delay-wrapper.irctc-pinned .irctc-delay-popover {
   opacity: 1 !important;
   pointer-events: auto !important;
   transform: translateY(0) scale(1) !important;
+  display: block !important;
 }
 
 .irctc-delay-popover-header {
