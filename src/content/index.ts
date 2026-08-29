@@ -272,7 +272,9 @@ function injectAutoWelcomeHUD() {
           <span>Live Delay Active</span>
         </div>
       `;
-      hudWrapper.querySelector('.irctc-hud-minimized')?.addEventListener('click', () => {
+      hudWrapper.querySelector('.irctc-hud-minimized')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
         isMinimized = false;
         renderHUD();
       });
@@ -287,8 +289,8 @@ function injectAutoWelcomeHUD() {
             <span>Live Train Delay Tracker</span>
           </div>
           <div class="irctc-hud-controls">
-            <button class="irctc-hud-btn-icon" id="irctc-hud-min" title="Minimize" aria-label="Minimize HUD">_</button>
-            <button class="irctc-hud-btn-icon" id="irctc-hud-close" title="Dismiss" aria-label="Close HUD">✕</button>
+            <button class="irctc-hud-btn-icon" id="irctc-hud-min" type="button" title="Minimize" aria-label="Minimize HUD">_</button>
+            <button class="irctc-hud-btn-icon" id="irctc-hud-close" type="button" title="Dismiss" aria-label="Close HUD">✕</button>
           </div>
         </div>
         <div class="irctc-hud-body" aria-live="polite">
@@ -313,26 +315,34 @@ function injectAutoWelcomeHUD() {
       </div>
     `;
 
-    document.getElementById('irctc-hud-min')?.addEventListener('click', () => {
+    hudWrapper.querySelector('#irctc-hud-min')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       isMinimized = true;
       renderHUD();
     });
 
-    document.getElementById('irctc-hud-close')?.addEventListener('click', () => {
+    hudWrapper.querySelector('#irctc-hud-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       hudWrapper.remove();
     });
 
-    document.getElementById('irctc-hud-config-btn')?.addEventListener('click', () => {
+    hudWrapper.querySelector('#irctc-hud-config-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       openSettingsDashboard();
     });
 
-    document.getElementById('irctc-hud-gotit-btn')?.addEventListener('click', () => {
+    hudWrapper.querySelector('#irctc-hud-gotit-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       hudWrapper.remove();
     });
   }
 
-  renderHUD();
   document.body.appendChild(hudWrapper);
+  renderHUD();
 }
 
 /**
