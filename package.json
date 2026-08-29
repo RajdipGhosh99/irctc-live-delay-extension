@@ -6,7 +6,8 @@
   "homepage": "https://github.com/RajdipGhosh99",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "package": "npm run build && cd dist && zip -r ../irctc-live-delay-tracker-v1.5.0.zip . && cd .."
   },
   "dependencies": {
     "rxjs": "^7.8.1"

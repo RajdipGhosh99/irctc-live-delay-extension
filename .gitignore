@@ -5,6 +5,7 @@ node_modules/
 
 # Build Outputs
 dist/
+*.zip
 
 # Logs
 npm-debug.log*
