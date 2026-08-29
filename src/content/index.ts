@@ -40,21 +40,28 @@ let autoFetchDebounceTimer: any = null;
  * Batches and fetches live running status for all detected train cards on the page
  */
 async function autoFetchAllPageTrains(forceRefresh = false) {
+  if (!isExtensionEnabled || !isSiteEnabled) return;
   if (isBatchFetching) return;
   isBatchFetching = true;
 
+  processTrainCards();
+
+  const list = Array.from(activeWidgets.values());
+  console.log(`[Live Delay Tracker] ⚡ Auto-fetching status for ${list.length} trains on page (force=${forceRefresh})...`);
+
   try {
-    const list = Array.from(activeWidgets.values());
     for (let i = 0; i < list.length; i++) {
       const widget = list[i];
       if (forceRefresh || !widget.hasFetched) {
         widget.fetchStatus(forceRefresh);
         if (i < list.length - 1) {
-          // Stagger by 220ms for smooth non-blocking execution
-          await new Promise((res) => setTimeout(res, 220));
+          // Stagger by 200ms for smooth non-blocking execution
+          await new Promise((res) => setTimeout(res, 200));
         }
       }
     }
+  } catch (err) {
+    console.error('[Live Delay Tracker] Auto-fetch error:', err);
   } finally {
     isBatchFetching = false;
   }
@@ -762,7 +769,23 @@ async function init() {
     processTrainCards();
     injectAutoWelcomeHUD();
 
-    // 2. Reactive RxJS Mutation Stream with 200ms debouncing (smooth 60 FPS scrolling)
+    // 2. Immediate auto-fetch pass on load if enabled
+    if (isAutoFetchAll) {
+      console.log(`[Live Delay Tracker] ⚡ Auto-Fetch is active. Scheduling initial load passes...`);
+      setTimeout(() => {
+        autoFetchAllPageTrains(false);
+      }, 300);
+      setTimeout(() => {
+        processTrainCards();
+        autoFetchAllPageTrains(false);
+      }, 1500);
+      setTimeout(() => {
+        processTrainCards();
+        autoFetchAllPageTrains(false);
+      }, 3500);
+    }
+
+    // 3. Reactive RxJS Mutation Stream with 200ms debouncing (smooth 60 FPS scrolling)
     createMutationObservable(document.body, { childList: true, subtree: true })
       .pipe(debounceTime(200), takeUntil(destroy$))
       .subscribe(() => {

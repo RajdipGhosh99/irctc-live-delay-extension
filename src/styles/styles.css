@@ -25,7 +25,14 @@
   flex-shrink: 0 !important;
   white-space: nowrap !important;
   line-height: 1 !important;
-  z-index: 50 !important;
+  z-index: 99999 !important;
+}
+
+.irctc-delay-wrapper:hover,
+.irctc-delay-wrapper.irctc-refreshing,
+.irctc-delay-wrapper.irctc-pinned,
+.irctc-delay-wrapper.has-data:hover {
+  z-index: 2147483647 !important;
 }
 
 /* Position Variants */
@@ -195,10 +202,10 @@
   -webkit-backdrop-filter: var(--irctc-glass-blur) !important;
   border: 1px solid var(--irctc-glass-border) !important;
   border-radius: 12px !important;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   font-size: 12px !important;
   color: #1e293b !important;
-  z-index: 10000 !important;
+  z-index: 2147483647 !important;
   opacity: 0 !important;
   display: none !important;
   pointer-events: none !important;
