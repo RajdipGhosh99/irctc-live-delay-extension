@@ -318,9 +318,9 @@ export function normalizeUnifiedTrainResponse(
   const remainingStationsCount = totalStations > 0 ? Math.max(0, totalStations - visitedCount) : undefined;
   let routeProgressPct = 0;
   if (totalStations > 0 && isStarted) {
-    routeProgressPct = Math.min(100, Math.max(5, Math.round((visitedCount / totalStations) * 100)));
-  } else if (isStarted) {
-    routeProgressPct = 50;
+    routeProgressPct = Math.min(100, Math.max(0, Math.round((visitedCount / totalStations) * 100)));
+  } else {
+    routeProgressPct = 0;
   }
 
   // 8. Unified Journey Status & Multi-Metric Delay Calculations (Today, Today's Avg, Month Avg)

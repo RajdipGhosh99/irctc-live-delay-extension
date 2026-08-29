@@ -725,21 +725,17 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     Boolean(data.currentStationName && !/not\s*started|origin/i.test(data.currentStationName)) ||
     Boolean(data.statusSummary && !/not\s*started\s*yet|yet\s*to\s*start|scheduled\s*\(not/i.test(data.statusSummary));
 
-  let progressPct = data.routeProgressPct ?? 0;
-  if (progressPct === 0 && isTripRunning) {
-    progressPct = 50; // Active en route
-  }
-
+  const progressPct = (data.routeProgressPct && data.routeProgressPct > 0) ? data.routeProgressPct : 0;
   const stopsLeft = data.remainingStationsCount !== undefined && data.remainingStationsCount > 0 ? `${data.remainingStationsCount} stops left` : '';
-  let progressText = '🏁 Trip Not Started Yet';
+  let progressText = '🏁 Not Started Yet';
 
   if (isTripRunning) {
-    if (data.totalStations && data.totalStations > 0 && data.routeProgressPct && data.routeProgressPct > 0) {
-      progressText = `${data.routeProgressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`;
+    if (data.totalStations && data.totalStations > 0 && progressPct > 0) {
+      progressText = `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`;
     } else if (data.currentStationName && !/not\s*started|origin/i.test(data.currentStationName)) {
-      progressText = `🚆 Live: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
+      progressText = `🚆 In Transit: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
     } else {
-      progressText = '🚆 Journey In Progress (Live Tracking)';
+      progressText = '🚆 In Transit (Live Tracking)';
     }
   }
 
