@@ -299,22 +299,43 @@
   margin-top: 3px !important;
 }
 
+.irctc-status-highlight-box {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+
 .irctc-delay-popover-row {
   display: flex !important;
   justify-content: space-between !important;
-  margin: 4px 0 !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  margin: 5px 0 !important;
   line-height: 1.4 !important;
+  white-space: normal !important;
+  box-sizing: border-box !important;
 }
 
 .irctc-delay-label {
   color: #64748b !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
+  font-size: 11.5px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
 }
 
 .irctc-delay-val {
   font-weight: 600 !important;
   color: #1e293b !important;
   text-align: right !important;
+  flex: 1 !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
 }
 
 .irctc-popover-btn-row {

@@ -558,12 +558,16 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
       </div>
     </div>
 
-    <div class="irctc-delay-popover-row">
-      <span class="irctc-delay-label">Live Status:</span>
-      <span class="irctc-delay-val" style="color: ${data.isOnTime ? '#059669' : '#dc2626'}">
+    <!-- Dedicated Live Status Highlight Box -->
+    <div class="irctc-status-highlight-box" style="background: ${data.isOnTime ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${data.isOnTime ? '#bbf7d0' : '#fecaca'}; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; text-align: left;">
+      <div style="font-size: 10px; font-weight: 700; color: ${data.isOnTime ? '#166534' : '#991b1b'}; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.3px;">
+        ${data.isOnTime ? '🟢 Live Running Status (On Time)' : '🔴 Live Running Status (Delayed)'}
+      </div>
+      <div style="color: ${data.isOnTime ? '#15803d' : '#991b1b'}; font-weight: 700; font-size: 12px; line-height: 1.4; word-break: break-word; overflow-wrap: break-word; white-space: normal;">
         ${data.statusSummary}
-      </span>
+      </div>
     </div>
+
     ${activeDate ? `
       <div class="irctc-delay-popover-row">
         <span class="irctc-delay-label">📅 Journey Date:</span>
@@ -572,13 +576,13 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     ` : ''}
     ${data.currentStationName ? `
       <div class="irctc-delay-popover-row">
-        <span class="irctc-delay-label">Current Location:</span>
+        <span class="irctc-delay-label">📍 Current Location:</span>
         <span class="irctc-delay-val">${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}</span>
       </div>
     ` : ''}
     ${data.nextStationName ? `
       <div class="irctc-delay-popover-row">
-        <span class="irctc-delay-label">Next Halt:</span>
+        <span class="irctc-delay-label">➡️ Next Halt:</span>
         <span class="irctc-delay-val">${data.nextStationName}</span>
       </div>
     ` : ''}
