@@ -686,6 +686,41 @@ function updateBadgeUI(
   }
 }
 
+function shortenLiveLocation(raw: string): string {
+  if (!raw) return '';
+  let str = raw.trim();
+
+  // 1. Remove redundant trailing delay text like ". Delay: 01:21", ". Late: 15 Mins", etc.
+  str = str.replace(/[\.\,]\s*(?:Delay|Late|Delayed|Running\s*late)[\:\s]*.*$/i, '').trim();
+
+  // 2. Shorten "Arrived at STATION(CODE) at TIME" -> "Arr @ CODE (TIME)" or "Arr @ STATION (TIME)"
+  const arrMatch = str.match(/Arrived\s+at\s+([A-Za-z0-9\s]+?)(?:\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
+  if (arrMatch) {
+    const code = arrMatch[2] || arrMatch[1].trim();
+    const time = arrMatch[3];
+    return `Arr @ ${code} (${time})`;
+  }
+
+  // 3. Shorten "Departed from STATION(CODE) at TIME" -> "Dep @ CODE (TIME)" or "Dep @ STATION (TIME)"
+  const depMatch = str.match(/Departed\s+from\s+([A-Za-z0-9\s]+?)(?:\(([A-Z0-9]+)\))?\s+at\s+(\d{1,2}:\d{2})/i);
+  if (depMatch) {
+    const code = depMatch[2] || depMatch[1].trim();
+    const time = depMatch[3];
+    return `Dep @ ${code} (${time})`;
+  }
+
+  // 4. Shorten general prefixes and station suffixes
+  str = str
+    .replace(/^Arrived\s+at\s+/i, 'Arr @ ')
+    .replace(/^Departed\s+from\s+/i, 'Dep @ ')
+    .replace(/^Passed\s+through\s+/i, 'Passed @ ')
+    .replace(/\s+JN\b/gi, ' Jn')
+    .replace(/\s+CANTT\b/gi, ' Cantt')
+    .replace(/\s+CENTRAL\b/gi, ' Ctrl');
+
+  return str;
+}
+
 function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDelayData, providerUsed?: string, travelDate?: string) {
   popover.style.display = 'block';
   popover.setAttribute('role', 'tooltip');
@@ -702,7 +737,7 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayOfWeekName = dayNames[now.getDay()];
 
-  // 1. Live location & Next Platform strip
+  // 1. Live location & Next Platform strip (Crisp & Shortened)
   let liveLocationSummary = '';
   const isNotStarted =
     (data.currentStationName === 'Not Started' || data.statusSummary?.includes('Not Started')) &&
@@ -712,14 +747,14 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
   if (isNotStarted) {
     liveLocationSummary = '📍 Not Started Yet';
   } else if (data.statusSummary && /departed|arrived|passed|late|delay/i.test(data.statusSummary)) {
-    liveLocationSummary = `📍 ${data.statusSummary}`;
+    liveLocationSummary = `📍 ${shortenLiveLocation(data.statusSummary)}`;
   } else if (data.currentStationName && data.nextStationName && data.currentStationName !== 'Not Started') {
     const nextPf = data.nextStationPlatform ? ` (${data.nextStationPlatform}${data.nextStationHaltMinutes ? ` • ${data.nextStationHaltMinutes}m stop` : ''})` : '';
     liveLocationSummary = `📍 ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''} ➔ ➡️ Next: ${data.nextStationName}${nextPf}`;
   } else if (data.currentStationName && data.currentStationName !== 'Not Started') {
     liveLocationSummary = `📍 Current: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
   } else if (data.statusSummary && !data.statusSummary.includes('Scheduled (Not Started Yet)')) {
-    liveLocationSummary = `📍 ${data.statusSummary}`;
+    liveLocationSummary = `📍 ${shortenLiveLocation(data.statusSummary)}`;
   } else {
     liveLocationSummary = '📍 Not Started Yet';
   }
