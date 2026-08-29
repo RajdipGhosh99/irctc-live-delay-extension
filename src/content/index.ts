@@ -779,22 +779,7 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     liveLocationSummary = '📍 Not Started Yet';
   }
 
-  // 2. Route Progress Bar Text & Active Trip Detection
-  const progressPct = (data.routeProgressPct && data.routeProgressPct > 0) ? data.routeProgressPct : 0;
-  const stopsLeft = data.remainingStationsCount !== undefined && data.remainingStationsCount > 0 ? `${data.remainingStationsCount} stops left` : '';
-  let progressText = '🏁 Not Started Yet';
-
-  if (!isNotStarted) {
-    if (data.totalStations && data.totalStations > 0 && progressPct > 0) {
-      progressText = `${progressPct}% Journey Done ${stopsLeft ? `• ${stopsLeft}` : ''}`;
-    } else if (data.currentStationName && data.currentStationName !== 'Not Started') {
-      progressText = `🚆 In Transit: ${data.currentStationName}${data.currentStationCode ? ` (${data.currentStationCode})` : ''}`;
-    } else {
-      progressText = '🚆 In Transit (Live Tracking)';
-    }
-  }
-
-  // 3. Travel Intelligence & Delay Trend strip (Simple English)
+  // 2. Travel Intelligence & Delay Trend strip (Simple English)
   const trendText = data.delayTrendText || (data.isOnTime ? '🟢 Running on schedule' : '🟢 Steady pace');
   const riskTag = data.reliabilityTag || (punctuality >= 85 ? '🛡️ Usually On-Time' : '⚠️ Delay Risk');
 
@@ -810,16 +795,6 @@ function renderPopover(popover: HTMLElement, trainNumber: string, data: TrainDel
     <!-- Live Position Strip -->
     <div class="irctc-popover-live-strip" title="${liveLocationSummary}">
       <span>${liveLocationSummary}</span>
-    </div>
-
-    <!-- Journey Progress Micro-Bar -->
-    <div class="irctc-progress-bar-wrap">
-      <div class="irctc-progress-bar-track">
-        <div class="irctc-progress-bar-fill" style="width: ${progressPct}%;"></div>
-      </div>
-      <div class="irctc-progress-bar-sub">
-        <span>${progressText}</span>
-      </div>
     </div>
 
     <!-- 3-Metric Delay Analytics (Compact & Non-Duplicate) -->
