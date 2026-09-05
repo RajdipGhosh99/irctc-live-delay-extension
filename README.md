@@ -9,13 +9,46 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release%20(v2.0.0)-blue?style=for-the-badge&logo=github" alt="Download Release" /></a>
   <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=for-the-badge" alt="GPL 3.0 License" /></a>
-  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.0"><img src="https://img.shields.io/badge/Release-v2.0.0-indigo?style=for-the-badge" alt="Release v2.0.0" /></a>
-  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-blue?style=for-the-badge&logo=github" alt="Author" /></a>
+  <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-indigo?style=for-the-badge&logo=github" alt="Author" /></a>
   <img src="https://img.shields.io/badge/Copyleft-ShareAlike-success?style=for-the-badge" alt="Copyleft ShareAlike" />
   <img src="https://img.shields.io/badge/Manifest-V3-success?style=for-the-badge" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge" alt="PRs Welcome" />
 </p>
+
+---
+
+## 📥 Download & 30-Second Installation Guide
+
+You do **not** need a Chrome Web Store account or subscription to use this extension. You can install it directly on **Google Chrome**, **Microsoft Edge**, **Brave**, **Opera**, **Vivaldi**, or any Chromium browser in 30 seconds:
+
+### Step 1: Download the Extension Zip
+👉 **[Download Latest Release (`train-delay-tracker-v2.0.0.zip`)](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest/download/train-delay-tracker-v2.0.0.zip)**  
+*(Or browse all versions on the [GitHub Releases Page](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases))*
+
+### Step 2: Extract / Unzip
+- Extract the downloaded `.zip` file into a permanent folder on your computer (e.g. `Documents/train-delay-tracker` or `Downloads/train-delay-tracker-v2.0.0`).
+
+### Step 3: Load into your Browser
+1. Open your browser and go to the extension management page:
+   - **Google Chrome / Brave / Vivaldi:** `chrome://extensions/`
+   - **Microsoft Edge:** `edge://extensions/`
+   - **Opera:** `opera://extensions/`
+2. Turn on the **Developer mode** toggle switch (located in the top-right corner).
+3. Click the **Load unpacked** button (top-left corner).
+4. Select the extracted folder.
+
+### Step 4: Accept Terms & Enjoy!
+- Click the 🚆 icon in your browser toolbar to open the extension popup.
+- Accept the Fair Personal Use Terms and start tracking live train statuses across any supported booking website!
+
+---
+
+### 🔄 How to Update to Newer Releases
+When a new version is released on GitHub:
+1. Download the new release `.zip` file from [Releases](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases).
+2. Extract and replace the files in your existing extension folder.
+3. Open `chrome://extensions/` and click the **Reload (↻)** icon on the Train Delay Tracker card.
 
 ---
 
@@ -38,13 +71,16 @@
   - ✅ **RailYatri** (`railyatri.in`)
   - ✅ **Generic Leaf Scanner** (Fallback for any upcoming booking portal)
 - 🛡️ **Multi-Token API Rotation Pool:** Automatically rotates across direct public gateway, RapidAPI Rail Engine 1, RapidAPI Rail Engine 2, and IndianRailAPI with automatic circuit breaker fallback.
-- 💾 **Smart Local Cache:** 0 duplicate API calls on hover — cached entries load instantaneously with 15-minute TTL and zero network overhead.
+- 💾 **50 MB Smart Cache & Selectable Retention Policies:**
+  - **No Cache (Default)**: Always live queries without local memory retention.
+  - **1 Minute / 5 Minutes / 15 Minutes**: Optional retention policies to preserve quota.
+  - Capped strictly at 50 MB with automatic expired & LRU eviction.
 - 🎛️ **Floating HUD with Batch Fetch:** Floating controller pinned to the viewport with `⚡ Fetch All` and tab-specific dismissal.
 - 🔍 **Instant Quick Search Popup:** Look up any 5-digit train number directly from the browser extension popup without visiting any booking website.
 
 ---
 
-## 🏛️ Modular Strategy Pattern Architecture
+## 🏛️ Strategy Pattern Architecture
 
 ```
                                   [ User Browses Booking Site ]
@@ -65,9 +101,9 @@
                                                 │
                          ┌──────────────────────┴──────────────────────┐
                          ▼                                             ▼
-             [ 15-Min Local Cache ]                        [ Multi-Tier Gateway Coordinator ]
-              • 0 network calls                             1. Direct Public Gateway (Free)
-              • Instant render                              2. RapidAPI Rail Engine 1 (Multi-Token)
+             [ 50MB Local Cache ]                          [ Multi-Tier Gateway Coordinator ]
+              • Selectable TTL (0, 1, 5, 15m)               1. Direct Public Gateway (Free)
+              • LRU Quota Pruning                           2. RapidAPI Rail Engine 1 (Multi-Token)
                                                             3. RapidAPI Rail Engine 2 (Multi-Token)
                                                             4. IndianRail Gateway (Direct Key)
                                                             5. Custom Webhook Gateway
@@ -75,12 +111,11 @@
 
 ---
 
-## 🚀 Quickstart & Developer Setup
+## 💻 Developer & Maintainer Setup
 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm (v9 or higher)
-- Google Chrome, Microsoft Edge, Brave, or Arc
 
 ### 1. Clone & Install
 ```bash
@@ -89,23 +124,27 @@ cd irctc-live-delay-extension
 npm install
 ```
 
-### 2. Build the Extension
+### 2. Build & Test
 ```bash
-# Development build
+# Start Vite development server
 npm run dev
 
-# Production build
+# Build production bundle
 npm run build
 
 # Package distribution zip
 npm run package
 ```
 
-### 3. Load in Browser
-1. Open your browser and navigate to `chrome://extensions/` (or `edge://extensions/`).
-2. Enable **Developer mode** in the top-right corner.
-3. Click **Load unpacked** and select the `dist/` directory.
-4. Open any train booking site (e.g. [ConfirmTkt](https://www.confirmtkt.com)) and start tracking!
+### 3. Automated Versioning & Release
+To publish a new version release to GitHub:
+```bash
+# Automated release script (builds, packages, tags, and generates zip)
+./scripts/release.sh 2.0.0
+
+# Push tag to trigger GitHub Actions automated release
+git push origin main --tags
+```
 
 ---
 
@@ -131,11 +170,11 @@ See the full [`DISCLAIMER.md`](DISCLAIMER.md) for complete terms.
 
 ## 🔒 Privacy Policy
 
-**Last Updated:** August 29, 2026
+**Last Updated:** September 5, 2026
 
 Live Train Delay Tracker is committed to protecting your privacy:
 - **Zero Personal Data Collection:** The extension does not collect, track, transmit, sell, or share any personal data, browsing history, cookies, or user credentials.
-- **Local Storage Usage:** The `storage` and `unlimitedStorage` permissions are used strictly on your local machine to cache live train status (with 15-minute TTL) and save your custom preferences.
+- **Local Storage Usage:** The `storage` and `unlimitedStorage` permissions are used strictly on your local machine to cache live train status (capped at 50 MB) and save your custom preferences.
 - **Permissions:** The `tabs` and `scripting` permissions and host access patterns are used exclusively to inject interactive delay badges into train search results.
 - **Zero Remote Code:** No remote scripts, `eval()`, or external executable code are used. All assets are self-contained.
 
