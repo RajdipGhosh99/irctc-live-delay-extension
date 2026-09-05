@@ -43,10 +43,10 @@ export class PixelVerifier {
 
       // Find the specific title text element anchor
       const titleRow = card.querySelector('.rail-train-title-row');
-      let titleEl = titleRow ? titleRow.querySelector('.train-name, [class*="train-name"], [class*="trainName"], h3, strong, .truncate, span') : null;
+      let titleEl = titleRow ? titleRow.querySelector('[data-testid="train-name"], [class*="listName"], .train-name, [class*="train-name"], [class*="trainName"], h3, strong, .truncate, p, span') : null;
       if (!titleEl) {
         titleEl = badgeWrapper.previousElementSibling ||
-                  card.querySelector('.train-name, [class*="train-name"], [class*="trainName"], h3, strong, .truncate');
+                  card.querySelector('[data-testid="train-name"], [class*="listName"], .train-name, [class*="train-name"], [class*="trainName"], h3, strong, .truncate, p');
       }
 
       if (!titleEl) return null;
