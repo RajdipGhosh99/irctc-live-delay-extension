@@ -16,7 +16,7 @@ export class MakeMyTripAdapter extends BasePortalAdapter {
   public override getBadgeAnchor(card: HTMLElement): HTMLElement | null {
     // Specifically search for train name element first, avoiding departure/arrival times
     const trainNameEl = card.querySelector(
-      '.train-name, [class*="train-name"], [class*="trainName"], [data-testid*="train-name"], .train-name-wrap, .train-heading, h3, h4'
+      '[data-testid="train-name"], [class*="ListingCard_listName"], [class*="listName"], .train-name, [class*="train-name"], [class*="trainName"], [data-testid*="train-name"], .train-name-wrap, .train-heading, h3, h4'
     );
     if (trainNameEl instanceof HTMLElement) {
       return trainNameEl;
@@ -47,6 +47,12 @@ export class MakeMyTripAdapter extends BasePortalAdapter {
       ) {
         nextTarget = sib;
       }
+
+      // Ensure anchor does not force a full-width line break
+      anchor.style.display = 'inline-block';
+      anchor.style.width = 'auto';
+      anchor.style.maxWidth = 'fit-content';
+      anchor.style.margin = '0';
 
       // To guarantee the badge is NEVER pushed below longer train names,
       // wrap the train title and badge together in an inline-flex nowrap row.

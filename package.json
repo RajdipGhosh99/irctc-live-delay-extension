@@ -29,6 +29,7 @@
     "test": "tsc --noEmit && npx tsx scripts/test-adapters.js",
     "test:e2e": "npm run build && npx tsx tests/e2e/run-e2e.ts",
     "test:e2e:live": "npm run build && npx tsx tests/e2e/run-e2e.ts --live",
+    "test:e2e:live:mmt": "npm run build && npx tsx tests/e2e/live-mmt.ts",
     "test:e2e:headful": "npm run build && npx tsx tests/e2e/run-e2e.ts --headful",
     "build": "node scripts/bundle-css.js && tsc && vite build",
     "preview": "vite preview",

@@ -78,7 +78,7 @@ export const DEFAULT_E2E_CONFIG: E2ETestConfig = {
       mockPath: '/makemytrip',
       getLiveUrl: (src, dest, dateIso) => {
         const { yyyymmdd } = formatDateFormats(dateIso);
-        return `https://www.makemytrip.com/railways/listing?srcStn=${src}&destStn=${dest}&date=${yyyymmdd}`;
+        return `https://www.makemytrip.com/railways/listing?srcCity=Kharagpur&destCity=Howrah&srcStn=${src}&destStn=${dest}&date=${yyyymmdd}&classType=ALL`;
       },
     },
     {

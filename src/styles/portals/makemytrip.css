@@ -20,3 +20,16 @@
   white-space: nowrap !important;
   display: inline-flex !important;
 }
+
+.rail-train-title-row > p,
+.rail-train-title-row > [class*="listName"],
+.rail-train-title-row > [data-testid="train-name"] {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: inline-block !important;
+  width: auto !important;
+  max-width: fit-content !important;
+  margin: 0 !important;
+}
+
