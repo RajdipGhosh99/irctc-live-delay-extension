@@ -249,16 +249,24 @@
   align-items: center !important;
   border-top: 1px solid #f1f5f9 !important;
   padding-top: 7px !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
 }
 
 .rail-popover-meta {
-  font-size: 9.5px !important;
-  color: #94a3b8 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex-shrink: 1 !important;
 }
 
 .rail-popover-actions {
   display: flex !important;
   gap: 5px !important;
+  flex-shrink: 0 !important;
 }
 
 .rail-action-btn {

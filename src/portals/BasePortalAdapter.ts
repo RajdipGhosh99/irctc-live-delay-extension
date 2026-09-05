@@ -197,11 +197,14 @@ export class BasePortalAdapter implements PortalAdapter {
       if (!parent.classList.contains('flex') && !parent.classList.contains('makeFlex') && !parent.classList.contains('d-flex')) {
         parent.style.display = 'inline-flex';
         parent.style.alignItems = 'center';
-        parent.style.flexWrap = 'wrap';
+        parent.style.flexWrap = 'nowrap';
         parent.style.gap = '8px';
       } else {
         parent.style.alignItems = 'center';
+        parent.style.flexWrap = 'nowrap';
       }
+      badgeWrapper.style.flexShrink = '0';
+      badgeWrapper.style.whiteSpace = 'nowrap';
       parent.insertBefore(badgeWrapper, anchor.nextSibling);
       return;
     }

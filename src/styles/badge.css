@@ -3,6 +3,16 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
+.rail-train-title-row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  max-width: 100% !important;
+  vertical-align: middle !important;
+}
+
 .rail-delay-wrapper {
   position: relative !important;
   display: inline-flex !important;
@@ -12,6 +22,8 @@
   padding: 0 !important;
   font-family: var(--rail-font-family) !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
   z-index: 100 !important;
 }
 

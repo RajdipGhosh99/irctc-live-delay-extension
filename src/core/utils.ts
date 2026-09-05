@@ -291,6 +291,59 @@ export function shortenLiveLocation(locationStr?: string, maxLen = 42): string {
 }
 
 /**
+ * Strips redundant delay narratives from station location strings so the location micro-banner
+ * strictly presents the train's actual physical location/station without duplicate delay text.
+ */
+export function cleanLiveLocation(
+  rawLocation?: string,
+  currentStation?: string,
+  nextStation?: string,
+  maxLen = 48
+): string {
+  let text = (rawLocation || '').trim();
+
+  if (text) {
+    // Strip trailing delay narratives like ", and running 4 hours 49 minutes late", "running 289 mins late", "delay by 4 hrs", "Right Time", etc.
+    text = text
+      .replace(/(?:,\s*)?(?:and\s+)?\b(?:running|is\s+running)\s+[\d\w\s]+(?:late|early|behind|ahead|right\s*time|on\s*time)[^.]*\.?/gi, '')
+      .replace(/(?:,\s*)?\b(?:delay|delayed|late|early)\s*(?:by)?\s*[\d\w\s]+(?:mins?|minutes?|hours?|hrs?)[^.]*\.?/gi, '')
+      .replace(/(?:,\s*)?\b(?:right\s*time|on\s*time|rt|ontime)\b[^.]*\.?/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/[,\-\.]\s*$/, '');
+  }
+
+  // If text was stripped down completely or was unavailable, compose from current/next station
+  if (!text || text.length < 3) {
+    if (currentStation && currentStation.trim()) {
+      text = nextStation && nextStation.trim()
+        ? `Near ${currentStation.trim()} → ${nextStation.trim()}`
+        : `Near ${currentStation.trim()}`;
+    } else {
+      text = 'En route to destination';
+    }
+  }
+
+  return shortenLiveLocation(text, maxLen);
+}
+
+/**
+ * Formats ISO timestamp to crisp 24-hour clock time (e.g. "23:08")
+ */
+export function formatIsoClock24(isoTimestamp?: string): string {
+  if (!isoTimestamp) return 'Just now';
+  try {
+    const d = new Date(isoTimestamp);
+    if (isNaN(d.getTime())) return 'Just now';
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
+  } catch {
+    return 'Just now';
+  }
+}
+
+/**
  * Universal 5-digit train number extractor supporting isolated numbers and concatenated titles (e.g. "12904Golden", "22436", "04153")
  */
 export function extractTrainNumberRegex(text: string): string | null {

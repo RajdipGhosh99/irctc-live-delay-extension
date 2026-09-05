@@ -163,20 +163,32 @@ class ContentScriptOrchestrator {
       state: 'idle',
     };
 
-    // 1. Double-click opens the detailed analytics card
-    badge.addEventListener('dblclick', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (widget.state === 'idle' || widget.state === 'error') {
+    // 1. Hover: Open detailed analytics popover on hover (fetches live data if not yet cached)
+    let hoverLeaveTimer: any = null;
+    wrapper.addEventListener('mouseenter', () => {
+      if (hoverLeaveTimer) {
+        clearTimeout(hoverLeaveTimer);
+        hoverLeaveTimer = null;
+      }
+      if (widget.popover) {
+        this.openPopover(widget);
+      } else if (widget.state === 'idle' || widget.state === 'error') {
         this.fetchTrainDelay(widget).then(() => {
           this.openPopover(widget);
         });
-      } else {
-        this.togglePopover(widget);
       }
     });
 
-    // 2. Single click: fetches data if idle/error, or closes popover if open
+    // 2. Mouse leave: Automatically closes popover after brief buffer
+    wrapper.addEventListener('mouseleave', () => {
+      hoverLeaveTimer = setTimeout(() => {
+        if (this.activePopoverWidget === widget) {
+          this.closeActivePopover();
+        }
+      }, 150);
+    });
+
+    // 3. Single click: Toggles popover or fetches if idle
     badge.addEventListener('click', (e) => {
       e.stopPropagation();
       if (this.activePopoverWidget === widget) {
@@ -184,22 +196,19 @@ class ContentScriptOrchestrator {
         return;
       }
       if (widget.state === 'idle' || widget.state === 'error') {
-        this.fetchTrainDelay(widget);
+        this.fetchTrainDelay(widget).then(() => this.openPopover(widget));
+      } else {
+        this.openPopover(widget);
       }
     });
 
-    // 3. Hover: remains closed by default (optionally fetches delay in background if enabled)
-    if (this.settings?.fetchOnHover) {
-      wrapper.addEventListener('mouseenter', () => {
-        if (widget.state === 'idle') {
-          this.fetchTrainDelay(widget); // updates badge dot/time without opening popover
-        }
+    // 4. Double click: Force refreshes live status
+    badge.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.fetchTrainDelay(widget, true).then(() => {
+        this.openPopover(widget);
       });
-    }
-
-    // 4. Mouse leave: automatically closes popover
-    wrapper.addEventListener('mouseleave', () => {
-      this.closeActivePopover();
     });
 
     this.adapter.injectBadge(card, wrapper, position);
@@ -264,6 +273,7 @@ class ContentScriptOrchestrator {
   }
 
   private attachPopover(widget: InjectedWidget, data: TrainDelayData): void {
+    const wasOpen = this.activePopoverWidget === widget || widget.popover?.classList.contains('is-open');
     if (widget.popover) widget.popover.remove();
 
     const popover = PopoverComponent.renderPopover(
@@ -272,9 +282,14 @@ class ContentScriptOrchestrator {
       () => this.closeActivePopover()
     );
 
-    // Strictly ensure closed by default
-    popover.style.display = 'none';
-    popover.classList.remove('is-open');
+    if (wasOpen) {
+      popover.style.display = 'block';
+      popover.classList.add('is-open');
+      this.activePopoverWidget = widget;
+    } else {
+      popover.style.display = 'none';
+      popover.classList.remove('is-open');
+    }
 
     widget.wrapper.appendChild(popover);
     widget.popover = popover;

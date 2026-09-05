@@ -30,17 +30,41 @@ export class MakeMyTripAdapter extends BasePortalAdapter {
 
     const anchor = this.getBadgeAnchor(card);
     if (anchor && anchor !== card && anchor.parentElement) {
-      const parent = anchor.parentElement;
-      // Ensure the parent container displays inline-flex / flex row to keep badge beside the train name
-      if (!parent.classList.contains('flex') && !parent.classList.contains('makeFlex')) {
-        parent.style.display = 'inline-flex';
-        parent.style.alignItems = 'center';
-        parent.style.flexWrap = 'wrap';
-        parent.style.gap = '8px';
-      } else {
-        parent.style.alignItems = 'center';
+      // If already wrapped in our dedicated title row, append directly
+      if (anchor.parentElement.classList.contains('rail-train-title-row')) {
+        anchor.parentElement.appendChild(badgeWrapper);
+        return;
       }
-      parent.insertBefore(badgeWrapper, anchor.nextSibling);
+
+      const parent = anchor.parentElement;
+
+      // Check if adjacent sibling is a train number element (e.g. "#12301" or "(12301)")
+      let nextTarget: HTMLElement = anchor;
+      const sib = anchor.nextElementSibling;
+      if (
+        sib instanceof HTMLElement &&
+        (/(?:num|no|code|id)/i.test(sib.className) || /\(\d{5}\)/.test(sib.textContent || ''))
+      ) {
+        nextTarget = sib;
+      }
+
+      // To guarantee the badge is NEVER pushed below longer train names,
+      // wrap the train title and badge together in an inline-flex nowrap row.
+      const titleRow = document.createElement('div');
+      titleRow.className = 'rail-train-title-row';
+      titleRow.style.cssText =
+        'display: inline-flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; max-width: 100% !important; vertical-align: middle !important;';
+
+      parent.insertBefore(titleRow, anchor);
+      titleRow.appendChild(anchor);
+      if (nextTarget !== anchor && nextTarget.parentNode === parent) {
+        titleRow.appendChild(nextTarget);
+      }
+      titleRow.appendChild(badgeWrapper);
+
+      // Prevent badge from shrinking or wrapping
+      badgeWrapper.style.flexShrink = '0';
+      badgeWrapper.style.whiteSpace = 'nowrap';
       return;
     }
 

@@ -52,6 +52,16 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
+.rail-train-title-row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  max-width: 100% !important;
+  vertical-align: middle !important;
+}
+
 .rail-delay-wrapper {
   position: relative !important;
   display: inline-flex !important;
@@ -61,6 +71,8 @@
   padding: 0 !important;
   font-family: var(--rail-font-family) !important;
   box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
   z-index: 100 !important;
 }
 
@@ -460,16 +472,24 @@
   align-items: center !important;
   border-top: 1px solid #f1f5f9 !important;
   padding-top: 7px !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
 }
 
 .rail-popover-meta {
-  font-size: 9.5px !important;
-  color: #94a3b8 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex-shrink: 1 !important;
 }
 
 .rail-popover-actions {
   display: flex !important;
   gap: 5px !important;
+  flex-shrink: 0 !important;
 }
 
 .rail-action-btn {
@@ -706,9 +726,22 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
-.rail-delay-wrapper.vendor-makemytrip {
-  margin-left: 10px !important;
+.rail-train-title-row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  max-width: 100% !important;
   vertical-align: middle !important;
+}
+
+.rail-delay-wrapper.vendor-makemytrip {
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
 }
 
 

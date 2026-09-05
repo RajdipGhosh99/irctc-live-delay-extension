@@ -5,7 +5,7 @@
  */
 
 import { TrainDelayData } from '../core/types';
-import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
+import { cleanLiveLocation, formatDelayHhMm, formatIsoClock24 } from '../core/utils';
 import {
   barChartIcon,
   checkIcon,
@@ -32,26 +32,25 @@ export class PopoverComponent {
 
     const isDelayed = data.delayMinutes > 5;
     const isEarly = data.delayMinutes < -5;
-    const delayAbs = Math.abs(data.delayMinutes);
 
-    // Pill color, live status styling and text
+    // Pill color, live status styling and non-redundant status
     let statusPillClass = 'status-ontime';
     let statusPillText = 'On Time';
     let todayLiveHhMm = '00:00';
-    let todayLiveSub = 'Right Time';
+    let todayLiveSub = 'On Schedule';
     let todayLiveBoxClass = 'box-ontime';
 
     if (isDelayed) {
       statusPillClass = 'status-delayed';
-      statusPillText = `${delayAbs}m Late`;
-      todayLiveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      todayLiveSub = `${delayAbs}m Behind`;
+      statusPillText = 'Delayed';
+      todayLiveHhMm = formatDelayHhMm(data.delayMinutes, false); // Formatted as 24-hr duration (e.g. 04:49)
+      todayLiveSub = 'Behind Schedule';
       todayLiveBoxClass = 'box-late';
     } else if (isEarly) {
       statusPillClass = 'status-ontime';
-      statusPillText = `${delayAbs}m Early`;
+      statusPillText = 'Early';
       todayLiveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      todayLiveSub = `${delayAbs}m Ahead`;
+      todayLiveSub = 'Ahead of Schedule';
       todayLiveBoxClass = 'box-ontime';
     } else {
       statusPillClass = 'status-ontime';
@@ -61,22 +60,26 @@ export class PopoverComponent {
       todayLiveBoxClass = 'box-ontime';
     }
 
-    // Historical analytics metrics
+    // Historical analytics metrics (strictly 24-hr clock duration HH:MM)
     const stats = data.delayHistory || {
       todayAvgDelayMinutes: Math.max(0, Math.round(data.delayMinutes * 0.75)),
       monthAvgDelayMinutes: Math.max(0, Math.round(data.delayMinutes * 0.6)),
-      punctualityRatePercent: isDelayed ? Math.max(45, 90 - Math.min(40, delayAbs)) : 92,
+      punctualityRatePercent: isDelayed ? Math.max(45, 90 - Math.min(40, Math.abs(data.delayMinutes))) : 92,
       historicalRunsAnalyzed: 28,
     };
 
     const todayAvgHhMm = formatDelayHhMm(stats.todayAvgDelayMinutes, false);
-    const monthAvgHhMm = formatDelayHhMm(stats.monthAvgDelayMinutes, false);
 
-    // Live station location string
-    let rawLocation = data.statusSummary || data.currentStationName || 'En route to destination';
-    const locationText = shortenLiveLocation(rawLocation, 44);
+    // Clean physical station location string (strips redundant delay phrases so location doesn't repeat delay)
+    const locationText = cleanLiveLocation(
+      data.statusSummary,
+      data.currentStationName,
+      data.nextStationName,
+      44
+    );
 
-    const updatedText = data.lastUpdatedIso ? formatIsoHumanTime(data.lastUpdatedIso) : 'Just now';
+    // Compact 24-hour update clock timestamp (e.g. "23:08")
+    const updatedClock = formatIsoClock24(data.lastUpdatedIso);
 
     popover.innerHTML = `
       <!-- Header -->
@@ -141,9 +144,7 @@ export class PopoverComponent {
 
       <!-- Action Footer -->
       <div class="rail-popover-footer">
-        <div class="rail-popover-meta">
-          <span>Updated: ${updatedText}</span>
-        </div>
+        <span class="rail-popover-meta" title="Last live data sync">Updated: ${updatedClock}</span>
         <div class="rail-popover-actions">
           <button type="button" class="rail-action-btn rail-btn-copy" title="Copy delay status to clipboard">
             ${copyIcon({ size: 11, className: 'svg-icon-inline' })} Copy
@@ -176,7 +177,7 @@ export class PopoverComponent {
     if (copyBtn) {
       copyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const copyText = `Train #${data.trainNumber} (${data.trainName || 'Express'}): ${data.statusSummary || statusPillText} | Live Delay: ${todayLiveHhMm} (4-Wk Avg: ${todayAvgHhMm}, 30-Day: ${monthAvgHhMm})`;
+        const copyText = `Train #${data.trainNumber} (${data.trainName || 'Express'}): ${locationText} | Live Delay: ${todayLiveHhMm} (4-Wk Avg: ${todayAvgHhMm})`;
         navigator.clipboard?.writeText(copyText).then(() => {
           copyBtn.innerHTML = `${checkIcon({ size: 11, className: 'svg-icon-inline' })} Copied!`;
           setTimeout(() => {
