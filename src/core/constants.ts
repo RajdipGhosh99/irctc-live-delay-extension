@@ -97,6 +97,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   maxCacheSizeMb: 50, // Max cache size: 50 MB
   showFloatingHUD: true,
   termsAccepted: false, // Requires user acceptance on first run
+  recentSearches: ['12952', '12301', '12004'],
   schemaVersion: '2.0.0',
   providers: {
     'direct-rail-gateway': {

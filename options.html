@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Live Train Delay Tracker - Settings</title>
+  <title>Live Train Delay Tracker - Settings & Dashboard</title>
   <link rel="stylesheet" href="./src/options/options.css" />
 </head>
 <body>
-  <!-- Mobile Navigation Bar -->
+  <!-- Mobile Navigation Header -->
   <header class="mobile-nav-header">
     <div class="mobile-brand">
       <img src="./icons/icon32.png" alt="Logo" class="mobile-logo" width="28" height="28" />
@@ -25,83 +25,213 @@
     <!-- Sidebar / Brand -->
     <aside class="options-sidebar" id="options-sidebar">
       <div class="brand">
-        <img src="./icons/icon48.png" alt="Logo" class="brand-logo" width="36" height="36" />
+        <div class="brand-logo-frame">
+          <img src="./icons/icon48.png" alt="Logo" class="brand-logo" width="34" height="34" />
+        </div>
         <div>
           <h2>Train Delay Tracker</h2>
-          <span class="version-tag">v2.0.0</span>
+          <div class="brand-version-row">
+            <span class="version-tag">v2.0.0</span>
+            <span class="fair-use-tag">Personal Use</span>
+          </div>
         </div>
       </div>
 
       <nav class="sidebar-nav" aria-label="Settings Navigation">
-        <a href="#general" class="nav-item active" data-target="general">⚙️ General & Sites</a>
-        <a href="#tokens" class="nav-item" data-target="tokens">🔑 Multi-Provider & Pools</a>
-        <a href="#ondemand" class="nav-item" data-target="ondemand">⚡ Click-to-Fetch & Cache</a>
+        <a href="#general" class="nav-item active" data-target="general">
+          <span class="nav-icon">🌐</span>
+          <span>Supported Sites & Placement</span>
+        </a>
+        <a href="#ondemand" class="nav-item" data-target="ondemand">
+          <span class="nav-icon">⚡</span>
+          <span>Click-to-Fetch & 50MB Cache</span>
+        </a>
+        <a href="#tokens" class="nav-item" data-target="tokens">
+          <span class="nav-icon">🔑</span>
+          <span>Multi-Provider & Token Pools</span>
+        </a>
+        <a href="#compliance" class="nav-item" data-target="compliance">
+          <span class="nav-icon">⚖️</span>
+          <span>Fair Use & Legal Hub</span>
+        </a>
       </nav>
 
-      <div class="sidebar-footer">
-        <div class="storage-meter">
-          <div class="storage-meter-label">
-            <span>Cache Quota (Max 50 MB)</span>
-            <span id="storage-used-text">0.0 MB / 50 MB</span>
-          </div>
-          <div class="storage-bar-track">
-            <div class="storage-bar-fill" id="storage-bar-fill" style="width: 0%;"></div>
+      <!-- Sidebar Storage Meter -->
+      <div class="sidebar-storage-card">
+        <div class="storage-meter-label">
+          <span class="meter-title">Cache Quota</span>
+          <span class="meter-cap">Max 50 MB</span>
+        </div>
+        <div class="storage-bar-track">
+          <div class="storage-bar-fill" id="storage-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="storage-meter-footer">
+          <span id="storage-used-text">0.0 MB / 50 MB</span>
+          <span class="meter-status">Strict Limit</span>
+        </div>
+      </div>
+
+      <!-- Developer Profile Card -->
+      <div class="dev-profile-card">
+        <div class="dev-profile-header">
+          <div class="dev-avatar">RG</div>
+          <div class="dev-info">
+            <span class="dev-name">Rajdip Ghosh</span>
+            <span class="dev-title">Creator & Maintainer</span>
           </div>
         </div>
-        <p class="license-info">GNU GPL-3.0 • 100% Open Source</p>
+        <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension" target="_blank" rel="noopener noreferrer" class="github-btn">
+          <span>★ Star on GitHub</span>
+          <span class="arrow-ext">↗</span>
+        </a>
+        <p class="license-text">GNU GPL-3.0 • 100% Free & Open Source</p>
       </div>
     </aside>
 
     <!-- Main Content Area -->
     <main class="options-main">
-      <!-- Top Save Banner -->
+      <!-- Floating Save Toast Banner -->
       <div class="save-banner" id="save-banner">
-        <span>✓ Settings saved successfully</span>
+        <span class="toast-check">✓</span>
+        <span id="save-banner-text">Settings saved successfully</span>
       </div>
 
-      <!-- Section: General & Supported Sites -->
+      <!-- Main Dashboard Header -->
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Settings & Extension Preferences</h1>
+          <p class="page-subtitle">Configure real-time live delay badges, customize booking site integration, and manage redundant API pools.</p>
+        </div>
+        <div class="global-status-pill" id="dashboard-global-status">
+          <span class="pulse-dot"></span> Live Monitoring Active
+        </div>
+      </header>
+
+      <!-- Section 1: Supported Sites & Badge Placement -->
       <section id="general" class="settings-card active">
         <div class="card-header">
-          <h3>Global & Supported Booking Portals</h3>
-          <p>Toggle extension activity or customize live badge position per booking portal.</p>
+          <div class="header-icon-box">🌐</div>
+          <div>
+            <h3>Supported Booking Portals & Live Badge Placement</h3>
+            <p>Customize badge position for each supported booking site or disable tracking on specific portals.</p>
+          </div>
         </div>
 
-        <div class="toggle-row">
-          <div>
-            <strong>Enable Live Delay Tracker Globally</strong>
-            <p>Master switch to turn on/off delay badge injection on all train search portals.</p>
+        <div class="global-toggles-grid">
+          <div class="toggle-box-card">
+            <div class="toggle-text-col">
+              <strong>Global Delay Tracking</strong>
+              <p>Master switch to enable or pause real-time delay badge injection across all portals.</p>
+            </div>
+            <label class="modern-switch" title="Toggle Extension Globally">
+              <input type="checkbox" id="master-enable-switch" checked aria-label="Toggle Extension Globally" />
+              <span class="switch-slider"></span>
+            </label>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="master-enable-switch" checked aria-label="Toggle Extension Globally" />
-            <span class="slider round"></span>
-          </label>
+
+          <div class="toggle-box-card">
+            <div class="toggle-text-col">
+              <strong>Viewport-Pinned Floating HUD</strong>
+              <p>Displays an expandable quick-control widget in the bottom-right corner of booking pages.</p>
+            </div>
+            <label class="modern-switch" title="Toggle Floating HUD">
+              <input type="checkbox" id="floating-hud-switch" checked aria-label="Toggle Floating HUD" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
         </div>
 
-        <div class="toggle-row">
-          <div>
-            <strong>Show Viewport-Pinned Floating HUD</strong>
-            <p>Displays an expandable quick-control card in the bottom-right corner of train search pages.</p>
+        <!-- Live Simulated Badge Preview -->
+        <div class="preview-banner-card">
+          <div class="preview-label">LIVE BADGE PREVIEW</div>
+          <div class="preview-train-row">
+            <div class="preview-train-info">
+              <span class="preview-train-number">#12952</span>
+              <strong class="preview-train-name">Mumbai Rajdhani Express</strong>
+            </div>
+            <div class="preview-badge-sample">
+              <span class="preview-badge-icon">⚡</span>
+              <span class="preview-badge-status status-delayed-sample">+18m Late</span>
+              <span class="preview-badge-sub">Passed KANPUR (CNB)</span>
+            </div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="floating-hud-switch" checked aria-label="Toggle Floating HUD" />
-            <span class="slider round"></span>
-          </label>
         </div>
 
         <!-- Dynamic Portal Cards Container -->
-        <h4 style="margin: 20px 0 10px 0; font-size: 14px; color: #334155;">Supported Booking Sites & Badge Placement:</h4>
+        <div class="sites-section-header">
+          <h4>Supported Booking Portals (9 Portals Ready):</h4>
+          <span class="sites-sub-note">Adjust badge location according to each site's unique layout</span>
+        </div>
         <div class="sites-grid" id="sites-container">
           <!-- Dynamically populated per-site cards -->
         </div>
       </section>
 
-      <!-- Section: Multi-Token Pools -->
+      <!-- Section 2: Click-to-Fetch & 50 MB Cache Settings -->
+      <section id="ondemand" class="settings-card">
+        <div class="card-header">
+          <div class="header-icon-box">⚡</div>
+          <div>
+            <h3>On-Demand Click-to-Fetch & 50 MB Cache Quota</h3>
+            <p>Zero unexpected network queries. Live train metrics are fetched only when you click or opt in.</p>
+          </div>
+        </div>
+
+        <!-- Feature Spotlight Banner -->
+        <div class="feature-spotlight-banner">
+          <div class="spotlight-badge">100% ON-DEMAND ⚡</div>
+          <strong>Strict Click-to-Fetch Protection Enabled</strong>
+          <p>Hovering over train listings does NOT make background API requests. Network queries occur strictly on user interaction.</p>
+        </div>
+
+        <div class="settings-control-group">
+          <div class="form-row">
+            <div class="form-label-col">
+              <label for="cache-ttl-select">Local Cache Retention Policy:</label>
+              <p>Caches live running status locally to eliminate duplicate API requests. Hard-capped at 50 MB.</p>
+            </div>
+            <div class="form-input-col">
+              <select id="cache-ttl-select" class="modern-select-lg">
+                <option value="0" selected>No Cache (Always Live Fetch - Zero Storage)</option>
+                <option value="1">1 Minute (Ultra Fresh Live Data)</option>
+                <option value="5">5 Minutes (Recommended - Saves API Quota)</option>
+                <option value="15">15 Minutes (Extended Travel Window)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toggle-box-card">
+            <div class="toggle-text-col">
+              <strong>Auto-Fetch Visible Trains When Browsing</strong>
+              <p>Automatically loads live running status for all train listings visible on search results without manual clicking.</p>
+            </div>
+            <label class="modern-switch" title="Toggle Auto-Fetch for All Trains">
+              <input type="checkbox" id="auto-fetch-all-switch" aria-label="Toggle Auto-Fetch for All Trains" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Cache Storage Card -->
+        <div class="cache-breakdown-card">
+          <div class="cache-card-info">
+            <strong>Local Cache Storage Footprint</strong>
+            <p>All cached train data is stored securely in your browser and automatically evicted on expiration or 50 MB limit.</p>
+          </div>
+          <button type="button" id="clear-all-cache-btn" class="btn-danger-action">
+            🗑 Clear Entire Local Cache
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 3: Multi-Provider & Token Pools -->
       <section id="tokens" class="settings-card">
         <div class="card-header">
+          <div class="header-icon-box">🔑</div>
           <div class="header-with-badge">
             <div>
-              <h3>API Providers & Multi-Token Key Pools</h3>
-              <p>Add multiple free API tokens to multiply your monthly quota (1 token = 500 calls, 2 tokens = 1000 calls).</p>
+              <h3>API Gateways & Multi-Token Key Pools</h3>
+              <p>Direct Rail Network works out-of-the-box with zero keys. Power users can add redundant backup tokens.</p>
             </div>
             <div class="pool-aggregate-badge" id="total-quota-badge">
               ⚡ Total Pool: 0 Active Tokens
@@ -109,26 +239,33 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="primary-provider-select">Primary Provider to Query First:</label>
-          <select id="primary-provider-select" class="form-control">
-            <option value="direct-rail-gateway" selected>National Rail Network (Direct - 100% Free & Unlimited)</option>
-            <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free calls/token/mo)</option>
-            <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free calls/token/mo)</option>
-            <option value="indianrailapi">IndianRail Gateway (250 free calls/token/day)</option>
-            <option value="custom-webhook">Custom Webhook / Private Reverse Proxy</option>
-          </select>
-        </div>
-
-        <div class="toggle-row">
-          <div>
-            <strong>Automatic Failover Across Providers</strong>
-            <p>If all tokens in the primary provider are exhausted, automatically try backup providers.</p>
+        <div class="settings-control-group">
+          <div class="form-row">
+            <div class="form-label-col">
+              <label for="primary-provider-select">Primary API Gateway:</label>
+              <p>The gateway queried first for all live train lookups.</p>
+            </div>
+            <div class="form-input-col">
+              <select id="primary-provider-select" class="modern-select-lg">
+                <option value="direct-rail-gateway" selected>National Rail Network (Direct - 100% Free & Unlimited)</option>
+                <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free calls/token/mo)</option>
+                <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free calls/token/mo)</option>
+                <option value="indianrailapi">IndianRail Gateway (250 free calls/token/day)</option>
+                <option value="custom-webhook">Custom Webhook / Private Reverse Proxy</option>
+              </select>
+            </div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="auto-failover-switch" checked aria-label="Toggle Automatic Failover" />
-            <span class="slider round"></span>
-          </label>
+
+          <div class="toggle-box-card">
+            <div class="toggle-text-col">
+              <strong>Automatic Multi-Tier Failover</strong>
+              <p>If all keys in your primary gateway are exhausted or rate-limited, automatically fall back to secondary gateways.</p>
+            </div>
+            <label class="modern-switch" title="Toggle Automatic Failover">
+              <input type="checkbox" id="auto-failover-switch" checked aria-label="Toggle Automatic Failover" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <!-- Provider Token Pools Container -->
@@ -137,76 +274,51 @@
         </div>
       </section>
 
-      <!-- Section: Click-to-Fetch & Cache Settings -->
-      <section id="ondemand" class="settings-card">
+      <!-- Section 4: Fair Use & Legal Hub -->
+      <section id="compliance" class="settings-card">
         <div class="card-header">
-          <h3>Click-to-Fetch & Cache Settings</h3>
-          <p>Zero unexpected API calls — delay info is only fetched when you click on a train badge.</p>
-        </div>
-
-        <div class="toggle-row highlight-row" style="background: #f0fdf4; border-color: #bbf7d0;">
+          <div class="header-icon-box">⚖️</div>
           <div>
-            <strong style="color: #166534;">Strict Click-to-Fetch Mode Enabled</strong>
-            <p style="color: #15803d;">Hovering does NOT make any API calls. Network requests only occur when you explicitly click a train badge.</p>
+            <h3>Personal Fair Use & Legal Compliance Hub</h3>
+            <p>Guidelines and fair-use terms governing the interactive use of this open-source tool.</p>
           </div>
-          <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 9999px;">
-            100% On-Demand ⚡
-          </span>
         </div>
 
-        <div class="form-group">
-          <label for="cache-ttl-select">Local Cache Retention (Saves API calls, Max 50 MB):</label>
-          <select id="cache-ttl-select" class="form-control">
-            <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
-            <option value="1">1 Minute (Ultra Fresh)</option>
-            <option value="5">5 Minutes (Recommended)</option>
-            <option value="15">15 Minutes</option>
-          </select>
+        <div class="compliance-grid">
+          <div class="compliance-card">
+            <div class="compliance-icon">👤</div>
+            <strong>1. Personal Fair Use Only</strong>
+            <p>Developed strictly for interactive personal passenger lookups. Automated commercial scraping or data resale is prohibited.</p>
+          </div>
+
+          <div class="compliance-card">
+            <div class="compliance-icon">🛡️</div>
+            <strong>2. Anti-Abuse & Rate Protection</strong>
+            <p>Automated crawler loops, denial-of-service queries, and high-frequency bulk requests are actively prevented.</p>
+          </div>
+
+          <div class="compliance-card">
+            <div class="compliance-icon">🌐</div>
+            <strong>3. Independent Open-Source Tool</strong>
+            <p>This extension is independent and is not affiliated with, endorsed by, or connected to any third-party booking portals.</p>
+          </div>
+
+          <div class="compliance-card">
+            <div class="compliance-icon">⏱️</div>
+            <strong>4. Informational Estimates</strong>
+            <p>Delays and running metrics are public estimates. Always verify official display indicators at railway stations before boarding.</p>
+          </div>
         </div>
 
-        <div class="toggle-row">
+        <!-- Terms Status Banner -->
+        <div class="terms-status-box" id="terms-status-container">
           <div>
-            <strong>⚡ Auto-Fetch Status for All Trains on Page</strong>
-            <p>Automatically loads live running status and delay metrics for all train listings without needing to click each train manually.</p>
+            <span class="status-box-title">Terms & Conditions Status:</span>
+            <div id="terms-status-text" class="status-box-val">✓ Accepted for Personal Fair Use</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="auto-fetch-all-switch" aria-label="Toggle Auto-Fetch for All Trains" />
-            <span class="slider round"></span>
-          </label>
-        </div>
-
-        <div class="cache-management-box">
-          <div class="cache-stats-row">
-            <div>
-              <strong>Local Memory Storage</strong>
-              <p>Cached train delays are saved locally to eliminate duplicate API requests (capped at 50 MB).</p>
-            </div>
-            <button type="button" id="clear-all-cache-btn" class="btn btn-danger">
-              🗑 Clear Entire Local Cache
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section: Legal Disclaimer & Anti-Abuse -->
-      <section class="settings-card" style="border-top: 2px solid #cbd5e1; background: #f8fafc;">
-        <div class="card-header">
-          <h3 style="color: #475569;">⚠️ Legal Disclaimer & Fair Use Notice</h3>
-          <p style="font-size: 11.5px; line-height: 1.5; color: #64748b; margin-top: 6px;">
-            <strong>Personal Fair Use Only:</strong> This extension is developed strictly for interactive personal lookups. Automated scraping, continuous polling bots, or commercial resale of live data are strictly prohibited.<br />
-            <strong>Independent Project:</strong> This extension is an independent open-source tool and is not affiliated with, endorsed by, or connected to any third-party ticketing portal.<br />
-            <strong>Informational Estimates:</strong> Live status and delay predictions are estimates based on public signals. Always verify your departure timings at the station before traveling.
-          </p>
-
-          <div class="terms-acceptance-status" id="terms-status-container" style="margin-top: 14px; padding: 10px 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <strong style="font-size: 12px; color: #1e293b;">Terms & Conditions Status:</strong>
-              <div id="terms-status-text" style="font-size: 11px; color: #16a34a; font-weight: 600;">✓ Accepted for Personal Fair Use</div>
-            </div>
-            <button type="button" id="reaccept-terms-btn" class="btn btn-secondary btn-sm" style="display: none; padding: 6px 12px; font-size: 11.5px;">
-              Review & Accept Terms
-            </button>
-          </div>
+          <button type="button" id="reaccept-terms-btn" class="btn-reaccept-terms" style="display: none;">
+            Review & Accept Terms
+          </button>
         </div>
       </section>
     </main>
@@ -215,3 +327,4 @@
   <script type="module" src="./src/options/options.ts"></script>
 </body>
 </html>
+

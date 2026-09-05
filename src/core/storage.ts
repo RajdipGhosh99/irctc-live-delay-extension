@@ -33,6 +33,7 @@ function migrateLegacySettings(raw: any): MultiProviderSettings {
     showFloatingHUD: raw.showFloatingHUD ?? DEFAULT_SETTINGS.showFloatingHUD,
     termsAccepted: raw.termsAccepted ?? DEFAULT_SETTINGS.termsAccepted,
     termsAcceptedAt: raw.termsAcceptedAt,
+    recentSearches: Array.isArray(raw.recentSearches) ? raw.recentSearches : [...(DEFAULT_SETTINGS.recentSearches || [])],
     schemaVersion: '2.0.0',
     providers: { ...DEFAULT_SETTINGS.providers },
   };

@@ -32,18 +32,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const providerPoolsContainer = document.getElementById('provider-pools-container') as HTMLElement;
   const clearAllCacheBtn = document.getElementById('clear-all-cache-btn') as HTMLButtonElement;
   const saveBanner = document.getElementById('save-banner') as HTMLElement;
+  const saveBannerText = document.getElementById('save-banner-text') as HTMLElement;
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle') as HTMLButtonElement;
   const optionsSidebar = document.getElementById('options-sidebar') as HTMLElement;
   const storageUsedText = document.getElementById('storage-used-text') as HTMLElement;
   const storageBarFill = document.getElementById('storage-bar-fill') as HTMLElement;
   const termsStatusText = document.getElementById('terms-status-text') as HTMLElement;
   const reacceptTermsBtn = document.getElementById('reaccept-terms-btn') as HTMLButtonElement;
+  const dashboardGlobalStatus = document.getElementById('dashboard-global-status') as HTMLElement;
 
   let currentSettings: MultiProviderSettings = await loadSettings();
 
-  function showSaveBanner(msg = '✓ Settings saved successfully') {
+  function showSaveBanner(msg = 'Settings saved successfully') {
     if (!saveBanner) return;
-    saveBanner.textContent = msg;
+    if (saveBannerText) {
+      saveBannerText.textContent = msg;
+    } else {
+      saveBanner.textContent = msg;
+    }
     saveBanner.classList.add('visible');
     setTimeout(() => {
       saveBanner.classList.remove('visible');
@@ -52,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function updateStorageMeter() {
     const info = await getCacheStorageInfo(currentSettings.maxCacheSizeMb ?? 50);
-    const maxMb = Math.round(info.maxBytes / (1024 * 1024));
+    const maxMb = Math.min(50, Math.round(info.maxBytes / (1024 * 1024)));
     const usedMb = (info.bytes / (1024 * 1024)).toFixed(2);
     const percent = Math.min(100, Math.max(0, (info.bytes / info.maxBytes) * 100));
 
@@ -94,12 +100,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   function renderUI() {
-    masterEnableSwitch.checked = currentSettings.extensionEnabled !== false;
+    const isGloballyActive = currentSettings.extensionEnabled !== false;
+    masterEnableSwitch.checked = isGloballyActive;
     floatingHudSwitch.checked = currentSettings.showFloatingHUD !== false;
     primaryProviderSelect.value = currentSettings.activeProvider || 'direct-rail-gateway';
     autoFailoverSwitch.checked = currentSettings.autoFailover !== false;
     autoFetchAllSwitch.checked = Boolean(currentSettings.autoFetchAllTrains);
     cacheTtlSelect.value = String(currentSettings.cacheTtlMinutes ?? 0);
+
+    if (dashboardGlobalStatus) {
+      if (isGloballyActive) {
+        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot"></span> Live Monitoring Active';
+        dashboardGlobalStatus.className = 'global-status-pill';
+      } else {
+        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot" style="background:#dc2626;"></span> Monitoring Paused';
+        dashboardGlobalStatus.className = 'global-status-pill';
+        dashboardGlobalStatus.style.background = '#fee2e2';
+        dashboardGlobalStatus.style.color = '#dc2626';
+        dashboardGlobalStatus.style.borderColor = '#fca5a5';
+      }
+    }
 
     // Terms Status
     if (termsStatusText) {
@@ -107,8 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dateStr = currentSettings.termsAcceptedAt
           ? new Date(currentSettings.termsAcceptedAt).toLocaleDateString()
           : 'Active';
-        termsStatusText.textContent = `✓ Accepted for Personal Fair Use (${dateStr})`;
-        termsStatusText.style.color = '#16a34a';
+        termsStatusText.textContent = `✓ Verified & Accepted for Personal Fair Use (${dateStr})`;
+        termsStatusText.style.color = '#15803d';
         if (reacceptTermsBtn) {
           reacceptTermsBtn.style.display = 'none';
         }
@@ -153,9 +173,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <strong>${sanitizeHtml(site.name)}</strong>
             <span class="site-host-sub">${sanitizeHtml(site.host)}</span>
           </div>
-          <label class="switch">
+          <label class="modern-switch" title="Toggle ${site.name}">
             <input type="checkbox" class="site-toggle" data-host="${site.host}" ${isEnabled ? 'checked' : ''} aria-label="Toggle ${site.name}" />
-            <span class="slider round"></span>
+            <span class="switch-slider"></span>
           </label>
         </div>
 
@@ -195,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentSettings.sitePositions = currentSettings.sitePositions || {};
         currentSettings.sitePositions[host] = select.value as BadgePosition;
         saveSettings(currentSettings);
-        showSaveBanner(`Position for ${host} updated`);
+        showSaveBanner(`Placement for ${host} updated`);
       });
     });
   }
@@ -228,11 +248,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="provider-pool-header">
             <div class="provider-title-group">
               <strong>${sanitizeHtml(meta.name)}</strong>
-              <span class="quota-pill" style="background: #f0fdf4; color: #166534;">100% Free & Unlimited</span>
+              <span class="quota-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">100% Free & Unlimited (Zero Setup)</span>
             </div>
-            <span style="font-size: 11.5px; color: #16a34a; font-weight: 700;">● Active</span>
+            <span style="font-size: 11.5px; color: #16a34a; font-weight: 700;">● Active Default</span>
           </div>
-          <p style="font-size: 12px; color: #475569; margin: 6px 0 0 0;">
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0; line-height: 1.45;">
             ${sanitizeHtml(meta.description)}
           </p>
         `;
@@ -241,38 +261,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const keysHtml = keys.length === 0
-        ? `<div class="no-tokens-msg" style="font-size: 12px; color: #64748b; padding: 6px 0;">No tokens added yet. Add a token below to activate this provider.</div>`
+        ? `<div class="no-tokens-msg" style="font-size: 12px; color: #64748b; padding: 6px 0;">No keys added yet. Add a token below to enable redundant failover for this gateway.</div>`
         : keys.map((k) => `
-          <div class="token-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 5px;">
+          <div class="token-row" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 6px; gap: 8px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 11.5px; font-weight: 600;">${sanitizeHtml(k.label || 'Token')}</span>
-              <code style="font-size: 11px; color: #334155;">${maskIsoCredential(k.key)}</code>
-              <span style="font-size: 10px; padding: 2px 6px; border-radius: 9999px; background: ${k.status === 'active' ? '#dcfce7; color: #166534;' : '#fee2e2; color: #991b1b;'}">${k.status}</span>
+              <span style="font-size: 12px; font-weight: 700; color: #0f172a;">${sanitizeHtml(k.label || 'Token')}</span>
+              <code style="font-size: 11px; color: #334155; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${maskIsoCredential(k.key)}</code>
+              <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 9999px; background: ${k.status === 'active' ? '#dcfce7; color: #166534;' : '#fee2e2; color: #991b1b;'}">${k.status}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 10.5px; color: #64748b;">${k.requestCount || 0} calls</span>
-              <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 13px;">🗑</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn-copy-token" data-key="${k.key}" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: #334155;" title="Copy key">📋 Copy</button>
+              <button type="button" class="btn-test-token" data-provider="${pid}" data-key="${k.key}" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 700; cursor: pointer; color: #1e40af;" title="Test live key validity">⚡ Test Key</button>
+              <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 13px; padding: 2px 6px;" title="Delete token">🗑</button>
             </div>
           </div>
         `).join('');
 
       card.innerHTML = `
-        <div class="provider-pool-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="provider-pool-header">
           <div class="provider-title-group">
             <strong>${sanitizeHtml(meta.name)}</strong>
-            <span class="quota-pill" style="font-size: 10.5px; background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 9999px; margin-left: 6px;">${meta.freeTierLimit}</span>
+            <span class="quota-pill" style="font-size: 10.5px; background: #eff6ff; color: #1e40af; padding: 2px 8px; border-radius: 9999px; border: 1px solid #bfdbfe;">${meta.freeTierLimit}</span>
           </div>
         </div>
-        <p style="font-size: 12px; color: #475569; margin: 6px 0 10px 0;">${sanitizeHtml(meta.description)}</p>
+        <p style="font-size: 12px; color: #475569; margin: 4px 0 10px 0; line-height: 1.45;">${sanitizeHtml(meta.description)}</p>
 
         <div class="token-list" id="tokens-${pid}">
           ${keysHtml}
         </div>
 
-        <div class="add-token-form" style="display: flex; gap: 6px; margin-top: 8px;">
-          <input type="text" id="label-input-${pid}" placeholder="Token Label (e.g. Personal)" style="flex: 1; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
-          <input type="password" id="key-input-${pid}" placeholder="Paste API Key / Token" style="flex: 2; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
-          <button type="button" class="btn-add-token" data-provider="${pid}" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">
+        <div class="add-token-form" style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+          <input type="text" id="label-input-${pid}" placeholder="Token Label (e.g. Backup Key)" style="flex: 1; min-width: 140px; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
+          <input type="password" id="key-input-${pid}" placeholder="Paste API Key / Token" style="flex: 2; min-width: 200px; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
+          <button type="button" class="btn-add-token" data-provider="${pid}" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">
             + Add Key
           </button>
         </div>
@@ -285,6 +306,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       totalQuotaBadge.textContent = `⚡ Total Pool: ${totalTokens} Active Tokens`;
     }
 
+    // Attach copy token listeners
+    providerPoolsContainer.querySelectorAll<HTMLButtonElement>('.btn-copy-token').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-key') || '';
+        navigator.clipboard.writeText(key).then(() => {
+          btn.textContent = '✓ Copied';
+          setTimeout(() => {
+            btn.textContent = '📋 Copy';
+          }, 1500);
+        });
+      });
+    });
+
+    // Attach test token listeners
+    providerPoolsContainer.querySelectorAll<HTMLButtonElement>('.btn-test-token').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pid = btn.getAttribute('data-provider') as ProviderId;
+        const key = btn.getAttribute('data-key') || '';
+        btn.textContent = 'Testing...';
+        btn.disabled = true;
+
+        chrome.runtime.sendMessage(
+          { type: 'TEST_KEY', providerId: pid, apiKey: key },
+          (res) => {
+            btn.disabled = false;
+            if (res?.success && res.data) {
+              btn.textContent = '✓ Valid Key';
+              btn.style.color = '#15803d';
+              btn.style.background = '#dcfce7';
+              showSaveBanner(`Key test passed for ${PROVIDER_METADATA_MAP[pid]?.name || pid}`);
+            } else {
+              btn.textContent = '❌ Test Failed';
+              btn.style.color = '#b91c1c';
+              btn.style.background = '#fee2e2';
+            }
+            setTimeout(() => {
+              btn.textContent = '⚡ Test Key';
+              btn.style.color = '';
+              btn.style.background = '';
+            }, 3000);
+          }
+        );
+      });
+    });
+
     // Attach token add listeners
     providerPoolsContainer.querySelectorAll<HTMLButtonElement>('.btn-add-token').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -293,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const labelInput = document.getElementById(`label-input-${pid}`) as HTMLInputElement;
 
         const rawKey = keyInput?.value?.trim();
-        const label = labelInput?.value?.trim() || `Token ${(currentSettings.providers[pid]?.keys?.length || 0) + 1}`;
+        const label = labelInput?.value?.trim() || `Key ${(currentSettings.providers[pid]?.keys?.length || 0) + 1}`;
 
         if (!rawKey) return;
 
@@ -340,6 +406,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentSettings.extensionEnabled = masterEnableSwitch.checked;
     saveSettings(currentSettings);
     showSaveBanner(`Extension ${masterEnableSwitch.checked ? 'Enabled Globally' : 'Paused'}`);
+    renderUI();
   });
 
   // Floating HUD Switch Change
@@ -376,7 +443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveSettings(currentSettings);
     showSaveBanner(
       currentSettings.cacheTtlMinutes === 0
-        ? 'Cache disabled (Live Fetch Only)'
+        ? 'Cache retention set to No Cache (Live Fetch Only)'
         : `Cache retention set to ${currentSettings.cacheTtlMinutes} minutes`
     );
     updateStorageMeter();
@@ -392,3 +459,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderUI();
 });
+

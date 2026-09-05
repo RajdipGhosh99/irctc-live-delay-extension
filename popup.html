@@ -2,139 +2,171 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Live Train Delay Tracker</title>
   <link rel="stylesheet" href="./src/popup/popup.css" />
 </head>
 <body>
-  <div class="popup-container">
-    <!-- 1. Header -->
+  <div class="popup-wrapper">
+    <!-- 1. Hero Brand Header -->
     <header class="popup-header">
-      <div class="header-title">
-        <img src="./icons/icon32.png" alt="Icon" class="header-logo" width="24" height="24" />
-        <div>
-          <h2>Train Delay Tracker</h2>
-          <span class="author-tag">by <strong>Rajdip Ghosh</strong></span>
+      <div class="header-brand">
+        <div class="logo-wrapper">
+          <img src="./icons/icon32.png" alt="Train Delay Tracker Logo" class="brand-logo" width="26" height="26" />
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1>Train Delay Tracker</h1>
+            <span class="version-chip">v2.0.0</span>
+          </div>
+          <span class="brand-sub">by <strong>Rajdip Ghosh</strong> • Personal Fair Use</span>
         </div>
       </div>
-      <span id="global-status-badge" class="badge badge-active">Active</span>
+      <div class="header-actions">
+        <span id="global-status-badge" class="live-status-badge badge-active" title="Extension Monitoring Status">
+          <span class="pulse-dot"></span> Active
+        </span>
+        <button type="button" id="open-options-header-btn" class="icon-btn" title="Open Full Settings Dashboard" aria-label="Settings">
+          ⚙️
+        </button>
+      </div>
     </header>
 
-    <!-- 2. Master Toggle -->
-    <div class="toggle-box">
-      <div class="toggle-label-group">
-        <strong>Extension Status</strong>
-        <span id="master-toggle-text">Active globally</span>
+    <!-- 2. Master Status Quick Toggle -->
+    <div class="master-status-card">
+      <div class="master-info">
+        <div class="master-title">Live Delay Tracking</div>
+        <div class="master-desc" id="master-toggle-text">Active across all supported portals</div>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="popup-master-switch" checked aria-label="Toggle Extension" />
-        <span class="slider round"></span>
+      <label class="modern-switch" title="Toggle Extension Globally">
+        <input type="checkbox" id="popup-master-switch" checked aria-label="Toggle Extension Globally" />
+        <span class="switch-slider"></span>
       </label>
     </div>
 
-    <!-- 3. Quick Train Tracker -->
-    <div class="quick-tracker-card">
-      <div class="quick-tracker-header">
-        <span>⚡ Quick Train Tracker</span>
-        <span class="quick-tracker-sub">Track any train instantly</span>
+    <!-- 3. Spotlight Quick Train Tracker -->
+    <section class="quick-tracker-section">
+      <div class="section-badge-header">
+        <span class="section-tag">⚡ INSTANT LOOKUP</span>
+        <span class="section-tag-sub">Track any train in real-time</span>
       </div>
-      <div class="quick-input-group">
+
+      <div class="search-input-box">
+        <span class="search-icon">🚂</span>
         <input
           type="text"
           id="quick-train-input"
-          class="quick-input"
-          placeholder="Enter 5-digit train # (e.g. 12952)"
+          class="search-field"
+          placeholder="Enter train # (e.g. 12952, 12301)"
           maxlength="6"
           autocomplete="off"
+          aria-label="Train Number"
         />
-        <button type="button" id="quick-train-btn" class="btn btn-primary btn-track">
-          🔍 Track
+        <button type="button" id="quick-train-btn" class="btn-track-action">
+          <span>Track Live</span> ⚡
         </button>
       </div>
 
-      <!-- Quick Result Card Slot -->
+      <!-- Recent Searches Quick Chips -->
+      <div class="recent-searches-bar" id="recent-searches-bar">
+        <span class="recent-label">Recent:</span>
+        <div class="recent-chips" id="recent-chips-container">
+          <!-- Dynamically populated chips -->
+        </div>
+      </div>
+
+      <!-- Quick Result Card Container -->
       <div id="quick-train-result" class="quick-result-area" style="display: none;"></div>
-    </div>
+    </section>
 
-    <!-- 4. Portal Actions -->
-    <div class="section-card">
-      <div class="section-title">🌐 Current Tab Actions</div>
-      
-      <button type="button" id="fetch-page-trains-btn" class="btn-batch-fetch">
-        ⚡ Fetch All Statuses on Current Tab
-      </button>
-
-      <div class="sub-toggle-row">
-        <div>
-          <strong>Auto-Fetch Visible Trains</strong>
-          <span>Automatically load delays when browsing</span>
+    <!-- 4. Current Tab Context & Batch Actions -->
+    <section class="tab-context-section" id="tab-context-section">
+      <div class="context-header">
+        <div class="site-detect-badge" id="site-detect-badge">
+          <span class="portal-icon">🌐</span>
+          <span id="current-site-label">Checking active tab...</span>
         </div>
-        <label class="switch switch-sm">
-          <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
-          <span class="slider round"></span>
-        </label>
-      </div>
-
-      <div id="current-site-box" class="site-box">
-        <span id="current-site-label">Site: Current Tab</span>
-        <button type="button" id="site-toggle-btn" class="btn btn-sm btn-outline">
-          Toggle Site
+        <button type="button" id="site-toggle-btn" class="site-toggle-pill">
+          Enabled
         </button>
       </div>
-    </div>
 
-    <!-- 5. Provider & Cache Settings -->
-    <div class="section-card">
-      <div class="section-title">⚙️ Gateway & Storage</div>
+      <div class="context-body" id="context-body">
+        <button type="button" id="fetch-page-trains-btn" class="btn-fetch-all">
+          <span class="lightning-icon">⚡</span>
+          <span>Fetch All Delays on Current Page</span>
+        </button>
 
-      <div class="form-group">
-        <label for="active-provider-select">Primary API Gateway:</label>
-        <select id="active-provider-select" class="select-input">
-          <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
-          <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
-          <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
-          <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
-          <option value="custom-webhook">Custom Webhook / Private Proxy</option>
-        </select>
+        <div class="context-toggle-row">
+          <div class="toggle-text">
+            <strong>Auto-Fetch Visible Trains</strong>
+            <span>Automatically load delays while scrolling</span>
+          </div>
+          <label class="modern-switch modern-switch-sm">
+            <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
       </div>
 
-      <div class="form-group">
-        <div class="cache-setting-row">
-          <label for="popup-cache-select">Local Cache Policy:</label>
-          <span class="cache-quota-label" id="cache-quota-text">Limit: 50 MB</span>
+      <div id="non-supported-tip" class="non-supported-banner" style="display: none;">
+        <span>💡 <strong>Tip:</strong> Open <em>ConfirmTkt, MakeMyTrip, Ixigo, or ClearTrip</em> to see inline delay badges automatically, or use the quick tracker above!</span>
+      </div>
+    </section>
+
+    <!-- 5. Gateway & 50 MB Cache Controls -->
+    <section class="settings-mini-section">
+      <div class="mini-grid">
+        <div class="mini-control">
+          <label for="active-provider-select">Primary API Gateway:</label>
+          <div class="select-wrapper">
+            <select id="active-provider-select" class="modern-select">
+              <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
+              <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
+              <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
+              <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
+              <option value="custom-webhook">Custom Webhook / Private Proxy</option>
+            </select>
+          </div>
         </div>
-        <select id="popup-cache-select" class="select-input">
-          <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
-          <option value="1">1 Minute (Ultra Fresh)</option>
-          <option value="5">5 Minutes (Recommended)</option>
-          <option value="15">15 Minutes</option>
-        </select>
+
+        <div class="mini-control">
+          <div class="label-with-badge">
+            <label for="popup-cache-select">Cache Retention:</label>
+            <span class="quota-cap-chip" id="cache-quota-text">Limit: 50 MB</span>
+          </div>
+          <div class="select-wrapper">
+            <select id="popup-cache-select" class="modern-select">
+              <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
+              <option value="1">1 Minute (Ultra Fresh)</option>
+              <option value="5">5 Minutes (Recommended)</option>
+              <option value="15">15 Minutes</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div class="cache-section">
-        <div class="cache-info">
-          <span style="font-weight: 600;">Memory Used:</span>
-          <div id="cache-count" style="font-size: 11px; color: #1e40af; font-weight: 700;">0 KB (0 records)</div>
+      <!-- Storage Meter & Clear -->
+      <div class="storage-mini-bar">
+        <div class="storage-meta">
+          <span class="storage-title">Local Cache Memory:</span>
+          <span class="storage-value" id="cache-count">0 KB (0 records)</span>
         </div>
-        <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
+        <button type="button" id="clear-cache-btn" class="btn-clear-mini" title="Clear locally cached train records">
           🗑 Clear
         </button>
       </div>
-    </div>
+    </section>
 
-    <!-- 6. Full Dashboard Navigation -->
-    <button type="button" id="open-options-btn" class="btn btn-dashboard">
-      ⚙️ Open Full Settings Dashboard ↗
+    <!-- 6. Full Dashboard Link -->
+    <button type="button" id="open-options-btn" class="btn-full-options">
+      <span>⚙️ Open Full Settings Dashboard</span>
+      <span class="arrow-icon">↗</span>
     </button>
 
     <!-- 7. Legal Disclaimer Micro-Notice -->
-    <div class="popup-disclaimer-box">
-      <span>⚠️ <strong>Personal Fair Use Only:</strong> Independent educational tool. Anti-scraping rate policies apply. Verify schedules at the station.</span>
-    </div>
-
-    <!-- 8. Footer -->
-    <footer class="popup-footer">
-      <span>100% Free & Open Source under GNU GPL-3.0</span>
+    <footer class="popup-legal-footer">
+      <span>⚖️ <strong>Personal Fair Use Only:</strong> Independent open-source tool. Anti-scraping rate policies apply. Verify schedules at station.</span>
     </footer>
   </div>
 
@@ -142,32 +174,32 @@
   <div id="terms-modal" class="terms-overlay hidden">
     <div class="terms-modal-card">
       <div class="terms-modal-header">
-        <span style="font-size: 20px;">⚖️</span>
+        <div class="terms-icon-circle">⚖️</div>
         <div>
           <h3>Fair Use & Legal Terms</h3>
-          <span style="font-size: 10.5px; color: #64748b;">Please review and accept before using</span>
+          <span class="terms-sub">Please review and accept to enable live tracking</span>
         </div>
       </div>
 
       <div class="terms-modal-body">
         <div class="terms-rule-item">
           <strong>1. Personal Fair Use Only</strong>
-          <span>This extension is strictly for personal, interactive passenger lookups. Commercial resale and distribution are prohibited.</span>
+          <p>This extension is strictly for interactive personal passenger lookups. Automated commercial resale and bulk scraping are prohibited.</p>
         </div>
 
         <div class="terms-rule-item">
           <strong>2. Anti-Abuse & Rate Compliance</strong>
-          <span>Automated mass-scraping, bot crawlers, and denial-of-service traffic are strictly prohibited.</span>
+          <p>Automated crawler loops, mass queries, and denial-of-service traffic are strictly prevented to protect upstream networks.</p>
         </div>
 
         <div class="terms-rule-item">
           <strong>3. Independent Project</strong>
-          <span>This is an independent open-source tool and is not affiliated with, endorsed by, or operated by any official booking portals.</span>
+          <p>This is an independent open-source tool not affiliated with or endorsed by any official train booking portals.</p>
         </div>
 
         <div class="terms-rule-item">
           <strong>4. Informational Estimates</strong>
-          <span>Status metrics are public estimates. Always cross-check departure display boards at the railway station before boarding.</span>
+          <p>Status data and delay predictions are public estimates. Always verify official display boards at railway stations before traveling.</p>
         </div>
 
         <label class="terms-checkbox-row">

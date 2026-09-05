@@ -67,6 +67,7 @@ export interface MultiProviderSettings {
   showFloatingHUD: boolean;
   termsAccepted: boolean;
   termsAcceptedAt?: string;
+  recentSearches?: string[];
   schemaVersion: string;
   providers: Record<ProviderId, ProviderConfig>;
 }

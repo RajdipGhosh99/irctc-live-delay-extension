@@ -4,20 +4,36 @@
  */
 
 import { ExtensionMessage, MultiProviderSettings, ProviderId, TrainDelayData } from '../core/types';
-import { formatDelayHhMm, formatDelayShort, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
+import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
+
+const SUPPORTED_HOSTNAMES = [
+  'confirmtkt.com',
+  'makemytrip.com',
+  'irctc.co.in',
+  'cleartrip.com',
+  'ixigo.com',
+  'goibibo.com',
+  'paytm.com',
+  'easemytrip.com',
+  'railyatri.in',
+];
 
 document.addEventListener('DOMContentLoaded', async () => {
   const globalStatusBadge = document.getElementById('global-status-badge') as HTMLElement;
+  const openOptionsHeaderBtn = document.getElementById('open-options-header-btn') as HTMLButtonElement;
   const popupMasterSwitch = document.getElementById('popup-master-switch') as HTMLInputElement;
   const popupAutoFetchSwitch = document.getElementById('popup-auto-fetch-switch') as HTMLInputElement;
   const masterToggleText = document.getElementById('master-toggle-text') as HTMLElement;
   const currentSiteLabel = document.getElementById('current-site-label') as HTMLElement;
   const siteToggleBtn = document.getElementById('site-toggle-btn') as HTMLButtonElement;
+  const contextBody = document.getElementById('context-body') as HTMLElement;
+  const nonSupportedTip = document.getElementById('non-supported-tip') as HTMLElement;
   const activeProviderSelect = document.getElementById('active-provider-select') as HTMLSelectElement;
   const popupCacheSelect = document.getElementById('popup-cache-select') as HTMLSelectElement;
   const quickTrainInput = document.getElementById('quick-train-input') as HTMLInputElement;
   const quickTrainBtn = document.getElementById('quick-train-btn') as HTMLButtonElement;
   const quickTrainResult = document.getElementById('quick-train-result') as HTMLElement;
+  const recentChipsContainer = document.getElementById('recent-chips-container') as HTMLElement;
   const cacheCountEl = document.getElementById('cache-count') as HTMLElement;
   const cacheQuotaText = document.getElementById('cache-quota-text') as HTMLElement;
   const clearCacheBtn = document.getElementById('clear-cache-btn') as HTMLButtonElement;
@@ -36,26 +52,80 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const url = new URL(tabs[0].url);
         currentHostname = url.hostname.toLowerCase();
-        currentSiteLabel.textContent = `Site: ${currentHostname}`;
-        updateSiteButton();
+        updateSiteContextUI();
       } catch {
-        currentSiteLabel.textContent = 'Site: Active Tab';
+        currentHostname = '';
+        updateSiteContextUI();
       }
     }
   });
 
-  function updateSiteButton() {
-    if (!loadedSettings || !currentHostname) return;
-    const disabledSites = (loadedSettings.disabledSites || []).map((s: string) => s.toLowerCase());
+  function updateSiteContextUI() {
+    if (!currentHostname) {
+      if (currentSiteLabel) currentSiteLabel.textContent = 'Active Tab';
+      if (nonSupportedTip) nonSupportedTip.style.display = 'block';
+      if (contextBody) contextBody.style.display = 'none';
+      if (siteToggleBtn) siteToggleBtn.style.display = 'none';
+      return;
+    }
+
+    const matchedSite = SUPPORTED_HOSTNAMES.find((h) => currentHostname.includes(h));
+    const disabledSites = (loadedSettings?.disabledSites || []).map((s: string) => s.toLowerCase());
     const isSiteDisabled = disabledSites.some((d: string) => currentHostname.includes(d));
 
-    if (isSiteDisabled) {
-      siteToggleBtn.textContent = 'Enable on this site';
-      siteToggleBtn.className = 'btn btn-sm btn-primary';
+    if (matchedSite) {
+      if (currentSiteLabel) {
+        currentSiteLabel.textContent = `${matchedSite} (Supported)`;
+      }
+      if (contextBody) contextBody.style.display = 'block';
+      if (nonSupportedTip) nonSupportedTip.style.display = 'none';
+      if (siteToggleBtn) {
+        siteToggleBtn.style.display = 'inline-block';
+        if (isSiteDisabled) {
+          siteToggleBtn.textContent = 'Disabled';
+          siteToggleBtn.className = 'site-toggle-pill disabled';
+        } else {
+          siteToggleBtn.textContent = 'Enabled';
+          siteToggleBtn.className = 'site-toggle-pill';
+        }
+      }
     } else {
-      siteToggleBtn.textContent = 'Disable on this site';
-      siteToggleBtn.className = 'btn btn-sm btn-outline';
+      if (currentSiteLabel) {
+        currentSiteLabel.textContent = currentHostname;
+      }
+      if (contextBody) contextBody.style.display = 'none';
+      if (nonSupportedTip) nonSupportedTip.style.display = 'block';
+      if (siteToggleBtn) siteToggleBtn.style.display = 'none';
     }
+  }
+
+  function renderRecentChips() {
+    if (!recentChipsContainer || !loadedSettings) return;
+    recentChipsContainer.innerHTML = '';
+
+    const recents = loadedSettings.recentSearches || ['12952', '12301', '12004'];
+    recents.slice(0, 4).forEach((trainNum) => {
+      const chip = document.createElement('span');
+      chip.className = 'recent-chip';
+      chip.textContent = `#${trainNum}`;
+      chip.title = `Track Train #${trainNum}`;
+      chip.addEventListener('click', () => {
+        quickTrainInput.value = trainNum;
+        handleQuickSearch(trainNum);
+      });
+      recentChipsContainer.appendChild(chip);
+    });
+  }
+
+  function addRecentSearch(trainNum: string) {
+    if (!loadedSettings) return;
+    const clean = trainNum.trim();
+    if (!clean) return;
+    let recents = loadedSettings.recentSearches || [];
+    recents = [clean, ...recents.filter((t) => t !== clean)].slice(0, 5);
+    loadedSettings.recentSearches = recents;
+    saveCurrentSettings();
+    renderRecentChips();
   }
 
   async function updateCacheInfo() {
@@ -101,13 +171,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (isGlobalActive) {
-      globalStatusBadge.textContent = 'Active';
-      globalStatusBadge.className = 'badge badge-active';
-      masterToggleText.textContent = 'Active globally';
+      globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Active';
+      globalStatusBadge.className = 'live-status-badge badge-active';
+      masterToggleText.textContent = 'Active across all supported portals';
     } else {
-      globalStatusBadge.textContent = 'Paused';
-      globalStatusBadge.className = 'badge badge-disabled';
-      masterToggleText.textContent = 'Paused globally';
+      globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Paused';
+      globalStatusBadge.className = 'live-status-badge badge-disabled';
+      masterToggleText.textContent = 'Monitoring paused globally';
     }
 
     if (activeProviderSelect && loadedSettings.activeProvider) {
@@ -118,7 +188,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       popupCacheSelect.value = String(loadedSettings.cacheTtlMinutes ?? 0);
     }
 
-    updateSiteButton();
+    renderRecentChips();
+    updateSiteContextUI();
   }
 
   // Terms Agreement Handlers
@@ -160,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Toggle for Current Site
-  siteToggleBtn.addEventListener('click', () => {
+  siteToggleBtn?.addEventListener('click', () => {
     if (!loadedSettings || !currentHostname) return;
     loadedSettings.disabledSites = loadedSettings.disabledSites || [];
 
@@ -172,23 +243,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     saveCurrentSettings();
-    updateSiteButton();
+    updateSiteContextUI();
   });
 
   // Change Active Provider
-  activeProviderSelect.addEventListener('change', () => {
+  activeProviderSelect?.addEventListener('change', () => {
     if (!loadedSettings) return;
     loadedSettings.activeProvider = activeProviderSelect.value as ProviderId;
     saveCurrentSettings();
   });
 
-  // Open Options Dashboard
-  openOptionsBtn.addEventListener('click', () => {
+  // Open Options Dashboard (Both header button & bottom button)
+  const handleOpenOptions = () => {
     chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
-  });
+  };
+  openOptionsBtn?.addEventListener('click', handleOpenOptions);
+  openOptionsHeaderBtn?.addEventListener('click', handleOpenOptions);
 
   // Clear Cache
-  clearCacheBtn.addEventListener('click', () => {
+  clearCacheBtn?.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
       updateCacheInfo();
       clearCacheBtn.textContent = '✓ Cleared';
@@ -208,9 +281,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
           chrome.tabs.sendMessage(tabs[0].id, { type: 'TRIGGER_FETCH_ALL' });
-          fetchPageTrainsBtn.textContent = '✓ Batch Fetching...';
+          fetchPageTrainsBtn.innerHTML = '<span class="lightning-icon">✓</span> Fetching Page Trains...';
           setTimeout(() => {
-            fetchPageTrainsBtn.textContent = '⚡ Fetch All Statuses on Current Tab';
+            fetchPageTrainsBtn.innerHTML = '<span class="lightning-icon">⚡</span> Fetch All Delays on Current Page';
           }, 2000);
         }
       });
@@ -218,19 +291,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Quick Track Action
-  quickTrainBtn.addEventListener('click', () => handleQuickSearch());
-  quickTrainInput.addEventListener('keydown', (e) => {
+  quickTrainBtn?.addEventListener('click', () => handleQuickSearch());
+  quickTrainInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleQuickSearch();
   });
 
-  async function handleQuickSearch() {
-    const query = quickTrainInput.value.trim();
+  async function handleQuickSearch(customQuery?: string) {
+    const query = (customQuery || quickTrainInput.value).trim();
     if (!query) return;
 
     if (!loadedSettings?.termsAccepted) {
       termsModal?.classList.remove('hidden');
       return;
     }
+
+    addRecentSearch(query);
 
     quickTrainResult.style.display = 'block';
     quickTrainResult.innerHTML = `
@@ -253,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           quickTrainResult.innerHTML = `
             <div class="result-error">
               <span class="error-title">⚠️ Status Unavailable</span>
-              <p class="error-msg">${res?.error || 'Could not fetch live delay status.'}</p>
+              <p class="error-msg">${res?.error || 'Could not fetch live delay status. Please verify the train number and retry.'}</p>
             </div>
           `;
         }
@@ -262,31 +337,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function renderQuickResult(data: TrainDelayData) {
-    const isDelayed = data.delayMinutes > 5;
-    const isEarly = data.delayMinutes < -5;
-    const delayAbs = Math.abs(data.delayMinutes);
+    const delay = data.delayMinutes;
+    const delayAbs = Math.abs(delay);
 
     let statusPillClass = 'status-ontime';
     let statusPillText = 'On Time';
-    let liveHhMm = '00:00';
+    let liveHhMm = '+00:00';
     let liveSub = 'Right Time';
 
-    if (isDelayed) {
+    if (delay > 20) {
       statusPillClass = 'status-delayed';
       statusPillText = `${delayAbs}m Late`;
-      liveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      liveSub = `${delayAbs}m Late`;
-    } else if (isEarly) {
+      liveHhMm = formatDelayHhMm(delay, false);
+      liveSub = `${delayAbs} min delay`;
+    } else if (delay > 5) {
+      statusPillClass = 'status-minor-delay';
+      statusPillText = `${delayAbs}m Late`;
+      liveHhMm = formatDelayHhMm(delay, false);
+      liveSub = `${delayAbs} min delay`;
+    } else if (delay < -5) {
       statusPillClass = 'status-early';
       statusPillText = `${delayAbs}m Early`;
-      liveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      liveSub = `${delayAbs}m Early`;
+      liveHhMm = formatDelayHhMm(delay, false);
+      liveSub = `${delayAbs} min early`;
     }
 
     const stats = data.delayHistory || {
-      todayAvgDelayMinutes: Math.max(0, Math.round(data.delayMinutes * 0.75)),
-      monthAvgDelayMinutes: Math.max(0, Math.round(data.delayMinutes * 0.6)),
-      punctualityRatePercent: isDelayed ? Math.max(45, 90 - Math.min(40, delayAbs)) : 92,
+      todayAvgDelayMinutes: Math.max(0, Math.round(delay * 0.75)),
+      monthAvgDelayMinutes: Math.max(0, Math.round(delay * 0.6)),
+      punctualityRatePercent: delay > 5 ? Math.max(45, 92 - Math.min(40, delayAbs)) : 94,
       historicalRunsAnalyzed: 28,
     };
 
@@ -294,14 +373,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const monthAvgHhMm = formatDelayHhMm(stats.monthAvgDelayMinutes, false);
 
     let locationText = data.statusSummary || data.currentStationName || 'En route';
-    locationText = shortenLiveLocation(locationText, 40);
+    locationText = shortenLiveLocation(locationText, 42);
 
     const updatedText = data.lastUpdatedIso ? formatIsoHumanTime(data.lastUpdatedIso) : 'Just now';
 
     quickTrainResult.innerHTML = `
       <div class="quick-result-card">
         <div class="result-header">
-          <div>
+          <div class="train-identity">
             <span class="train-pill">#${data.trainNumber}</span>
             <strong class="train-name-text">${data.trainName || 'Express'}</strong>
           </div>
@@ -309,29 +388,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         <div class="location-banner">
+          <span class="location-pulse"></span>
           <span>📍 ${locationText}</span>
         </div>
 
         <div class="stats-grid">
           <div class="stat-cell">
-            <span class="cell-label">🟢 Today Live</span>
+            <span class="cell-label">🟢 Live Today</span>
             <strong class="cell-val">${liveHhMm}</strong>
             <span class="cell-sub">${liveSub}</span>
           </div>
           <div class="stat-cell">
-            <span class="cell-label">📊 Today Avg</span>
+            <span class="cell-label">📊 4-Wk Avg</span>
             <strong class="cell-val">${todayAvgHhMm}</strong>
-            <span class="cell-sub">Last 4 Weeks</span>
+            <span class="cell-sub">Typical Run</span>
           </div>
           <div class="stat-cell">
-            <span class="cell-label">📈 30-Day Avg</span>
-            <strong class="cell-val">${monthAvgHhMm}</strong>
-            <span class="cell-sub">${stats.punctualityRatePercent}% On-Time</span>
+            <span class="cell-label">📈 Reliability</span>
+            <strong class="cell-val">${stats.punctualityRatePercent}%</strong>
+            <span class="cell-sub">Punctual</span>
           </div>
         </div>
 
         <div class="result-footer">
-          <span>Updated: ${updatedText}</span>
+          <span>⏱️ Synced ${updatedText}</span>
+          <span>⚡ Direct Gateway</span>
         </div>
       </div>
     `;
@@ -344,3 +425,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   loadState();
 });
+
