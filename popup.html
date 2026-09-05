@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="popup-container">
-    <!-- Header -->
+    <!-- 1. Header -->
     <header class="popup-header">
       <div class="header-title">
         <img src="./icons/icon32.png" alt="Icon" class="header-logo" width="24" height="24" />
@@ -20,7 +20,7 @@
       <span id="global-status-badge" class="badge badge-active">Active</span>
     </header>
 
-    <!-- Master Switch -->
+    <!-- 2. Master Toggle -->
     <div class="toggle-box">
       <div class="toggle-label-group">
         <strong>Extension Status</strong>
@@ -32,7 +32,7 @@
       </label>
     </div>
 
-    <!-- Quick Live Train Search Bar -->
+    <!-- 3. Quick Train Tracker -->
     <div class="quick-tracker-card">
       <div class="quick-tracker-header">
         <span>⚡ Quick Train Tracker</span>
@@ -56,87 +56,83 @@
       <div id="quick-train-result" class="quick-result-area" style="display: none;"></div>
     </div>
 
-    <!-- Auto-Fetch All Toggle -->
-    <div class="toggle-box" style="margin-top: 10px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
-      <div class="toggle-label-group">
-        <strong style="font-size: 11.5px;">⚡ Auto-Fetch All Trains</strong>
-        <span id="auto-fetch-toggle-text" style="font-size: 10px; color: #64748b;">Automatically fetch status for visible trains</span>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
-        <span class="slider round"></span>
-      </label>
-    </div>
-
-    <!-- Quick Batch Action: Fetch All on Current Tab -->
-    <button type="button" id="fetch-page-trains-btn" class="btn btn-sm" style="width: 100%; background: #0284c7; color: #fff; margin-bottom: 10px; padding: 7px; font-size: 11.5px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;">
-      ⚡ Fetch All Statuses on Current Tab
-    </button>
-
-    <!-- Current Site Toggle -->
-    <div id="current-site-box" class="site-box">
-      <span id="current-site-label">Site: Current Tab</span>
-      <button type="button" id="site-toggle-btn" class="btn btn-sm btn-outline">
-        Toggle for this Site
+    <!-- 4. Portal Actions -->
+    <div class="section-card">
+      <div class="section-title">🌐 Current Tab Actions</div>
+      
+      <button type="button" id="fetch-page-trains-btn" class="btn-batch-fetch">
+        ⚡ Fetch All Statuses on Current Tab
       </button>
+
+      <div class="sub-toggle-row">
+        <div>
+          <strong>Auto-Fetch Visible Trains</strong>
+          <span>Automatically load delays when browsing</span>
+        </div>
+        <label class="switch switch-sm">
+          <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div id="current-site-box" class="site-box">
+        <span id="current-site-label">Site: Current Tab</span>
+        <button type="button" id="site-toggle-btn" class="btn btn-sm btn-outline">
+          Toggle Site
+        </button>
+      </div>
     </div>
 
-    <!-- Provider Selector -->
-    <div class="form-group">
-      <label for="active-provider-select">Primary API Provider:</label>
-      <select id="active-provider-select" class="select-input">
-        <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
-        <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
-        <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
-        <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
-        <option value="custom-webhook">Custom Webhook / Private Proxy</option>
-      </select>
+    <!-- 5. Provider & Cache Settings -->
+    <div class="section-card">
+      <div class="section-title">⚙️ Gateway & Storage</div>
+
+      <div class="form-group">
+        <label for="active-provider-select">Primary API Gateway:</label>
+        <select id="active-provider-select" class="select-input">
+          <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
+          <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
+          <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
+          <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
+          <option value="custom-webhook">Custom Webhook / Private Proxy</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="cache-setting-row">
+          <label for="popup-cache-select">Local Cache Policy:</label>
+          <span class="cache-quota-label" id="cache-quota-text">Limit: 50 MB</span>
+        </div>
+        <select id="popup-cache-select" class="select-input">
+          <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
+          <option value="1">1 Minute (Ultra Fresh)</option>
+          <option value="5">5 Minutes (Recommended)</option>
+          <option value="15">15 Minutes</option>
+        </select>
+      </div>
+
+      <div class="cache-section">
+        <div class="cache-info">
+          <span style="font-weight: 600;">Memory Used:</span>
+          <div id="cache-count" style="font-size: 11px; color: #1e40af; font-weight: 700;">0 KB (0 records)</div>
+        </div>
+        <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
+          🗑 Clear
+        </button>
+      </div>
     </div>
 
-    <!-- Dashboard Button -->
+    <!-- 6. Full Dashboard Navigation -->
     <button type="button" id="open-options-btn" class="btn btn-dashboard">
       ⚙️ Open Full Settings Dashboard ↗
     </button>
 
-    <!-- Cache Policy Selector -->
-    <div class="form-group" style="margin-top: 10px;">
-      <div class="cache-setting-row">
-        <label for="popup-cache-select" style="margin: 0;">⚡ Cache Policy:</label>
-        <span class="cache-quota-label" id="cache-quota-text">Limit: 50 MB</span>
-      </div>
-      <select id="popup-cache-select" class="select-input">
-        <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
-        <option value="1">1 Minute (Ultra Fresh)</option>
-        <option value="5">5 Minutes (Recommended)</option>
-        <option value="15">15 Minutes</option>
-      </select>
+    <!-- 7. Legal Disclaimer Micro-Notice -->
+    <div class="popup-disclaimer-box">
+      <span>⚠️ <strong>Personal Fair Use Only:</strong> Independent educational tool. Anti-scraping rate policies apply. Verify schedules at the station.</span>
     </div>
 
-    <!-- Dashboard Button -->
-    <button type="button" id="open-options-btn" class="btn btn-dashboard">
-      ⚙️ Open Full Settings Dashboard ↗
-    </button>
-
-    <!-- Cache Management -->
-    <div class="cache-section">
-      <div class="cache-info">
-        <span style="font-weight: 600;">⚡ Storage In Use:</span>
-        <div id="cache-count" style="font-size: 10.5px; color: #1e40af; font-weight: 700;">0 KB (0 records)</div>
-      </div>
-      <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
-        🗑 Clear
-      </button>
-    </div>
-
-    <!-- Legal & Anti-Abuse Notice Box -->
-    <div class="popup-disclaimer-box" style="margin-top: 10px; padding: 7px 9px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 9.5px; line-height: 1.4; color: #64748b;">
-      <div style="font-weight: 700; color: #475569; margin-bottom: 2px;">⚠️ Fair Use & Terms Notice:</div>
-      <div>• <strong>Personal Fair Use Only:</strong> Independent tool for personal interactive lookups.</div>
-      <div>• <strong>Anti-Abuse:</strong> Automated scraping, botting, or commercial misuse is prohibited.</div>
-      <div>• <strong>Informational:</strong> Estimates only. Verify schedule at station before travel.</div>
-    </div>
-
-    <!-- Footer -->
+    <!-- 8. Footer -->
     <footer class="popup-footer">
       <span>100% Free & Open Source under GNU GPL-3.0</span>
     </footer>
@@ -146,37 +142,37 @@
   <div id="terms-modal" class="terms-overlay hidden">
     <div class="terms-modal-card">
       <div class="terms-modal-header">
-        <span style="font-size: 18px;">⚖️</span>
+        <span style="font-size: 20px;">⚖️</span>
         <div>
           <h3>Fair Use & Legal Terms</h3>
-          <span style="font-size: 10px; color: #64748b;">Please review and accept before using</span>
+          <span style="font-size: 10.5px; color: #64748b;">Please review and accept before using</span>
         </div>
       </div>
 
       <div class="terms-modal-body">
         <div class="terms-rule-item">
           <strong>1. Personal Fair Use Only</strong>
-          <span>This extension is strictly provided for interactive, individual passenger convenience. Not for commercial resale.</span>
+          <span>This extension is strictly for personal, interactive passenger lookups. Commercial resale and distribution are prohibited.</span>
         </div>
 
         <div class="terms-rule-item">
           <strong>2. Anti-Abuse & Rate Compliance</strong>
-          <span>Automated mass-scraping, bot crawlers, or high-frequency automated querying that impacts public rail gateways is strictly prohibited.</span>
+          <span>Automated mass-scraping, bot crawlers, and denial-of-service traffic are strictly prohibited.</span>
         </div>
 
         <div class="terms-rule-item">
-          <strong>3. Independent & Unaffiliated</strong>
-          <span>This is an independent open-source project and is not affiliated with, endorsed by, or operated by any official booking portals.</span>
+          <strong>3. Independent Project</strong>
+          <span>This is an independent open-source tool and is not affiliated with, endorsed by, or operated by any official booking portals.</span>
         </div>
 
         <div class="terms-rule-item">
           <strong>4. Informational Estimates</strong>
-          <span>Running statuses are dynamic estimates. Always check physical departure boards at the railway station before boarding.</span>
+          <span>Status metrics are public estimates. Always cross-check departure display boards at the railway station before boarding.</span>
         </div>
 
         <label class="terms-checkbox-row">
           <input type="checkbox" id="terms-agree-checkbox" />
-          <span>I understand and agree to the Fair Use Terms, Anti-Abuse Policy, and Legal Disclaimer.</span>
+          <span>I agree to the Fair Use Terms, Anti-Abuse Policy, and Legal Disclaimer.</span>
         </label>
 
         <button type="button" id="terms-accept-btn" class="terms-accept-btn" disabled>
