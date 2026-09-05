@@ -117,6 +117,18 @@ npm run package
 
 ---
 
+## ⚠️ Legal Disclaimer & Anti-Abuse Policy
+
+> 🚫 **Acceptable Use Notice:**  
+> This extension is provided for **fair, personal, human interactive use** only. Automated web scraping, botting, high-frequency polling, denial-of-service (DoS) attempts, or commercial resale of live data are strictly prohibited. The software enforces strict on-demand click-to-fetch limits and local caching to protect public railway infrastructure.
+
+- **Unofficial Project:** This extension is an independent open-source project and is **not affiliated with, endorsed by, or connected to** Indian Railways, IRCTC, CRIS, or any private ticketing portal. All trademarks belong to their respective owners.
+- **AS-IS Software:** Live running delay times and arrival predictions are informational estimates based on public signals and third-party APIs. Always cross-verify journey schedules with official railway station displays before traveling.
+
+See the full [`DISCLAIMER.md`](DISCLAIMER.md) for complete terms.
+
+---
+
 ## 🔒 Privacy Policy
 
 **Last Updated:** August 29, 2026
