@@ -177,6 +177,18 @@
   padding: 2px 6px !important;
 }
 
+/* Disclaimer */
+.rail-popover-disclaimer {
+  font-size: 8.8px !important;
+  line-height: 1.35 !important;
+  color: #64748b !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  padding: 4px 6px !important;
+  margin-bottom: 7px !important;
+}
+
 /* Footer */
 .rail-popover-footer {
   display: flex !important;

@@ -109,6 +109,11 @@ export class PopoverComponent {
         <span class="rail-insight-pill">🕒 ${stats.historicalRunsAnalyzed} Runs Analyzed</span>
       </div>
 
+      <!-- Legal & Anti-Abuse Notice -->
+      <div class="rail-popover-disclaimer">
+        <span>⚠️ Unofficial estimate for personal use. Anti-scraping policy applies. Verify at station.</span>
+      </div>
+
       <!-- Action Footer -->
       <div class="rail-popover-footer">
         <div class="rail-popover-meta">
