@@ -101,12 +101,11 @@ When a new version is released on GitHub:
                                                 │
                          ┌──────────────────────┴──────────────────────┐
                          ▼                                             ▼
-             [ 50MB Local Cache ]                          [ Multi-Tier Gateway Coordinator ]
-              • Selectable TTL (0, 1, 5, 15m)               1. Direct Public Gateway (Free)
-              • LRU Quota Pruning                           2. RapidAPI Rail Engine 1 (Multi-Token)
-                                                            3. RapidAPI Rail Engine 2 (Multi-Token)
-                                                            4. IndianRail Gateway (Direct Key)
-                                                            5. Custom Webhook Gateway
+              [ 50MB Local Cache ]                          [ Multi-Tier Gateway Coordinator ]
+               • Selectable TTL (0, 1, 5, 15m)               1. Direct Public Gateway (Free)
+               • LRU Quota Pruning                           2. RapidAPI Rail Engine 1 (Multi-Token)
+                                                             3. RapidAPI Rail Engine 2 (Multi-Token)
+                                                             4. IndianRail Gateway (Direct Key)
 ```
 
 ---

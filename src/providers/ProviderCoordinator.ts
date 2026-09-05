@@ -54,7 +54,6 @@ async function executeDispatch(
     'rapidapi-rail-v1',
     'rapidapi-rail-v2',
     'indianrailapi',
-    'custom-webhook',
   ];
   const providerOrder: ProviderId[] = forcedProviderId
     ? [forcedProviderId]

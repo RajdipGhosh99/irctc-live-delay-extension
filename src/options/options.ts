@@ -239,7 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       'rapidapi-rail-v1',
       'rapidapi-rail-v2',
       'indianrailapi',
-      'custom-webhook',
     ];
 
     let totalTokens = 0;
