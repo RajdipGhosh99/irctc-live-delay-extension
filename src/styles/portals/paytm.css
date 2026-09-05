@@ -1,0 +1,10 @@
+/**
+ * Paytm Specific CSS Overrides
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+.rail-delay-wrapper.vendor-paytm {
+  margin-left: 8px !important;
+  display: inline-flex !important;
+  vertical-align: middle !important;
+}

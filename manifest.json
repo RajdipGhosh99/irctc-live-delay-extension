@@ -81,7 +81,7 @@
         "*://railyatri.in/*"
       ],
       "js": [
-        "src/content/index.ts"
+        "src/content/index.iife.ts"
       ],
       "css": [
         "src/styles/styles.css"

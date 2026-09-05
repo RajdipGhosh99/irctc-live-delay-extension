@@ -26,8 +26,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "test": "tsc --noEmit",
-    "build": "tsc && vite build",
+    "test": "tsc --noEmit && npx tsx scripts/test-adapters.js",
+    "build": "node scripts/bundle-css.js && tsc && vite build",
     "preview": "vite preview",
     "pack": "node scripts/pack.js",
     "package": "npm run build && node scripts/pack.js",

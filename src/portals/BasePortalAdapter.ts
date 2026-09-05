@@ -1,16 +1,18 @@
 /**
- * Base Portal Adapter Interface & Abstract Implementation
- * Strategy Pattern for Website-by-Website Isolation
+ * Base Config-Driven Portal Adapter Interface & Implementation
+ * Strategy Pattern parameterized by VendorPortalConfig.
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
 import { BadgePosition } from '../core/types';
 import { extractTrainNumberRegex, normalizeDateToIsoDate } from '../core/utils';
+import { VendorPortalConfig } from './configs/types';
 
 export interface PortalAdapter {
   readonly id: string;
   readonly name: string;
   readonly domains: string[];
+  readonly config?: VendorPortalConfig;
 
   matches(url: string, hostname: string): boolean;
   getSearchContainer(root: ParentNode): HTMLElement | null;
@@ -22,42 +24,133 @@ export interface PortalAdapter {
   getCustomCssClass(): string;
 }
 
-export abstract class BasePortalAdapter implements PortalAdapter {
-  abstract readonly id: string;
-  abstract readonly name: string;
-  abstract readonly domains: string[];
+export class BasePortalAdapter implements PortalAdapter {
+  readonly id: string;
+  readonly name: string;
+  readonly domains: string[];
+  readonly config?: VendorPortalConfig;
+
+  constructor(config?: VendorPortalConfig) {
+    if (config) {
+      this.config = config;
+      this.id = config.id;
+      this.name = config.name;
+      this.domains = config.domains;
+    } else {
+      this.id = 'generic';
+      this.name = 'Universal Booking Portal';
+      this.domains = ['*'];
+    }
+  }
 
   public matches(_url: string, hostname: string): boolean {
     const host = (hostname || '').toLowerCase();
     return this.domains.some((d) => host === d || host.endsWith(`.${d}`));
   }
 
-  public getSearchContainer(_root: ParentNode): HTMLElement | null {
+  public getSearchContainer(root: ParentNode): HTMLElement | null {
+    if (!this.config?.detection?.containerSelectors) return null;
+    for (const selector of this.config.detection.containerSelectors) {
+      const el = root.querySelector(selector);
+      if (el instanceof HTMLElement) return el;
+    }
     return null;
   }
 
-  public abstract getTrainCards(root: ParentNode): HTMLElement[];
+  public getTrainCards(root: ParentNode): HTMLElement[] {
+    const cards: HTMLElement[] = [];
+
+    // 1. Primary scan using vendor config selectors
+    if (this.config?.selectors?.cardSelectors) {
+      for (const selector of this.config.selectors.cardSelectors) {
+        try {
+          const elements = root.querySelectorAll(selector);
+          elements.forEach((el) => {
+            if (el instanceof HTMLElement && !cards.includes(el)) {
+              cards.push(el);
+            }
+          });
+        } catch (e) {
+          console.warn(`[PortalAdapter:${this.id}] Invalid selector ${selector}:`, e);
+        }
+      }
+    }
+
+    // 2. If vendor-specific selectors found cards, return them
+    if (cards.length > 0) {
+      return cards;
+    }
+
+    // 3. Resilient Fallback: Scan root for containers containing 5-digit train numbers
+    const candidateNodes = root.querySelectorAll('div, tr, li, article, section, a, td');
+    for (let i = 0; i < candidateNodes.length; i++) {
+      const el = candidateNodes[i] as HTMLElement;
+      if (
+        el.closest('.rail-delay-wrapper') ||
+        el.closest('#rail-live-hud') ||
+        el.classList.contains('rail-delay-wrapper')
+      ) {
+        continue;
+      }
+
+      const text = el.textContent || '';
+      if (text.length > 0 && text.length < 150 && el.children.length <= 8) {
+        const trainNum = extractTrainNumberRegex(text);
+        if (trainNum && !cards.includes(el)) {
+          cards.push(el);
+        }
+      }
+    }
+
+    return cards;
+  }
 
   public extractTrainNumber(cardOrElement: HTMLElement): string | null {
     if (!cardOrElement) return null;
 
-    // Check data attributes
-    const dataNum = cardOrElement.getAttribute('data-train-number') || cardOrElement.getAttribute('data-trainno');
-    if (dataNum && /^[0-2]\d{4}$/.test(dataNum.trim())) {
-      return dataNum.trim();
+    // 1. Check vendor-configured attributes
+    const attrs = this.config?.selectors?.trainNumberAttributes || ['data-train-number', 'data-trainno', 'id'];
+    for (const attr of attrs) {
+      const val = cardOrElement.getAttribute(attr);
+      if (val) {
+        const match = extractTrainNumberRegex(val);
+        if (match) return match;
+      }
     }
 
-    // Check card element ID (e.g., id="train-12952")
-    const id = cardOrElement.id || '';
-    const idMatch = id.match(/train-(\d{5})/i);
-    if (idMatch) return idMatch[1];
+    // 2. Check vendor-configured title / number child selectors
+    if (this.config?.selectors?.titleSelectors) {
+      for (const sel of this.config.selectors.titleSelectors) {
+        try {
+          const titleEl = cardOrElement.querySelector(sel);
+          if (titleEl && titleEl.textContent) {
+            const match = extractTrainNumberRegex(titleEl.textContent);
+            if (match) return match;
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
 
-    // Fallback to text matching
+    // 3. Fallback to card textContent
     const text = cardOrElement.textContent || '';
     return extractTrainNumberRegex(text);
   }
 
   public getBadgeAnchor(card: HTMLElement): HTMLElement | null {
+    if (this.config?.selectors?.badgeAnchorSelectors) {
+      for (const sel of this.config.selectors.badgeAnchorSelectors) {
+        try {
+          const anchor = card.querySelector(sel);
+          if (anchor instanceof HTMLElement) {
+            return anchor;
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
     return card;
   }
 
@@ -65,22 +158,33 @@ export abstract class BasePortalAdapter implements PortalAdapter {
     const anchor = this.getBadgeAnchor(card) || card;
     badgeWrapper.classList.add(`position-${position}`);
 
+    if (this.config?.styling?.customCssClass) {
+      badgeWrapper.classList.add(this.config.styling.customCssClass);
+    }
+    if (this.config?.styling?.extraBadgeWrapperClass) {
+      badgeWrapper.classList.add(this.config.styling.extraBadgeWrapperClass);
+    }
+
     if (position === 'card-header-right') {
       const header = card.querySelector('header, .header, [class*="header"], [class*="top"]') || anchor;
       header.appendChild(badgeWrapper);
-    } else if (position === 'below-name') {
+      return;
+    }
+
+    if (position === 'below-name') {
       if (anchor.parentNode) {
         anchor.parentNode.insertBefore(badgeWrapper, anchor.nextSibling);
       } else {
         card.appendChild(badgeWrapper);
       }
+      return;
+    }
+
+    // Default: beside-name
+    if (anchor.parentNode) {
+      anchor.parentNode.insertBefore(badgeWrapper, anchor.nextSibling);
     } else {
-      // Default: beside-name
-      if (anchor.parentNode) {
-        anchor.parentNode.insertBefore(badgeWrapper, anchor.nextSibling);
-      } else {
-        card.appendChild(badgeWrapper);
-      }
+      card.appendChild(badgeWrapper);
     }
   }
 
@@ -96,17 +200,20 @@ export abstract class BasePortalAdapter implements PortalAdapter {
     const urlIso = normalizeDateToIsoDate(window.location.href);
     if (urlIso) return urlIso;
 
-    // 3. Scan DOM for date strings
-    const dateElement = card.querySelector('[class*="date"], [class*="day"], [id*="date"]');
-    if (dateElement && dateElement.textContent) {
-      const iso = normalizeDateToIsoDate(dateElement.textContent);
-      if (iso) return iso;
+    // 3. Scan vendor date selectors or general DOM for date strings
+    const dateSelectors = this.config?.selectors?.dateSelectors || ['[class*="date"]', '[class*="day"]', '[id*="date"]'];
+    for (const sel of dateSelectors) {
+      const el = card.querySelector(sel) || document.querySelector(sel);
+      if (el && el.textContent) {
+        const iso = normalizeDateToIsoDate(el.textContent);
+        if (iso) return iso;
+      }
     }
 
     return null;
   }
 
   public getCustomCssClass(): string {
-    return `vendor-${this.id}`;
+    return this.config?.styling?.customCssClass || `vendor-${this.id}`;
   }
 }

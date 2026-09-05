@@ -28,7 +28,7 @@ export class FloatingHudComponent {
       return;
     }
 
-    const host = document.documentElement || document.body;
+    const host = document.body || document.documentElement;
 
     // 1. Minimized Bubble
     const minBubble = document.createElement('div');

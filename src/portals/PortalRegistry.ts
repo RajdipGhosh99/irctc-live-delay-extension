@@ -10,17 +10,23 @@ import { ConfirmTktAdapter } from './ConfirmTktAdapter';
 import { EaseMyTripAdapter } from './EaseMyTripAdapter';
 import { GenericPortalAdapter } from './GenericPortalAdapter';
 import { GoibiboAdapter } from './GoibiboAdapter';
+import { IrctcAdapter } from './IrctcAdapter';
 import { IxigoAdapter } from './IxigoAdapter';
 import { MakeMyTripAdapter } from './MakeMyTripAdapter';
+import { PaytmAdapter } from './PaytmAdapter';
+import { RailYatriAdapter } from './RailYatriAdapter';
 
 export class PortalRegistry {
   private static adapters: BasePortalAdapter[] = [
     new ConfirmTktAdapter(),
+    new IrctcAdapter(),
     new MakeMyTripAdapter(),
-    new ClearTripAdapter(),
     new IxigoAdapter(),
+    new PaytmAdapter(),
+    new ClearTripAdapter(),
     new GoibiboAdapter(),
     new EaseMyTripAdapter(),
+    new RailYatriAdapter(),
   ];
 
   private static genericAdapter: BasePortalAdapter = new GenericPortalAdapter();

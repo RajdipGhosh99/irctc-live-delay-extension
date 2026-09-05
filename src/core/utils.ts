@@ -291,10 +291,11 @@ export function shortenLiveLocation(locationStr?: string, maxLen = 42): string {
 }
 
 /**
- * Universal 5-digit train number extractor supporting isolated numbers and concatenated titles (e.g. "12904Golden")
+ * Universal 5-digit train number extractor supporting isolated numbers and concatenated titles (e.g. "12904Golden", "22436", "04153")
  */
 export function extractTrainNumberRegex(text: string): string | null {
   if (!text) return null;
-  const match = text.match(/(?:^|[^\d])([0-2]\d{4})(?=[^\d]|$)/);
+  const match = text.match(/(?:^|[^\d])(\d{5})(?=[^\d]|$)/);
   return match ? match[1] : null;
 }
+
