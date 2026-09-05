@@ -40,7 +40,7 @@ You do **not** need a Chrome Web Store account or subscription to use this exten
 
 ### Step 4: Accept Terms & Enjoy!
 - Click the 🚆 icon in your browser toolbar to open the extension popup.
-- Accept the Fair Personal Use Terms and start tracking live train statuses across any supported booking website!
+- Accept the Fair Non-Commercial Terms and start tracking live train statuses across any supported booking website!
 
 ---
 
@@ -159,7 +159,7 @@ git push origin main --tags
 ## ⚠️ Legal Disclaimer & Anti-Abuse Policy
 
 > 🚫 **Acceptable Use Notice:**  
-> This extension is provided for **fair, personal, human interactive use** only. Automated web scraping, botting, high-frequency polling, denial-of-service (DoS) attempts, or commercial resale of live data are strictly prohibited. The software enforces strict on-demand click-to-fetch limits and local caching to protect public railway infrastructure.
+> This extension is provided for **fair, individual, non-commercial passenger use** only. Automated web scraping, botting, high-frequency polling, denial-of-service (DoS) attempts, or commercial resale of live data are strictly prohibited. The software enforces strict on-demand click-to-fetch limits and local caching to protect public railway infrastructure.
 
 - **Independent Project:** This extension is an independent open-source project and is **not affiliated with, endorsed by, or connected to** any private ticketing portal. All trademarks belong to their respective owners.
 - **AS-IS Software:** Live running delay times and arrival predictions are informational estimates based on public signals and third-party APIs. Always cross-verify journey schedules with official railway station displays before traveling.

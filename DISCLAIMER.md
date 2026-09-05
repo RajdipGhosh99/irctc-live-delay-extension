@@ -8,7 +8,7 @@ Please read this Disclaimer and Acceptable Use Policy carefully before using **L
 
 ## 1. 🚫 Strict Anti-Abuse & Non-Misuse Policy
 
-This extension is developed strictly for **fair, personal, human interactive use** to check train delay statistics on ticket booking portals.
+This extension is developed strictly for **fair, individual, non-commercial passenger use** to check train delay statistics on ticket booking portals.
 
 ### Prohibited Conduct:
 - **No Automated Scraping or Botting:** You may NOT use this software, its source code, or its underlying API integrations to perform automated batch scraping, web crawling, continuous high-frequency polling, or bot operations against railway servers or third-party providers.

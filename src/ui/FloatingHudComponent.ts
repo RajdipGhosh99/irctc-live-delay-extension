@@ -78,7 +78,7 @@ export class FloatingHudComponent {
           </button>
         </div>
         <div class="rail-hud-disclaimer">
-          <span>${shieldCheckIcon({ size: 10, className: 'svg-icon-inline' })} ${termsAccepted ? 'Personal Fair Use Only' : 'Please accept Fair Use Terms in popup'}</span>
+          <span>${shieldCheckIcon({ size: 10, className: 'svg-icon-inline' })} ${termsAccepted ? 'Individual Non-Commercial Tool' : 'Please accept Compliance Terms in popup'}</span>
         </div>
       </div>
     `;

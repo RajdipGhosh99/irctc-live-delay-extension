@@ -140,7 +140,7 @@ export class PopoverComponent {
 
       <!-- Legal & Anti-Abuse Notice -->
       <div class="rail-popover-disclaimer">
-        <span>${shieldCheckIcon({ size: 9, className: 'svg-icon-inline' })} Personal Fair Use Only. Verify at station.</span>
+        <span>${shieldCheckIcon({ size: 9, className: 'svg-icon-inline' })} Individual Non-Commercial Tool. Verify at station.</span>
       </div>
 
       <!-- Action Footer -->

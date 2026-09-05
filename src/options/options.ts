@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dateStr = currentSettings.termsAcceptedAt
           ? new Date(currentSettings.termsAcceptedAt).toLocaleDateString()
           : 'Active';
-        termsStatusText.innerHTML = `${checkIcon({ size: 14, className: 'svg-icon-inline' })} Verified & Accepted for Personal Fair Use (${dateStr})`;
+        termsStatusText.innerHTML = `${checkIcon({ size: 14, className: 'svg-icon-inline' })} Verified & Accepted for Individual Non-Commercial Use (${dateStr})`;
         termsStatusText.style.color = '#15803d';
         if (reacceptTermsBtn) {
           reacceptTermsBtn.style.display = 'none';
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentSettings.termsAccepted = true;
     currentSettings.termsAcceptedAt = new Date().toISOString();
     saveSettings(currentSettings);
-    showSaveBanner('Terms accepted for Personal Fair Use');
+    showSaveBanner('Terms accepted for Non-Commercial Use');
     renderUI();
   });
 
