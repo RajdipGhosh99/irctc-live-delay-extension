@@ -29,7 +29,7 @@ function migrateLegacySettings(raw: any): MultiProviderSettings {
     fetchOnHover: raw.fetchOnHover ?? DEFAULT_SETTINGS.fetchOnHover,
     autoFetchAllTrains: raw.autoFetchAllTrains ?? DEFAULT_SETTINGS.autoFetchAllTrains,
     cacheTtlMinutes: raw.cacheTtlMinutes ?? DEFAULT_SETTINGS.cacheTtlMinutes,
-    maxCacheSizeMb: raw.maxCacheSizeMb ?? DEFAULT_SETTINGS.maxCacheSizeMb,
+    maxCacheSizeMb: Math.min(50, Math.max(1, raw.maxCacheSizeMb ?? DEFAULT_SETTINGS.maxCacheSizeMb)),
     showFloatingHUD: raw.showFloatingHUD ?? DEFAULT_SETTINGS.showFloatingHUD,
     termsAccepted: raw.termsAccepted ?? DEFAULT_SETTINGS.termsAccepted,
     termsAcceptedAt: raw.termsAcceptedAt,
@@ -72,9 +72,11 @@ export async function loadSettings(): Promise<MultiProviderSettings> {
 
       if (res[STORAGE_KEYS.SETTINGS]) {
         const settings = res[STORAGE_KEYS.SETTINGS] as MultiProviderSettings;
+        const maxCacheSizeMb = Math.min(50, Math.max(1, settings.maxCacheSizeMb ?? 50));
         resolve({
           ...DEFAULT_SETTINGS,
           ...settings,
+          maxCacheSizeMb,
           providers: { ...DEFAULT_SETTINGS.providers, ...settings.providers },
         });
         return;
@@ -94,13 +96,18 @@ export async function loadSettings(): Promise<MultiProviderSettings> {
 }
 
 export async function saveSettings(settings: MultiProviderSettings): Promise<void> {
+  const sanitizedSettings: MultiProviderSettings = {
+    ...settings,
+    maxCacheSizeMb: Math.min(50, Math.max(1, settings.maxCacheSizeMb ?? 50)),
+  };
+
   return new Promise((resolve, reject) => {
     if (typeof chrome === 'undefined' || !chrome.storage?.local) {
       resolve();
       return;
     }
 
-    chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: settings }, () => {
+    chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: sanitizedSettings }, () => {
       if (chrome.runtime?.lastError) {
         reject(new Error(chrome.runtime.lastError.message));
       } else {
@@ -269,15 +276,16 @@ export async function clearAllCache(): Promise<void> {
 }
 
 export async function getCacheStorageInfo(maxCacheSizeMb = 50): Promise<{ count: number; bytes: number; maxBytes: number; formattedSize: string }> {
+  const effectiveMaxMb = Math.min(50, Math.max(1, maxCacheSizeMb));
   return new Promise((resolve) => {
     if (typeof chrome === 'undefined' || !chrome.storage?.local) {
-      resolve({ count: 0, bytes: 0, maxBytes: maxCacheSizeMb * 1024 * 1024, formattedSize: '0 KB' });
+      resolve({ count: 0, bytes: 0, maxBytes: effectiveMaxMb * 1024 * 1024, formattedSize: '0 KB' });
       return;
     }
 
     chrome.storage.local.get(null, (items) => {
       if (chrome.runtime?.lastError || !items) {
-        resolve({ count: 0, bytes: 0, maxBytes: maxCacheSizeMb * 1024 * 1024, formattedSize: '0 KB' });
+        resolve({ count: 0, bytes: 0, maxBytes: effectiveMaxMb * 1024 * 1024, formattedSize: '0 KB' });
         return;
       }
 
@@ -298,7 +306,7 @@ export async function getCacheStorageInfo(maxCacheSizeMb = 50): Promise<{ count:
       resolve({
         count: cacheKeys.length,
         bytes: totalBytes,
-        maxBytes: maxCacheSizeMb * 1024 * 1024,
+        maxBytes: effectiveMaxMb * 1024 * 1024,
         formattedSize,
       });
     });
