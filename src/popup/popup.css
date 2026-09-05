@@ -380,3 +380,124 @@ input:checked + .slider:before {
   font-size: 10px;
   color: var(--text-muted);
 }
+
+/* Terms Acceptance Modal Overlay */
+.terms-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.terms-overlay.hidden {
+  display: none !important;
+}
+
+.terms-modal-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  width: 100%;
+  max-height: 94vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.terms-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.terms-modal-header h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.terms-modal-body {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.terms-rule-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
+.terms-rule-item strong {
+  color: #1e293b;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.terms-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 10px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.terms-checkbox-row input {
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.terms-accept-btn {
+  width: 100%;
+  padding: 9px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.terms-accept-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.terms-accept-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.cache-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cache-quota-label {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 600;
+}

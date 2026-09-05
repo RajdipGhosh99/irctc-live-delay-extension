@@ -12,7 +12,8 @@ export class FloatingHudComponent {
   public static mount(
     vendorClass: string,
     onFetchAll: () => void,
-    onOpenSettings: () => void
+    onOpenSettings: () => void,
+    termsAccepted = true
   ): void {
     if (this.isDismissed || document.getElementById('rail-live-hud')) {
       return;
@@ -53,10 +54,10 @@ export class FloatingHudComponent {
       <div class="rail-hud-body">
         <div class="rail-hud-status-row">
           <span id="rail-hud-count-text">0 trains detected</span>
-          <span class="rail-hud-live-indicator">● Active</span>
+          <span class="rail-hud-live-indicator">${termsAccepted ? '● Active' : '⚠️ Terms Required'}</span>
         </div>
         <div class="rail-hud-actions">
-          <button type="button" class="rail-hud-action-btn primary" id="rail-hud-fetch-all-btn">
+          <button type="button" class="rail-hud-action-btn primary" id="rail-hud-fetch-all-btn" ${termsAccepted ? '' : 'title="Please accept terms first"'}>
             ⚡ Fetch All
           </button>
           <button type="button" class="rail-hud-action-btn secondary" id="rail-hud-settings-btn" title="Open Settings">
@@ -64,7 +65,7 @@ export class FloatingHudComponent {
           </button>
         </div>
         <div class="rail-hud-disclaimer">
-          <span>⚠️ Personal Fair Use Only</span>
+          <span>${termsAccepted ? '⚠️ Personal Fair Use Only' : '⚠️ Please accept Fair Use Terms in popup'}</span>
         </div>
       </div>
     `;

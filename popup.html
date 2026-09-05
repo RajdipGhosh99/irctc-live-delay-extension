@@ -98,11 +98,30 @@
       ⚙️ Open Full Settings Dashboard ↗
     </button>
 
+    <!-- Cache Policy Selector -->
+    <div class="form-group" style="margin-top: 10px;">
+      <div class="cache-setting-row">
+        <label for="popup-cache-select" style="margin: 0;">⚡ Cache Policy:</label>
+        <span class="cache-quota-label" id="cache-quota-text">Limit: 50 MB</span>
+      </div>
+      <select id="popup-cache-select" class="select-input">
+        <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
+        <option value="1">1 Minute (Ultra Fresh)</option>
+        <option value="5">5 Minutes (Recommended)</option>
+        <option value="15">15 Minutes</option>
+      </select>
+    </div>
+
+    <!-- Dashboard Button -->
+    <button type="button" id="open-options-btn" class="btn btn-dashboard">
+      ⚙️ Open Full Settings Dashboard ↗
+    </button>
+
     <!-- Cache Management -->
     <div class="cache-section">
       <div class="cache-info">
-        <span style="font-weight: 600;">⚡ Cache (15-min TTL):</span>
-        <div id="cache-count" style="font-size: 10.5px; color: #1e40af; font-weight: 700;">0 records</div>
+        <span style="font-weight: 600;">⚡ Storage In Use:</span>
+        <div id="cache-count" style="font-size: 10.5px; color: #1e40af; font-weight: 700;">0 KB (0 records)</div>
       </div>
       <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
         🗑 Clear
@@ -121,6 +140,50 @@
     <footer class="popup-footer">
       <span>100% Free & Open Source under GNU GPL-3.0</span>
     </footer>
+  </div>
+
+  <!-- Mandatory Terms & Conditions Acceptance Gate Modal -->
+  <div id="terms-modal" class="terms-overlay hidden">
+    <div class="terms-modal-card">
+      <div class="terms-modal-header">
+        <span style="font-size: 18px;">⚖️</span>
+        <div>
+          <h3>Fair Use & Legal Terms</h3>
+          <span style="font-size: 10px; color: #64748b;">Please review and accept before using</span>
+        </div>
+      </div>
+
+      <div class="terms-modal-body">
+        <div class="terms-rule-item">
+          <strong>1. Personal Fair Use Only</strong>
+          <span>This extension is strictly provided for interactive, individual passenger convenience. Not for commercial resale.</span>
+        </div>
+
+        <div class="terms-rule-item">
+          <strong>2. Anti-Abuse & Rate Compliance</strong>
+          <span>Automated mass-scraping, bot crawlers, or high-frequency automated querying that impacts public rail gateways is strictly prohibited.</span>
+        </div>
+
+        <div class="terms-rule-item">
+          <strong>3. Independent & Unaffiliated</strong>
+          <span>This is an independent open-source project and is not affiliated with, endorsed by, or operated by any official booking portals.</span>
+        </div>
+
+        <div class="terms-rule-item">
+          <strong>4. Informational Estimates</strong>
+          <span>Running statuses are dynamic estimates. Always check physical departure boards at the railway station before boarding.</span>
+        </div>
+
+        <label class="terms-checkbox-row">
+          <input type="checkbox" id="terms-agree-checkbox" />
+          <span>I understand and agree to the Fair Use Terms, Anti-Abuse Policy, and Legal Disclaimer.</span>
+        </label>
+
+        <button type="button" id="terms-accept-btn" class="terms-accept-btn" disabled>
+          Accept & Continue 🚀
+        </button>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="./src/popup/popup.ts"></script>

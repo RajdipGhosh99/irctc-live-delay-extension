@@ -93,9 +93,10 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   autoFailover: true,
   fetchOnHover: false,
   autoFetchAllTrains: false,
-  cacheTtlMinutes: 15,
-  maxCacheSizeMb: 150,
+  cacheTtlMinutes: 0, // Default: No cache (Always Live Fetch)
+  maxCacheSizeMb: 50, // Max cache size: 50 MB
   showFloatingHUD: true,
+  termsAccepted: false, // Requires user acceptance on first run
   schemaVersion: '2.0.0',
   providers: {
     'direct-rail-gateway': {

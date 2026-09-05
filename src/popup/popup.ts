@@ -14,13 +14,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentSiteLabel = document.getElementById('current-site-label') as HTMLElement;
   const siteToggleBtn = document.getElementById('site-toggle-btn') as HTMLButtonElement;
   const activeProviderSelect = document.getElementById('active-provider-select') as HTMLSelectElement;
+  const popupCacheSelect = document.getElementById('popup-cache-select') as HTMLSelectElement;
   const quickTrainInput = document.getElementById('quick-train-input') as HTMLInputElement;
   const quickTrainBtn = document.getElementById('quick-train-btn') as HTMLButtonElement;
   const quickTrainResult = document.getElementById('quick-train-result') as HTMLElement;
   const cacheCountEl = document.getElementById('cache-count') as HTMLElement;
+  const cacheQuotaText = document.getElementById('cache-quota-text') as HTMLElement;
   const clearCacheBtn = document.getElementById('clear-cache-btn') as HTMLButtonElement;
   const openOptionsBtn = document.getElementById('open-options-btn') as HTMLButtonElement;
   const fetchPageTrainsBtn = document.getElementById('fetch-page-trains-btn') as HTMLButtonElement;
+  const termsModal = document.getElementById('terms-modal') as HTMLElement;
+  const termsAgreeCheckbox = document.getElementById('terms-agree-checkbox') as HTMLInputElement;
+  const termsAcceptBtn = document.getElementById('terms-accept-btn') as HTMLButtonElement;
 
   let loadedSettings: MultiProviderSettings | null = null;
   let currentHostname = '';
@@ -53,6 +58,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  async function updateCacheInfo() {
+    chrome.runtime.sendMessage({ type: 'GET_CACHE_STATS' }, (res) => {
+      if (res?.success && res.info) {
+        const { count, formattedSize, maxBytes } = res.info;
+        const maxMb = Math.round(maxBytes / (1024 * 1024));
+        if (cacheCountEl) {
+          cacheCountEl.textContent = `${formattedSize} (${count} record${count === 1 ? '' : 's'})`;
+        }
+        if (cacheQuotaText) {
+          cacheQuotaText.textContent = `Limit: ${maxMb} MB`;
+        }
+      }
+    });
+  }
+
   async function loadState() {
     chrome.runtime.sendMessage({ type: 'GET_SETTINGS' } as ExtensionMessage, (res) => {
       if (res?.success && res.settings) {
@@ -61,16 +81,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    chrome.storage.local.get(null, (all) => {
-      const keys = Object.keys(all || {}).filter(
-        (k) => k.startsWith('rail_cache_') || k.startsWith('irctc_cache_')
-      );
-      cacheCountEl.textContent = `${keys.length} cached records`;
-    });
+    updateCacheInfo();
   }
 
   function updateUI() {
     if (!loadedSettings) return;
+
+    // Check Terms Gate
+    if (!loadedSettings.termsAccepted) {
+      termsModal?.classList.remove('hidden');
+    } else {
+      termsModal?.classList.add('hidden');
+    }
 
     const isGlobalActive = loadedSettings.extensionEnabled !== false;
     popupMasterSwitch.checked = isGlobalActive;
@@ -92,8 +114,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       activeProviderSelect.value = loadedSettings.activeProvider;
     }
 
+    if (popupCacheSelect) {
+      popupCacheSelect.value = String(loadedSettings.cacheTtlMinutes ?? 0);
+    }
+
     updateSiteButton();
   }
+
+  // Terms Agreement Handlers
+  termsAgreeCheckbox?.addEventListener('change', () => {
+    termsAcceptBtn.disabled = !termsAgreeCheckbox.checked;
+  });
+
+  termsAcceptBtn?.addEventListener('click', () => {
+    if (!loadedSettings) return;
+    loadedSettings.termsAccepted = true;
+    loadedSettings.termsAcceptedAt = new Date().toISOString();
+    saveCurrentSettings();
+    termsModal?.classList.add('hidden');
+    updateUI();
+  });
 
   // Master Switch Change
   popupMasterSwitch.addEventListener('change', () => {
@@ -110,6 +150,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       saveCurrentSettings();
     });
   }
+
+  // Cache Selector Change
+  popupCacheSelect?.addEventListener('change', () => {
+    if (!loadedSettings) return;
+    loadedSettings.cacheTtlMinutes = parseInt(popupCacheSelect.value, 10) || 0;
+    saveCurrentSettings();
+    updateCacheInfo();
+  });
 
   // Toggle for Current Site
   siteToggleBtn.addEventListener('click', () => {
@@ -142,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Clear Cache
   clearCacheBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
-      cacheCountEl.textContent = '0 cached records';
+      updateCacheInfo();
       clearCacheBtn.textContent = '✓ Cleared';
       setTimeout(() => {
         clearCacheBtn.textContent = '🗑 Clear';
@@ -153,6 +201,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Fetch Page Trains Button
   if (fetchPageTrainsBtn) {
     fetchPageTrainsBtn.addEventListener('click', () => {
+      if (!loadedSettings?.termsAccepted) {
+        termsModal?.classList.remove('hidden');
+        return;
+      }
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
           chrome.tabs.sendMessage(tabs[0].id, { type: 'TRIGGER_FETCH_ALL' });
@@ -175,6 +227,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const query = quickTrainInput.value.trim();
     if (!query) return;
 
+    if (!loadedSettings?.termsAccepted) {
+      termsModal?.classList.remove('hidden');
+      return;
+    }
+
     quickTrainResult.style.display = 'block';
     quickTrainResult.innerHTML = `
       <div class="result-loading">
@@ -186,9 +243,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.runtime.sendMessage(
       { type: 'FETCH_DELAY', trainNumber: query },
       (res) => {
+        updateCacheInfo();
         if (res?.success && res.data) {
           renderQuickResult(res.data);
         } else {
+          if (res?.termsRequired) {
+            termsModal?.classList.remove('hidden');
+          }
           quickTrainResult.innerHTML = `
             <div class="result-error">
               <span class="error-title">⚠️ Status Unavailable</span>

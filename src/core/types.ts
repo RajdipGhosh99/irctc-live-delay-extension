@@ -65,6 +65,8 @@ export interface MultiProviderSettings {
   cacheTtlMinutes: number;
   maxCacheSizeMb?: number;
   showFloatingHUD: boolean;
+  termsAccepted: boolean;
+  termsAcceptedAt?: string;
   schemaVersion: string;
   providers: Record<ProviderId, ProviderConfig>;
 }

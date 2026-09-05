@@ -4,7 +4,7 @@
  */
 
 import { PROVIDER_METADATA_MAP } from '../core/constants';
-import { loadSettings, saveSettings } from '../core/storage';
+import { getCacheStorageInfo, loadSettings, saveSettings } from '../core/storage';
 import { ApiKeyItem, BadgePosition, MultiProviderSettings, ProviderId } from '../core/types';
 import { maskIsoCredential, sanitizeHtml } from '../core/utils';
 
@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const saveBanner = document.getElementById('save-banner') as HTMLElement;
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle') as HTMLButtonElement;
   const optionsSidebar = document.getElementById('options-sidebar') as HTMLElement;
+  const storageUsedText = document.getElementById('storage-used-text') as HTMLElement;
+  const storageBarFill = document.getElementById('storage-bar-fill') as HTMLElement;
+  const termsStatusText = document.getElementById('terms-status-text') as HTMLElement;
+  const reacceptTermsBtn = document.getElementById('reaccept-terms-btn') as HTMLButtonElement;
 
   let currentSettings: MultiProviderSettings = await loadSettings();
 
@@ -44,6 +48,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
       saveBanner.classList.remove('visible');
     }, 2400);
+  }
+
+  async function updateStorageMeter() {
+    const info = await getCacheStorageInfo(currentSettings.maxCacheSizeMb ?? 50);
+    const maxMb = Math.round(info.maxBytes / (1024 * 1024));
+    const usedMb = (info.bytes / (1024 * 1024)).toFixed(2);
+    const percent = Math.min(100, Math.max(0, (info.bytes / info.maxBytes) * 100));
+
+    if (storageUsedText) {
+      storageUsedText.textContent = `${usedMb} MB / ${maxMb} MB`;
+    }
+    if (storageBarFill) {
+      storageBarFill.style.width = `${Math.max(2, percent)}%`;
+      if (percent > 85) {
+        storageBarFill.style.background = '#ef4444';
+      } else if (percent > 60) {
+        storageBarFill.style.background = '#f59e0b';
+      } else {
+        storageBarFill.style.background = '#2563eb';
+      }
+    }
   }
 
   mobileMenuToggle?.addEventListener('click', () => {
@@ -74,11 +99,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     primaryProviderSelect.value = currentSettings.activeProvider || 'direct-rail-gateway';
     autoFailoverSwitch.checked = currentSettings.autoFailover !== false;
     autoFetchAllSwitch.checked = Boolean(currentSettings.autoFetchAllTrains);
-    cacheTtlSelect.value = String(currentSettings.cacheTtlMinutes || 15);
+    cacheTtlSelect.value = String(currentSettings.cacheTtlMinutes ?? 0);
+
+    // Terms Status
+    if (termsStatusText) {
+      if (currentSettings.termsAccepted) {
+        const dateStr = currentSettings.termsAcceptedAt
+          ? new Date(currentSettings.termsAcceptedAt).toLocaleDateString()
+          : 'Active';
+        termsStatusText.textContent = `✓ Accepted for Personal Fair Use (${dateStr})`;
+        termsStatusText.style.color = '#16a34a';
+        if (reacceptTermsBtn) {
+          reacceptTermsBtn.style.display = 'none';
+        }
+      } else {
+        termsStatusText.textContent = '⚠️ Pending Acceptance (Accept terms to enable tracking)';
+        termsStatusText.style.color = '#dc2626';
+        if (reacceptTermsBtn) {
+          reacceptTermsBtn.style.display = 'inline-block';
+        }
+      }
+    }
 
     renderSitesGrid();
     renderProviderPools();
+    updateStorageMeter();
   }
+
+  reacceptTermsBtn?.addEventListener('click', () => {
+    currentSettings.termsAccepted = true;
+    currentSettings.termsAcceptedAt = new Date().toISOString();
+    saveSettings(currentSettings);
+    showSaveBanner('✓ Terms accepted for Personal Fair Use');
+    renderUI();
+  });
 
   function renderSitesGrid() {
     if (!sitesContainer) return;
@@ -318,15 +372,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cache TTL Change
   cacheTtlSelect.addEventListener('change', () => {
-    currentSettings.cacheTtlMinutes = parseInt(cacheTtlSelect.value, 10) || 15;
+    currentSettings.cacheTtlMinutes = parseInt(cacheTtlSelect.value, 10) || 0;
     saveSettings(currentSettings);
-    showSaveBanner(`Cache retention set to ${currentSettings.cacheTtlMinutes} minutes`);
+    showSaveBanner(
+      currentSettings.cacheTtlMinutes === 0
+        ? 'Cache disabled (Live Fetch Only)'
+        : `Cache retention set to ${currentSettings.cacheTtlMinutes} minutes`
+    );
+    updateStorageMeter();
   });
 
   // Clear All Cache
   clearAllCacheBtn?.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
       showSaveBanner('✓ All cached train delays cleared from memory');
+      updateStorageMeter();
     });
   });
 

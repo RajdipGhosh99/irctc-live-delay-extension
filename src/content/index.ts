@@ -37,9 +37,17 @@ class ContentScriptOrchestrator {
       FloatingHudComponent.mount(
         this.adapter.getCustomCssClass(),
         () => this.fetchAllTrains(),
-        () => chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' })
+        () => chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' }),
+        this.settings.termsAccepted !== false
       );
     }
+
+    // Listen for live setting updates (e.g. Terms acceptance)
+    chrome.storage.onChanged?.addListener((changes, namespace) => {
+      if (namespace === 'local' && changes['rail_delay_tracker_settings']?.newValue) {
+        this.settings = changes['rail_delay_tracker_settings'].newValue;
+      }
+    });
 
     // Initial DOM scan
     this.scanAndInject();
@@ -173,6 +181,9 @@ class ContentScriptOrchestrator {
         this.attachPopover(widget, data);
         this.updateHudStats();
       } else {
+        if (response?.termsRequired) {
+          chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
+        }
         BadgeComponent.updateState(widget, 'error');
       }
     } catch (err) {
@@ -223,6 +234,11 @@ class ContentScriptOrchestrator {
   }
 
   public fetchAllTrains(): void {
+    if (!this.settings?.termsAccepted) {
+      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
+      return;
+    }
+
     let delayMs = 0;
     for (const widget of this.injectedWidgets.values()) {
       if (widget.state === 'idle' || widget.state === 'error') {

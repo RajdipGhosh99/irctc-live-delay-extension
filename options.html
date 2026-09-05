@@ -41,11 +41,11 @@
       <div class="sidebar-footer">
         <div class="storage-meter">
           <div class="storage-meter-label">
-            <span>Cache Quota</span>
-            <span id="storage-used-text">0 KB</span>
+            <span>Cache Quota (Max 50 MB)</span>
+            <span id="storage-used-text">0.0 MB / 50 MB</span>
           </div>
           <div class="storage-bar-track">
-            <div class="storage-bar-fill" id="storage-bar-fill" style="width: 2%;"></div>
+            <div class="storage-bar-fill" id="storage-bar-fill" style="width: 0%;"></div>
           </div>
         </div>
         <p class="license-info">GNU GPL-3.0 • 100% Open Source</p>
@@ -155,12 +155,12 @@
         </div>
 
         <div class="form-group">
-          <label for="cache-ttl-select">Local Cache Retention (Saves API calls):</label>
+          <label for="cache-ttl-select">Local Cache Retention (Saves API calls, Max 50 MB):</label>
           <select id="cache-ttl-select" class="form-control">
-            <option value="10">10 Minutes (Standard)</option>
-            <option value="15" selected>15 Minutes (Recommended)</option>
-            <option value="30">30 Minutes (Maximum Conservation)</option>
-            <option value="60">1 Hour</option>
+            <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
+            <option value="1">1 Minute (Ultra Fresh)</option>
+            <option value="5">5 Minutes (Recommended)</option>
+            <option value="15">15 Minutes</option>
           </select>
         </div>
 
@@ -179,7 +179,7 @@
           <div class="cache-stats-row">
             <div>
               <strong>Local Memory Storage</strong>
-              <p>Cached train delays are saved locally to eliminate duplicate API requests.</p>
+              <p>Cached train delays are saved locally to eliminate duplicate API requests (capped at 50 MB).</p>
             </div>
             <button type="button" id="clear-all-cache-btn" class="btn btn-danger">
               🗑 Clear Entire Local Cache
@@ -197,6 +197,16 @@
             <strong>Independent Project:</strong> This extension is an independent open-source tool and is not affiliated with, endorsed by, or connected to any third-party ticketing portal.<br />
             <strong>Informational Estimates:</strong> Live status and delay predictions are estimates based on public signals. Always verify your departure timings at the station before traveling.
           </p>
+
+          <div class="terms-acceptance-status" id="terms-status-container" style="margin-top: 14px; padding: 10px 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <strong style="font-size: 12px; color: #1e293b;">Terms & Conditions Status:</strong>
+              <div id="terms-status-text" style="font-size: 11px; color: #16a34a; font-weight: 600;">✓ Accepted for Personal Fair Use</div>
+            </div>
+            <button type="button" id="reaccept-terms-btn" class="btn btn-secondary btn-sm" style="display: none; padding: 6px 12px; font-size: 11.5px;">
+              Review & Accept Terms
+            </button>
+          </div>
         </div>
       </section>
     </main>

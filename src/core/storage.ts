@@ -31,6 +31,8 @@ function migrateLegacySettings(raw: any): MultiProviderSettings {
     cacheTtlMinutes: raw.cacheTtlMinutes ?? DEFAULT_SETTINGS.cacheTtlMinutes,
     maxCacheSizeMb: raw.maxCacheSizeMb ?? DEFAULT_SETTINGS.maxCacheSizeMb,
     showFloatingHUD: raw.showFloatingHUD ?? DEFAULT_SETTINGS.showFloatingHUD,
+    termsAccepted: raw.termsAccepted ?? DEFAULT_SETTINGS.termsAccepted,
+    termsAcceptedAt: raw.termsAcceptedAt,
     schemaVersion: '2.0.0',
     providers: { ...DEFAULT_SETTINGS.providers },
   };
@@ -108,7 +110,12 @@ export async function saveSettings(settings: MultiProviderSettings): Promise<voi
   });
 }
 
-export async function getCachedTrainData(trainNumber: string, ttlMinutes = 15): Promise<TrainDelayData | null> {
+export async function getCachedTrainData(trainNumber: string, ttlMinutes = 0): Promise<TrainDelayData | null> {
+  // If caching is disabled (0 minutes), bypass cache lookups
+  if (ttlMinutes <= 0) {
+    return null;
+  }
+
   return new Promise((resolve) => {
     if (typeof chrome === 'undefined' || !chrome.storage?.local) {
       resolve(null);
@@ -150,9 +157,18 @@ export async function getCachedTrainData(trainNumber: string, ttlMinutes = 15): 
   });
 }
 
-export async function setCachedTrainData(data: TrainDelayData, ttlMinutes = 15): Promise<void> {
+export async function setCachedTrainData(
+  data: TrainDelayData,
+  ttlMinutes = 0,
+  maxCacheSizeMb = 50
+): Promise<void> {
+  // If caching is disabled (0 minutes) or no valid train number, skip storing
+  if (ttlMinutes <= 0 || !data?.trainNumber) {
+    return;
+  }
+
   return new Promise((resolve) => {
-    if (typeof chrome === 'undefined' || !chrome.storage?.local || !data?.trainNumber) {
+    if (typeof chrome === 'undefined' || !chrome.storage?.local) {
       resolve();
       return;
     }
@@ -170,7 +186,60 @@ export async function setCachedTrainData(data: TrainDelayData, ttlMinutes = 15):
       expiresAtIso: getIso8601Timestamp(new Date(expiresAt)),
     };
 
-    chrome.storage.local.set({ [key]: entry }, () => resolve());
+    chrome.storage.local.get(null, (allItems) => {
+      if (chrome.runtime?.lastError || !allItems) {
+        chrome.storage.local.set({ [key]: entry }, () => resolve());
+        return;
+      }
+
+      const cacheKeys = Object.keys(allItems).filter(
+        (k) => k.startsWith(STORAGE_KEYS.CACHE_PREFIX) || k.startsWith(STORAGE_KEYS.LEGACY_CACHE_PREFIX)
+      );
+
+      // Estimate total cache size in bytes
+      let totalBytes = 0;
+      const cacheEntries: { key: string; entry: CacheEntry; size: number }[] = [];
+
+      for (const k of cacheKeys) {
+        const item = allItems[k];
+        const jsonStr = JSON.stringify(item);
+        const itemSize = jsonStr.length * 2; // UTF-16 approx byte size
+        totalBytes += itemSize;
+        cacheEntries.push({ key: k, entry: item, size: itemSize });
+      }
+
+      const maxBytes = maxCacheSizeMb * 1024 * 1024;
+      const keysToEvict: string[] = [];
+
+      // Evict expired entries first
+      for (const item of cacheEntries) {
+        if (item.entry?.expiresAt && now > item.entry.expiresAt) {
+          keysToEvict.push(item.key);
+          totalBytes -= item.size;
+        }
+      }
+
+      // If still exceeding 50 MB, evict oldest entries (LRU / oldest cachedAt)
+      if (totalBytes > maxBytes) {
+        const remainingEntries = cacheEntries
+          .filter((i) => !keysToEvict.includes(i.key))
+          .sort((a, b) => (a.entry.cachedAt || 0) - (b.entry.cachedAt || 0));
+
+        for (const item of remainingEntries) {
+          if (totalBytes <= maxBytes * 0.85) break; // Evict down to 85% of limit
+          keysToEvict.push(item.key);
+          totalBytes -= item.size;
+        }
+      }
+
+      if (keysToEvict.length > 0) {
+        chrome.storage.local.remove(keysToEvict, () => {
+          chrome.storage.local.set({ [key]: entry }, () => resolve());
+        });
+      } else {
+        chrome.storage.local.set({ [key]: entry }, () => resolve());
+      }
+    });
   });
 }
 
@@ -184,18 +253,54 @@ export async function clearAllCache(): Promise<void> {
     chrome.storage.local.get(null, (items) => {
       if (chrome.runtime?.lastError || !items) {
         resolve();
+      } else {
+        const keysToRemove = Object.keys(items).filter(
+          (k) => k.startsWith(STORAGE_KEYS.CACHE_PREFIX) || k.startsWith(STORAGE_KEYS.LEGACY_CACHE_PREFIX)
+        );
+
+        if (keysToRemove.length > 0) {
+          chrome.storage.local.remove(keysToRemove, () => resolve());
+        } else {
+          resolve();
+        }
+      }
+    });
+  });
+}
+
+export async function getCacheStorageInfo(maxCacheSizeMb = 50): Promise<{ count: number; bytes: number; maxBytes: number; formattedSize: string }> {
+  return new Promise((resolve) => {
+    if (typeof chrome === 'undefined' || !chrome.storage?.local) {
+      resolve({ count: 0, bytes: 0, maxBytes: maxCacheSizeMb * 1024 * 1024, formattedSize: '0 KB' });
+      return;
+    }
+
+    chrome.storage.local.get(null, (items) => {
+      if (chrome.runtime?.lastError || !items) {
+        resolve({ count: 0, bytes: 0, maxBytes: maxCacheSizeMb * 1024 * 1024, formattedSize: '0 KB' });
         return;
       }
 
-      const keysToRemove = Object.keys(items).filter(
+      const cacheKeys = Object.keys(items).filter(
         (k) => k.startsWith(STORAGE_KEYS.CACHE_PREFIX) || k.startsWith(STORAGE_KEYS.LEGACY_CACHE_PREFIX)
       );
 
-      if (keysToRemove.length > 0) {
-        chrome.storage.local.remove(keysToRemove, () => resolve());
-      } else {
-        resolve();
+      let totalBytes = 0;
+      for (const k of cacheKeys) {
+        totalBytes += JSON.stringify(items[k]).length * 2;
       }
+
+      let formattedSize = `${(totalBytes / 1024).toFixed(1)} KB`;
+      if (totalBytes > 1024 * 1024) {
+        formattedSize = `${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+      }
+
+      resolve({
+        count: cacheKeys.length,
+        bytes: totalBytes,
+        maxBytes: maxCacheSizeMb * 1024 * 1024,
+        formattedSize,
+      });
     });
   });
 }

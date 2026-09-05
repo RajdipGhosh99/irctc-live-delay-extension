@@ -4,7 +4,7 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
-import { clearAllCache, getCachedTrainData, loadSettings, saveSettings, setCachedTrainData } from '../core/storage';
+import { clearAllCache, getCachedTrainData, getCacheStorageInfo, loadSettings, saveSettings, setCachedTrainData } from '../core/storage';
 import { ExtensionMessage, MultiProviderSettings, ProviderId, TrainDelayData } from '../core/types';
 import { dispatchTrainDelayQuery } from '../providers/ProviderCoordinator';
 
@@ -27,9 +27,19 @@ async function handleMessage(message: ExtensionMessage): Promise<any> {
 
       const settings = await loadSettings();
 
-      // 1. Check local cache (unless forceRefresh is true)
-      if (!forceRefresh) {
-        const cached = await getCachedTrainData(trainNumber, settings.cacheTtlMinutes || 15);
+      // Check Terms Acceptance Gate
+      if (!settings.termsAccepted) {
+        return {
+          success: false,
+          error: 'Please review and accept the Fair Use Terms in the extension popup before querying live train data.',
+          termsRequired: true,
+        };
+      }
+
+      // 1. Check local cache (unless forceRefresh is true or cacheTtlMinutes is 0)
+      const ttlMinutes = settings.cacheTtlMinutes ?? 0;
+      if (!forceRefresh && ttlMinutes > 0) {
+        const cached = await getCachedTrainData(trainNumber, ttlMinutes);
         if (cached) {
           return { success: true, data: cached, fromCache: true };
         }
@@ -43,8 +53,10 @@ async function handleMessage(message: ExtensionMessage): Promise<any> {
         travelDate
       );
 
-      // 3. Save to local cache
-      await setCachedTrainData(liveData, settings.cacheTtlMinutes || 15);
+      // 3. Save to local cache if caching enabled
+      if (ttlMinutes > 0) {
+        await setCachedTrainData(liveData, ttlMinutes, settings.maxCacheSizeMb ?? 50);
+      }
 
       return { success: true, data: liveData, fromCache: false };
     }
@@ -62,6 +74,12 @@ async function handleMessage(message: ExtensionMessage): Promise<any> {
     case 'CLEAR_CACHE': {
       await clearAllCache();
       return { success: true };
+    }
+
+    case 'GET_CACHE_STATS': {
+      const settings = await loadSettings();
+      const info = await getCacheStorageInfo(settings.maxCacheSizeMb ?? 50);
+      return { success: true, info };
     }
 
     case 'OPEN_OPTIONS': {
