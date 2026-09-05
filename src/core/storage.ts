@@ -131,7 +131,7 @@ export async function getCachedTrainData(trainNumber: string, ttlMinutes = 0): P
         return;
       }
 
-      const rawEntry = res[key] || res[legacyKey];
+      const rawEntry = (res[key] || res[legacyKey]) as CacheEntry | any;
       if (!rawEntry) {
         resolve(null);
         return;
@@ -201,7 +201,7 @@ export async function setCachedTrainData(
       const cacheEntries: { key: string; entry: CacheEntry; size: number }[] = [];
 
       for (const k of cacheKeys) {
-        const item = allItems[k];
+        const item = allItems[k] as CacheEntry;
         const jsonStr = JSON.stringify(item);
         const itemSize = jsonStr.length * 2; // UTF-16 approx byte size
         totalBytes += itemSize;

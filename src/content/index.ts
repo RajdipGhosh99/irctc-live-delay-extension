@@ -45,7 +45,7 @@ class ContentScriptOrchestrator {
     // Listen for live setting updates (e.g. Terms acceptance)
     chrome.storage.onChanged?.addListener((changes, namespace) => {
       if (namespace === 'local' && changes['rail_delay_tracker_settings']?.newValue) {
-        this.settings = changes['rail_delay_tracker_settings'].newValue;
+        this.settings = changes['rail_delay_tracker_settings'].newValue as MultiProviderSettings;
       }
     });
 

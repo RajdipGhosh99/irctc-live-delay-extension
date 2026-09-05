@@ -31,19 +31,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build Extension
-        run: npm run build
-
-      - name: Package Extension ZIP
-        run: |
-          RELEASE_TAG="${{ github.ref_name }}"
-          if [ -z "$RELEASE_TAG" ]; then
-            RELEASE_TAG="${{ github.event.inputs.version }}"
-          fi
-          cd dist
-          zip -r "../train-delay-tracker-${RELEASE_TAG}.zip" .
-          zip -r "../train-delay-tracker-latest.zip" .
-          cd ..
+      - name: Build & Package Extension
+        run: npm run package
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -51,7 +40,8 @@ jobs:
           name: "Live Train Delay Tracker ${{ github.ref_name || github.event.inputs.version }}"
           tag_name: ${{ github.ref_name || github.event.inputs.version }}
           files: |
-            train-delay-tracker-*.zip
+            release/train-delay-tracker-*.zip
+            release/SHA256SUMS.txt
           draft: false
           prerelease: false
           generate_release_notes: true
@@ -62,7 +52,7 @@ jobs:
 
             ---
 
-            ### 📥 Download & 30-Second Manual Installation Guide
+            ### 📥 30-Second Manual Installation Guide
 
             Works on **Google Chrome**, **Microsoft Edge**, **Brave**, **Opera**, **Vivaldi**, and all Chromium browsers (No Web Store account required).
 

@@ -28,12 +28,20 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "package": "npm run build && cd dist && zip -r ../train-delay-tracker-v2.0.0.zip . && cd ..",
-    "release": "./scripts/release.sh"
+    "pack": "node scripts/pack.js",
+    "package": "npm run build && node scripts/pack.js",
+    "bump": "node scripts/bump-version.js",
+    "release": "node scripts/release.js",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major"
   },
-  "dependencies": {},
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.28",
+    "@types/archiver": "^8.0.0",
+    "@types/chrome": "^0.2.8",
+    "@types/node": "^26.4.1",
+    "archiver": "^8.0.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
   }
