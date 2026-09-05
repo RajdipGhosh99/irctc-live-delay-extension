@@ -9,7 +9,6 @@ import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../cor
 import {
   barChartIcon,
   checkIcon,
-  clockIcon,
   copyIcon,
   mapPinIcon,
   radioIcon,
@@ -17,7 +16,6 @@ import {
   shieldCheckIcon,
   trendingUpIcon,
   xIcon,
-  zapIcon,
 } from './icons';
 
 export class PopoverComponent {
@@ -36,22 +34,31 @@ export class PopoverComponent {
     const isEarly = data.delayMinutes < -5;
     const delayAbs = Math.abs(data.delayMinutes);
 
-    // Pill color and status text
+    // Pill color, live status styling and text
     let statusPillClass = 'status-ontime';
     let statusPillText = 'On Time';
     let todayLiveHhMm = '00:00';
     let todayLiveSub = 'Right Time';
+    let todayLiveBoxClass = 'box-ontime';
 
     if (isDelayed) {
       statusPillClass = 'status-delayed';
       statusPillText = `${delayAbs}m Late`;
       todayLiveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      todayLiveSub = `${delayAbs}m Late`;
+      todayLiveSub = `${delayAbs}m Behind`;
+      todayLiveBoxClass = 'box-late';
     } else if (isEarly) {
-      statusPillClass = 'status-early';
+      statusPillClass = 'status-ontime';
       statusPillText = `${delayAbs}m Early`;
       todayLiveHhMm = formatDelayHhMm(data.delayMinutes, false);
-      todayLiveSub = `${delayAbs}m Early`;
+      todayLiveSub = `${delayAbs}m Ahead`;
+      todayLiveBoxClass = 'box-ontime';
+    } else {
+      statusPillClass = 'status-ontime';
+      statusPillText = 'On Time';
+      todayLiveHhMm = '00:00';
+      todayLiveSub = 'On Schedule';
+      todayLiveBoxClass = 'box-ontime';
     }
 
     // Historical analytics metrics
@@ -94,20 +101,20 @@ export class PopoverComponent {
         </span>
       </div>
 
-      <!-- 3-Metric Analytics Grid -->
+      <!-- 3-Metric Analytics Grid: Red if Late, Green if On-Time, Mature Slate for Rest -->
       <div class="rail-popover-stats-grid">
-        <!-- Box 1: Today Live -->
-        <div class="rail-stat-box box-today-live">
+        <!-- Box 1: Live Status (Dynamic Late=Red / On-Time=Green) -->
+        <div class="rail-stat-box ${todayLiveBoxClass}">
           <div class="rail-stat-label">
             ${radioIcon({ size: 9, className: 'stat-icon-svg' })}
-            Today Live
+            Live Status
           </div>
           <div class="rail-stat-value">${todayLiveHhMm}</div>
           <div class="rail-stat-sub">${todayLiveSub}</div>
         </div>
 
-        <!-- Box 2: Today Avg (Last 4 Weeks) -->
-        <div class="rail-stat-box box-today-avg">
+        <!-- Box 2: 4-Wk Typical Run (Mature Neutral Slate) -->
+        <div class="rail-stat-box box-neutral">
           <div class="rail-stat-label">
             ${barChartIcon({ size: 9, className: 'stat-icon-svg' })}
             4-Wk Avg
@@ -116,27 +123,15 @@ export class PopoverComponent {
           <div class="rail-stat-sub">Typical Run</div>
         </div>
 
-        <!-- Box 3: 30-Day Avg -->
-        <div class="rail-stat-box box-month-avg">
+        <!-- Box 3: Reliability & Punctuality Rate (Mature Neutral Slate) -->
+        <div class="rail-stat-box box-neutral">
           <div class="rail-stat-label">
             ${trendingUpIcon({ size: 9, className: 'stat-icon-svg' })}
-            Reliability
+            Punctuality
           </div>
           <div class="rail-stat-value">${stats.punctualityRatePercent}%</div>
-          <div class="rail-stat-sub">${monthAvgHhMm} 30-Day Avg</div>
+          <div class="rail-stat-sub">${stats.historicalRunsAnalyzed} Runs Analyzed</div>
         </div>
-      </div>
-
-      <!-- Historical Insight Pills -->
-      <div class="rail-popover-insights">
-        <span class="rail-insight-pill">
-          ${zapIcon({ size: 10, className: 'svg-icon-inline' })}
-          ${stats.punctualityRatePercent}% Punctuality
-        </span>
-        <span class="rail-insight-pill">
-          ${clockIcon({ size: 10, className: 'svg-icon-inline' })}
-          ${stats.historicalRunsAnalyzed} Runs Analyzed
-        </span>
       </div>
 
       <!-- Legal & Anti-Abuse Notice -->

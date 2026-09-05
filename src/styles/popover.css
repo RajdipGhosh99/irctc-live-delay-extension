@@ -173,25 +173,59 @@
   text-overflow: ellipsis !important;
 }
 
-/* Insights */
-.rail-popover-insights {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 4px !important;
-  margin-bottom: 9px !important;
+/* Stats Box Color Schemes */
+/* 1. Late: Distinct bold red tone */
+.rail-stat-box.box-late {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
 }
 
-.rail-insight-pill {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  color: #475569 !important;
+.rail-stat-box.box-late .rail-stat-label {
+  color: #b91c1c !important;
+}
+
+.rail-stat-box.box-late .rail-stat-value {
+  color: #dc2626 !important;
+}
+
+.rail-stat-box.box-late .rail-stat-sub {
+  color: #b91c1c !important;
+}
+
+/* 2. On-Time / Correct: Clear crisp green tone */
+.rail-stat-box.box-ontime {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.rail-stat-box.box-ontime .rail-stat-label {
+  color: #15803d !important;
+}
+
+.rail-stat-box.box-ontime .rail-stat-value {
+  color: #16a34a !important;
+}
+
+.rail-stat-box.box-ontime .rail-stat-sub {
+  color: #15803d !important;
+}
+
+/* 3. Mature Slate / Neutral for Historical Analytics & Baseline Metrics */
+.rail-stat-box.box-neutral {
   background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 6px !important;
-  padding: 2px 6px !important;
+  border-color: #e2e8f0 !important;
+}
+
+.rail-stat-box.box-neutral .rail-stat-label {
+  color: #64748b !important;
+}
+
+.rail-stat-box.box-neutral .rail-stat-value {
+  color: #0f172a !important;
+}
+
+.rail-stat-box.box-neutral .rail-stat-sub {
+  color: #64748b !important;
 }
 
 /* Disclaimer */
