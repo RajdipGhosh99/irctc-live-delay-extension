@@ -64,7 +64,7 @@ export class FloatingHudComponent {
           </button>
         </div>
         <div class="rail-hud-disclaimer">
-          <span>⚠️ Unofficial • Personal Fair Use Only</span>
+          <span>⚠️ Personal Fair Use Only</span>
         </div>
       </div>
     `;

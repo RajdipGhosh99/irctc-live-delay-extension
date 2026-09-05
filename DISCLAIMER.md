@@ -20,11 +20,11 @@ The maintainers reserve the right to implement technical safeguards or revoke so
 
 ---
 
-## 2. 🏛️ Independent & Unofficial Project (No Affiliation)
+## 2. 🏛️ Independent Open-Source Project (No Affiliation)
 
 - **Live Train Delay Tracker** is an independent, non-commercial open-source project.
-- It is **NOT affiliated with, associated with, authorized by, endorsed by, or in any way officially connected with** Indian Railways, IRCTC (Indian Railway Catering and Tourism Corporation), CRIS (Centre for Railway Information Systems), the Ministry of Railways (Government of India), or any private booking portal (such as ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, EaseMyTrip, or Paytm).
-- All railway brand names, station codes, train numbers, and portal trademarks mentioned in the codebase or documentation are used solely for descriptive identification and compatibility purposes under **Fair Use** doctrines.
+- It is **NOT affiliated with, associated with, authorized by, endorsed by, or connected with** any private booking portal (such as ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, EaseMyTrip, or Paytm).
+- All brand names, station codes, train numbers, and portal trademarks mentioned in the codebase or documentation are used solely for descriptive identification and compatibility purposes under **Fair Use** doctrines.
 
 ---
 

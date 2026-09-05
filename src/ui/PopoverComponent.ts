@@ -111,7 +111,7 @@ export class PopoverComponent {
 
       <!-- Legal & Anti-Abuse Notice -->
       <div class="rail-popover-disclaimer">
-        <span>⚠️ Unofficial estimate for personal use. Anti-scraping policy applies. Verify at station.</span>
+        <span>⚠️ Personal Fair Use Only. Anti-scraping policy applies. Verify at station.</span>
       </div>
 
       <!-- Action Footer -->
