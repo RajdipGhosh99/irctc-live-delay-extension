@@ -1,21 +1,17 @@
 /**
- * Options Dashboard Script (Manifest V3) - ISO/IEC 25010 & ISO 9241-171 Standardized Edition
- * Features:
- * 1. Multi-Token Pool Manager with Instant Testing & Quota Calculation.
- * 2. ISO/IEC 27001 Security: Safe input sanitization, zero plaintext key exposure.
- * 3. ISO 9241-171 Accessibility: Keyboard focus traps, Esc key modal dismissal, full ARIA roles.
- * 4. ISO 8601: Complete ISO timestamp tracking across token health metrics and cache records.
- * 5. Per-Site Configurable Positioning and Responsive layout.
+ * Options Dashboard Script for Live Train Delay Tracker
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
-import { ProviderId, ExtensionMessage, MultiProviderSettings, BadgePosition } from '../types';
-import { maskIsoCredential, sanitizeIsoString } from '../utils/iso-utils';
+import { PROVIDER_METADATA_MAP } from '../core/constants';
+import { loadSettings, saveSettings } from '../core/storage';
+import { ApiKeyItem, BadgePosition, MultiProviderSettings, ProviderId } from '../core/types';
+import { maskIsoCredential, sanitizeHtml } from '../core/utils';
 
 const SUPPORTED_SITES = [
-  { name: 'MakeMyTrip', host: 'makemytrip.com', note: 'Ample horizontal room beside train name' },
   { name: 'ConfirmTkt', host: 'confirmtkt.com', note: 'Clean train card header' },
-  { name: 'IRCTC', host: 'irctc.co.in', note: 'Official Indian Railways portal' },
+  { name: 'MakeMyTrip', host: 'makemytrip.com', note: 'Ample horizontal room beside train name' },
+  { name: 'IRCTC', host: 'irctc.co.in', note: 'Public booking portal' },
   { name: 'ClearTrip', host: 'cleartrip.com', note: 'Train listing row' },
   { name: 'Ixigo Trains', host: 'ixigo.com', note: 'Train search card' },
   { name: 'Goibibo Trains', host: 'goibibo.com', note: 'Train listing' },
@@ -25,55 +21,29 @@ const SUPPORTED_SITES = [
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elements
-  const masterSwitch = document.getElementById('master-switch') as HTMLInputElement;
-  const sitesGrid = document.getElementById('sites-grid') as HTMLElement;
+  const masterEnableSwitch = document.getElementById('master-enable-switch') as HTMLInputElement;
+  const floatingHudSwitch = document.getElementById('floating-hud-switch') as HTMLInputElement;
+  const sitesContainer = document.getElementById('sites-container') as HTMLElement;
   const primaryProviderSelect = document.getElementById('primary-provider-select') as HTMLSelectElement;
   const autoFailoverSwitch = document.getElementById('auto-failover-switch') as HTMLInputElement;
   const autoFetchAllSwitch = document.getElementById('auto-fetch-all-switch') as HTMLInputElement;
   const cacheTtlSelect = document.getElementById('cache-ttl-select') as HTMLSelectElement;
-  const showHudSwitch = document.getElementById('show-hud-switch') as HTMLInputElement;
-  const saveAllBtn = document.getElementById('save-all-btn') as HTMLButtonElement;
-  const toastMessage = document.getElementById('toast-message') as HTMLElement;
-  const cacheRecordsCount = document.getElementById('cache-records-count') as HTMLElement;
-  const clearCacheBtn = document.getElementById('clear-cache-btn') as HTMLButtonElement;
   const totalQuotaBadge = document.getElementById('total-quota-badge') as HTMLElement;
   const providerPoolsContainer = document.getElementById('provider-pools-container') as HTMLElement;
-
-  // Mobile Menu
+  const clearAllCacheBtn = document.getElementById('clear-all-cache-btn') as HTMLButtonElement;
+  const saveBanner = document.getElementById('save-banner') as HTMLElement;
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle') as HTMLButtonElement;
   const optionsSidebar = document.getElementById('options-sidebar') as HTMLElement;
 
-  // Modal Elements
-  const testModal = document.getElementById('test-modal') as HTMLElement;
-  const modalProviderName = document.getElementById('modal-provider-name') as HTMLElement;
-  const modalTokenLabel = document.getElementById('modal-token-label') as HTMLElement;
-  const modalTokenMasked = document.getElementById('modal-token-masked') as HTMLElement;
-  const modalStatusBox = document.getElementById('modal-status-box') as HTMLElement;
-  const modalStatusIndicator = document.getElementById('modal-status-indicator') as HTMLElement;
-  const modalStatusMessage = document.getElementById('modal-status-message') as HTMLElement;
-  const modalCancelBtn = document.getElementById('modal-cancel-btn') as HTMLButtonElement;
-  const modalSkipTestBtn = document.getElementById('modal-skip-test-btn') as HTMLButtonElement;
-  const modalTestAddBtn = document.getElementById('modal-test-add-btn') as HTMLButtonElement;
+  let currentSettings: MultiProviderSettings = await loadSettings();
 
-  let loadedSettings: MultiProviderSettings | null = null;
-  let catalog: Record<string, any> = {};
-
-  let pendingToken: {
-    providerId: ProviderId;
-    key: string;
-    label: string;
-    inputElement: HTMLInputElement;
-    labelElement: HTMLInputElement;
-  } | null = null;
-
-  function showToast(message: string, isError = false) {
-    toastMessage.textContent = message;
-    toastMessage.className = `toast ${isError ? 'error' : 'success'}`;
-    toastMessage.setAttribute('aria-live', 'assertive');
+  function showSaveBanner(msg = '✓ Settings saved successfully') {
+    if (!saveBanner) return;
+    saveBanner.textContent = msg;
+    saveBanner.classList.add('visible');
     setTimeout(() => {
-      toastMessage.className = 'toast hidden';
-    }, 4500);
+      saveBanner.classList.remove('visible');
+    }, 2400);
   }
 
   mobileMenuToggle?.addEventListener('click', () => {
@@ -98,49 +68,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // ISO/IEC 25010 Token Format Validation Checker
-  function validateTokenFormat(providerId: ProviderId, key: string): { valid: boolean; error?: string; cleanKey: string } {
-    const cleanKey = key.trim().replace(/^["']|["']$/g, '');
+  function renderUI() {
+    masterEnableSwitch.checked = currentSettings.extensionEnabled !== false;
+    floatingHudSwitch.checked = currentSettings.showFloatingHUD !== false;
+    primaryProviderSelect.value = currentSettings.activeProvider || 'direct-rail-gateway';
+    autoFailoverSwitch.checked = currentSettings.autoFailover !== false;
+    autoFetchAllSwitch.checked = Boolean(currentSettings.autoFetchAllTrains);
+    cacheTtlSelect.value = String(currentSettings.cacheTtlMinutes || 15);
 
-    if (!cleanKey) {
-      return { valid: false, error: 'Token string cannot be empty.', cleanKey };
-    }
-
-    if (cleanKey.toLowerCase().includes('your_api_key') || cleanKey.toLowerCase().includes('paste_key')) {
-      return { valid: false, error: 'Please replace placeholder with your actual API token.', cleanKey };
-    }
-
-    if (providerId === 'rapidapi-irctc1' || providerId === 'rapidapi-indianrail') {
-      if (cleanKey.length < 25) {
-        return { valid: false, error: 'RapidAPI keys are typically 40-60 characters long.', cleanKey };
-      }
-      if (!/^[a-zA-Z0-9_\-]+$/.test(cleanKey)) {
-        return { valid: false, error: 'RapidAPI token contains invalid special characters.', cleanKey };
-      }
-    } else if (providerId === 'indianrailapi') {
-      if (cleanKey.length < 15) {
-        return { valid: false, error: 'IndianRailAPI token is too short (at least 15 characters).', cleanKey };
-      }
-    }
-
-    return { valid: true, cleanKey };
+    renderSitesGrid();
+    renderProviderPools();
   }
 
-  function renderSitesGrid(disabledSites: string[], sitePositions: Record<string, BadgePosition> = {}) {
-    sitesGrid.innerHTML = '';
-    const disabledSet = new Set(disabledSites.map((s) => s.toLowerCase()));
+  function renderSitesGrid() {
+    if (!sitesContainer) return;
+    sitesContainer.innerHTML = '';
+
+    const disabledSet = new Set((currentSettings.disabledSites || []).map((s) => s.toLowerCase()));
+    const positions = currentSettings.sitePositions || {};
 
     SUPPORTED_SITES.forEach((site) => {
       const isEnabled = !disabledSet.has(site.host.toLowerCase());
-      const currentPos = sitePositions[site.host.toLowerCase()] || 'beside-name';
+      const currentPos = positions[site.host.toLowerCase()] || 'beside-name';
 
       const card = document.createElement('div');
       card.className = 'site-config-card';
       card.innerHTML = `
         <div class="site-card-top">
           <div class="site-name-group">
-            <strong>${sanitizeIsoString(site.name)}</strong>
-            <span class="site-host-sub">${sanitizeIsoString(site.host)}</span>
+            <strong>${sanitizeHtml(site.name)}</strong>
+            <span class="site-host-sub">${sanitizeHtml(site.host)}</span>
           </div>
           <label class="switch">
             <input type="checkbox" class="site-toggle" data-host="${site.host}" ${isEnabled ? 'checked' : ''} aria-label="Toggle ${site.name}" />
@@ -150,468 +107,228 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="site-position-row">
           <label for="pos-${site.host}">Badge Position:</label>
-          <select id="pos-${site.host}" class="site-pos-select" data-host="${site.host}" aria-label="Badge Position for ${site.name}">
+          <select id="pos-${site.host}" class="site-pos-select" data-host="${site.host}">
             <option value="beside-name" ${currentPos === 'beside-name' ? 'selected' : ''}>📍 Beside Train Name (Inline Right)</option>
-            <option value="card-header-right" ${currentPos === 'card-header-right' ? 'selected' : ''}>↗ Top-Right of Train Card</option>
+            <option value="card-header-right" ${currentPos === 'card-header-right' ? 'selected' : ''}>↗ Top-Right of Card</option>
             <option value="below-name" ${currentPos === 'below-name' ? 'selected' : ''}>⬇ Below Train Name</option>
           </select>
         </div>
       `;
-      sitesGrid.appendChild(card);
+      sitesContainer.appendChild(card);
     });
 
-    // Instant auto-save on portal toggle
-    sitesGrid.querySelectorAll<HTMLInputElement>('.site-toggle').forEach((toggle) => {
+    sitesContainer.querySelectorAll<HTMLInputElement>('.site-toggle').forEach((toggle) => {
       toggle.addEventListener('change', () => {
         const host = toggle.getAttribute('data-host') || '';
         const enabled = toggle.checked;
-        saveCurrentSettings(true, `Portal "${host}" ${enabled ? 'Enabled ✅' : 'Disabled ⏸'}`);
+        currentSettings.disabledSites = currentSettings.disabledSites || [];
+        const idx = currentSettings.disabledSites.indexOf(host);
+
+        if (enabled && idx >= 0) {
+          currentSettings.disabledSites.splice(idx, 1);
+        } else if (!enabled && idx < 0) {
+          currentSettings.disabledSites.push(host);
+        }
+
+        saveSettings(currentSettings);
+        showSaveBanner(`Portal "${host}" ${enabled ? 'Enabled' : 'Disabled'}`);
       });
     });
 
-    // Instant auto-save on position change
-    sitesGrid.querySelectorAll<HTMLSelectElement>('.site-pos-select').forEach((select) => {
+    sitesContainer.querySelectorAll<HTMLSelectElement>('.site-pos-select').forEach((select) => {
       select.addEventListener('change', () => {
         const host = select.getAttribute('data-host') || '';
-        const pos = select.value;
-        const posLabel = pos === 'beside-name' ? 'Beside Train Name' : pos === 'card-header-right' ? 'Top-Right of Card' : 'Below Train Name';
-        saveCurrentSettings(true, `📍 ${host} position set to: ${posLabel}`);
+        currentSettings.sitePositions = currentSettings.sitePositions || {};
+        currentSettings.sitePositions[host] = select.value as BadgePosition;
+        saveSettings(currentSettings);
+        showSaveBanner(`Position for ${host} updated`);
       });
     });
   }
 
-  function renderProviderPools(providers: Record<string, any>) {
+  function renderProviderPools() {
+    if (!providerPoolsContainer) return;
     providerPoolsContainer.innerHTML = '';
 
-    let totalActiveKeys = 0;
-    let totalEstimatedCalls = 0;
-    let totalInvalidKeys = 0;
+    const providerOrder: ProviderId[] = [
+      'direct-rail-gateway',
+      'rapidapi-rail-v1',
+      'rapidapi-rail-v2',
+      'indianrailapi',
+      'custom-webhook',
+    ];
 
-    const providerOrder: ProviderId[] = ['rapidapi-irctc1', 'rapidapi-indianrail', 'indianrailapi', 'irctc-official', 'custom'];
+    let totalTokens = 0;
 
     providerOrder.forEach((pid) => {
-      const conf = providers[pid] || { keys: [] };
-      const meta = catalog[pid] || {
-        name: pid,
-        freeTierLimit: 'Free tier available',
-        perTokenQuota: 500,
-        signupUrl: '',
-        requiresKey: true,
-      };
+      const meta = PROVIDER_METADATA_MAP[pid];
+      const conf = currentSettings.providers[pid] || { enabled: true, keys: [] };
+      const keys = conf.keys || [];
+      totalTokens += keys.filter((k) => k.status === 'active').length;
 
-      const keys: any[] = conf.keys || [];
-      const activeKeys = keys.filter((k) => k.status === 'active');
-      const invalidKeys = keys.filter((k) => k.status === 'invalid' || k.status === 'rate-limited');
+      const card = document.createElement('div');
+      card.className = 'provider-pool-card';
 
-      totalActiveKeys += activeKeys.length;
-      totalEstimatedCalls += activeKeys.length * (meta.perTokenQuota || 500);
-      totalInvalidKeys += invalidKeys.length;
-
-      const poolCard = document.createElement('div');
-      poolCard.className = 'provider-pool-card';
-
-      if (pid === 'irctc-official') {
-        poolCard.innerHTML = `
+      if (!meta.requiresKey) {
+        card.innerHTML = `
           <div class="provider-pool-header">
             <div class="provider-title-group">
-              <strong>${sanitizeIsoString(meta.name)}</strong>
-              <span class="quota-pill" style="background: #f1f5f9; color: #475569;">Browser Session Dependent</span>
+              <strong>${sanitizeHtml(meta.name)}</strong>
+              <span class="quota-pill" style="background: #f0fdf4; color: #166534;">100% Free & Unlimited</span>
             </div>
-            <button type="button" class="btn btn-sm btn-secondary test-token-btn" data-provider="irctc-official">
-              ⚡ Test IRCTC Connection
-            </button>
+            <span style="font-size: 11.5px; color: #16a34a; font-weight: 700;">● Active</span>
           </div>
           <p style="font-size: 12px; color: #475569; margin: 6px 0 0 0;">
-            Directly queries irctc.co.in. Works best when you have an active IRCTC browsing tab open.
+            ${sanitizeHtml(meta.description)}
           </p>
         `;
-        providerPoolsContainer.appendChild(poolCard);
+        providerPoolsContainer.appendChild(card);
         return;
       }
 
       const keysHtml = keys.length === 0
-        ? `<div class="no-tokens-msg">No tokens in this pool yet. Add your first token below!</div>`
-        : keys
-            .map((k) => {
-              const statusClass = k.status === 'active' ? 'active' : k.status === 'rate-limited' ? 'rate-limited' : 'invalid';
-              const statusText = k.status === 'active' ? 'Active 🟢' : k.status === 'rate-limited' ? 'Rate-Limited ⏳' : 'Invalid ❌';
-              return `
-                <div class="token-row">
-                  <div class="token-info">
-                    <span class="token-label">${sanitizeIsoString(k.label || 'Token')}</span>
-                    <span class="token-key-mask">${k.maskedKey || maskIsoCredential(k.key)}</span>
-                    <span class="token-badge ${statusClass}">${statusText}</span>
-                  </div>
-                  <div class="token-actions">
-                    <span class="token-req-count">${k.requestCount || 0} reqs</span>
-                    <button type="button" class="btn btn-sm btn-secondary test-token-btn" data-provider="${pid}" data-token-id="${k.id}">
-                      ⚡ Test
-                    </button>
-                    <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" title="Remove Token" aria-label="Remove Token ${k.label || ''}">
-                      🗑 Remove
-                    </button>
-                  </div>
-                </div>
-              `;
-            })
-            .join('');
+        ? `<div class="no-tokens-msg" style="font-size: 12px; color: #64748b; padding: 6px 0;">No tokens added yet. Add a token below to activate this provider.</div>`
+        : keys.map((k) => `
+          <div class="token-row" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 5px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 11.5px; font-weight: 600;">${sanitizeHtml(k.label || 'Token')}</span>
+              <code style="font-size: 11px; color: #334155;">${maskIsoCredential(k.key)}</code>
+              <span style="font-size: 10px; padding: 2px 6px; border-radius: 9999px; background: ${k.status === 'active' ? '#dcfce7; color: #166534;' : '#fee2e2; color: #991b1b;'}">${k.status}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 10.5px; color: #64748b;">${k.requestCount || 0} calls</span>
+              <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 13px;">🗑</button>
+            </div>
+          </div>
+        `).join('');
 
-      poolCard.innerHTML = `
-        <div class="provider-pool-header">
+      card.innerHTML = `
+        <div class="provider-pool-header" style="display: flex; justify-content: space-between; align-items: center;">
           <div class="provider-title-group">
-            <strong>${sanitizeIsoString(meta.name)}</strong>
-            <span class="quota-pill">${sanitizeIsoString(meta.freeTierLimit)}</span>
+            <strong>${sanitizeHtml(meta.name)}</strong>
+            <span class="quota-pill" style="font-size: 10.5px; background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 9999px; margin-left: 6px;">${meta.freeTierLimit}</span>
           </div>
-          ${meta.signupUrl ? `<a href="${meta.signupUrl}" target="_blank" rel="noopener noreferrer" class="link-btn">Get Free Token ↗</a>` : ''}
         </div>
+        <p style="font-size: 12px; color: #475569; margin: 6px 0 10px 0;">${sanitizeHtml(meta.description)}</p>
 
-        ${pid === 'custom' ? `
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="custom-endpoint-url">Custom Reverse Proxy Endpoint URL:</label>
-            <input type="text" id="custom-endpoint-url" class="form-control" placeholder="http://localhost:3000/api/train-delay" value="${sanitizeIsoString(conf.apiEndpoint || '')}" />
-          </div>
-        ` : ''}
-
-        <div class="tokens-list">
+        <div class="token-list" id="tokens-${pid}">
           ${keysHtml}
         </div>
 
-        <div class="add-token-box">
-          <div class="add-token-box-title">➕ Add Another Token to this Pool (Multiply Quota):</div>
-          <div class="add-token-inputs">
-            <input type="password" class="input-token-key" id="new-key-${pid}" placeholder="Paste API Key / Token" autocomplete="off" aria-label="New API Key for ${meta.name}" />
-            <input type="text" class="input-token-label" id="new-label-${pid}" placeholder="Label (e.g. Account #${keys.length + 1})" aria-label="Label for Token" />
-            <button type="button" class="btn btn-primary btn-sm add-token-btn" data-provider="${pid}" aria-label="Add token to ${meta.name}">
-              ➕ Add Token
-            </button>
-          </div>
-          <div class="input-validation-msg" id="val-msg-${pid}"></div>
+        <div class="add-token-form" style="display: flex; gap: 6px; margin-top: 8px;">
+          <input type="text" id="label-input-${pid}" placeholder="Token Label (e.g. Personal)" style="flex: 1; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
+          <input type="password" id="key-input-${pid}" placeholder="Paste API Key / Token" style="flex: 2; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
+          <button type="button" class="btn-add-token" data-provider="${pid}" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">
+            + Add Key
+          </button>
         </div>
       `;
 
-      providerPoolsContainer.appendChild(poolCard);
+      providerPoolsContainer.appendChild(card);
     });
 
-    if (totalInvalidKeys > 0) {
-      totalQuotaBadge.innerHTML = `🔥 <strong>${totalActiveKeys} Active</strong> Tokens (~${totalEstimatedCalls.toLocaleString()} calls) <span class="badge-excluded">(${totalInvalidKeys} invalid/cooldown excluded)</span>`;
-    } else {
-      totalQuotaBadge.innerHTML = `🔥 <strong>${totalActiveKeys} Active</strong> Tokens — Total Capacity: <strong>~${totalEstimatedCalls.toLocaleString()} calls/mo</strong>`;
+    if (totalQuotaBadge) {
+      totalQuotaBadge.textContent = `⚡ Total Pool: ${totalTokens} Active Tokens`;
     }
 
-    attachPoolEventListeners();
-  }
-
-  function attachPoolEventListeners() {
-    document.querySelectorAll<HTMLButtonElement>('.add-token-btn').forEach((btn) => {
+    // Attach token add listeners
+    providerPoolsContainer.querySelectorAll<HTMLButtonElement>('.btn-add-token').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const providerId = btn.getAttribute('data-provider') as ProviderId;
-        const keyInput = document.getElementById(`new-key-${providerId}`) as HTMLInputElement;
-        const labelInput = document.getElementById(`new-label-${providerId}`) as HTMLInputElement;
-        const valMsg = document.getElementById(`val-msg-${providerId}`) as HTMLElement;
+        const pid = btn.getAttribute('data-provider') as ProviderId;
+        const keyInput = document.getElementById(`key-input-${pid}`) as HTMLInputElement;
+        const labelInput = document.getElementById(`label-input-${pid}`) as HTMLInputElement;
 
-        const rawKey = keyInput?.value || '';
-        const label = labelInput?.value.trim() || `Account Token`;
+        const rawKey = keyInput?.value?.trim();
+        const label = labelInput?.value?.trim() || `Token ${(currentSettings.providers[pid]?.keys?.length || 0) + 1}`;
 
-        const validation = validateTokenFormat(providerId, rawKey);
-        if (!validation.valid) {
-          if (valMsg) {
-            valMsg.textContent = `❌ ${validation.error}`;
-            valMsg.className = 'input-validation-msg error';
-          }
-          showToast(validation.error || 'Invalid token format', true);
-          return;
-        }
+        if (!rawKey) return;
 
-        if (valMsg) {
-          valMsg.textContent = '✅ Format looks good';
-          valMsg.className = 'input-validation-msg success';
-        }
-
-        pendingToken = {
-          providerId,
-          key: validation.cleanKey,
+        const newItem: ApiKeyItem = {
+          id: `token-${Date.now()}`,
+          key: rawKey,
           label,
-          inputElement: keyInput,
-          labelElement: labelInput,
+          status: 'active',
+          requestCount: 0,
         };
 
-        const providerMeta = catalog[providerId] || { name: providerId };
-        modalProviderName.textContent = providerMeta.name;
-        modalTokenLabel.textContent = label;
-        modalTokenMasked.textContent = maskIsoCredential(validation.cleanKey);
+        currentSettings.providers[pid] = currentSettings.providers[pid] || { enabled: true, keys: [] };
+        currentSettings.providers[pid].keys = currentSettings.providers[pid].keys || [];
+        currentSettings.providers[pid].keys.push(newItem);
 
-        modalStatusBox.className = 'modal-status-box hidden';
-        modalTestAddBtn.disabled = false;
-        modalTestAddBtn.innerHTML = '⚡ Yes, Test & Add';
-        modalSkipTestBtn.disabled = false;
+        keyInput.value = '';
+        if (labelInput) labelInput.value = '';
 
-        testModal.classList.remove('hidden');
-        modalTestAddBtn.focus();
+        saveSettings(currentSettings);
+        showSaveBanner(`Token added to ${PROVIDER_METADATA_MAP[pid]?.name || pid}`);
+        renderProviderPools();
       });
     });
 
-    document.querySelectorAll<HTMLButtonElement>('.btn-remove-token').forEach((btn) => {
+    // Attach token delete listeners
+    providerPoolsContainer.querySelectorAll<HTMLButtonElement>('.btn-remove-token').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const providerId = btn.getAttribute('data-provider') as ProviderId;
-        const keyId = btn.getAttribute('data-token-id');
-        if (!providerId || !keyId) return;
+        const pid = btn.getAttribute('data-provider') as ProviderId;
+        const tokenId = btn.getAttribute('data-token-id');
+        if (!pid || !tokenId) return;
 
-        chrome.runtime.sendMessage(
-          {
-            type: 'REMOVE_PROVIDER_KEY',
-            payload: { providerId, keyId },
-          } as ExtensionMessage,
-          (res) => {
-            if (res?.success) {
-              showToast('🗑 Token removed from pool.');
-              loadData();
-            }
-          }
-        );
-      });
-    });
+        const keys = currentSettings.providers[pid]?.keys || [];
+        currentSettings.providers[pid].keys = keys.filter((k) => k.id !== tokenId);
 
-    document.querySelectorAll<HTMLButtonElement>('.test-token-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const providerId = btn.getAttribute('data-provider') as ProviderId;
-        if (!providerId) return;
-
-        btn.disabled = true;
-        btn.textContent = 'Testing...';
-
-        chrome.runtime.sendMessage(
-          {
-            type: 'TEST_PROVIDER',
-            payload: { providerId },
-          } as ExtensionMessage,
-          (res) => {
-            btn.disabled = false;
-            btn.textContent = '⚡ Test';
-            if (res?.success) {
-              showToast(`✅ ${res.message}`);
-              loadData();
-            } else {
-              showToast(`❌ ${res?.error || 'Connection failed'}`, true);
-            }
-          }
-        );
+        saveSettings(currentSettings);
+        showSaveBanner('Token removed');
+        renderProviderPools();
       });
     });
   }
 
-  // Keyboard accessibility: Close modal on Escape
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !testModal.classList.contains('hidden')) {
-      testModal.classList.add('hidden');
-      pendingToken = null;
-    }
+  // Master Switch Change
+  masterEnableSwitch.addEventListener('change', () => {
+    currentSettings.extensionEnabled = masterEnableSwitch.checked;
+    saveSettings(currentSettings);
+    showSaveBanner(`Extension ${masterEnableSwitch.checked ? 'Enabled Globally' : 'Paused'}`);
   });
 
-  modalCancelBtn.addEventListener('click', () => {
-    testModal.classList.add('hidden');
-    pendingToken = null;
+  // Floating HUD Switch Change
+  floatingHudSwitch.addEventListener('change', () => {
+    currentSettings.showFloatingHUD = floatingHudSwitch.checked;
+    saveSettings(currentSettings);
+    showSaveBanner(`Floating HUD ${floatingHudSwitch.checked ? 'Enabled' : 'Disabled'}`);
   });
 
-  modalSkipTestBtn.addEventListener('click', () => {
-    if (!pendingToken) return;
-    const { providerId, key, label, inputElement, labelElement } = pendingToken;
-
-    modalSkipTestBtn.disabled = true;
-    chrome.runtime.sendMessage(
-      {
-        type: 'ADD_PROVIDER_KEY',
-        payload: { providerId, key, label, status: 'active' },
-      } as ExtensionMessage,
-      (res) => {
-        testModal.classList.add('hidden');
-        if (res?.success) {
-          showToast('✅ Token added to pool successfully!');
-          inputElement.value = '';
-          labelElement.value = '';
-          loadData();
-        } else {
-          showToast(`❌ ${res?.error || 'Failed to add token'}`, true);
-        }
-        pendingToken = null;
-      }
-    );
-  });
-
-  modalTestAddBtn.addEventListener('click', () => {
-    if (!pendingToken) return;
-    const { providerId, key, label, inputElement, labelElement } = pendingToken;
-
-    modalTestAddBtn.disabled = true;
-    modalSkipTestBtn.disabled = true;
-    modalTestAddBtn.innerHTML = '<span class="spinner-sm"></span> Testing API...';
-
-    modalStatusBox.className = 'modal-status-box testing';
-    modalStatusIndicator.className = 'modal-status-indicator testing';
-    modalStatusMessage.textContent = 'Querying live status of Train #12002 to verify credentials...';
-
-    chrome.runtime.sendMessage(
-      {
-        type: 'TEST_PROVIDER',
-        payload: { providerId, keyToTest: key },
-      } as ExtensionMessage,
-      (testRes) => {
-        if (testRes?.success) {
-          modalStatusBox.className = 'modal-status-box success';
-          modalStatusIndicator.className = 'modal-status-indicator success';
-          modalStatusMessage.textContent = `✅ Verified! (Latency: ${testRes.latencyMs || 150}ms)`;
-
-          chrome.runtime.sendMessage(
-            {
-              type: 'ADD_PROVIDER_KEY',
-              payload: { providerId, key, label, status: 'active' },
-            } as ExtensionMessage,
-            (addRes) => {
-              setTimeout(() => {
-                testModal.classList.add('hidden');
-                if (addRes?.success) {
-                  showToast('🎉 Token verified and added! Pool capacity increased.');
-                  inputElement.value = '';
-                  labelElement.value = '';
-                  loadData();
-                }
-                pendingToken = null;
-              }, 1200);
-            }
-          );
-        } else {
-          modalTestAddBtn.disabled = false;
-          modalSkipTestBtn.disabled = false;
-          modalTestAddBtn.innerHTML = '⚡ Retry Test';
-
-          modalStatusBox.className = 'modal-status-box error';
-          modalStatusIndicator.className = 'modal-status-indicator error';
-          modalStatusMessage.textContent = `❌ Test Failed: ${testRes?.error || 'Authentication error'}. Pool capacity NOT increased.`;
-          showToast(`❌ Token verification failed: ${testRes?.error || 'Invalid Key'}`, true);
-        }
-      }
-    );
-  });
-
-  async function loadData() {
-    chrome.runtime.sendMessage({ type: 'GET_SETTINGS' } as ExtensionMessage, (res) => {
-      if (res?.success && res.data) {
-        loadedSettings = res.data;
-        catalog = res.data.catalog || {};
-        populateForm(res.data);
-      }
-    });
-
-    chrome.runtime.sendMessage({ type: 'GET_CACHE_STATS' } as ExtensionMessage, (res) => {
-      if (res?.success) {
-        cacheRecordsCount.textContent = `${res.count} records (${res.formattedSize} / 150 MB)`;
-      } else {
-        chrome.storage.local.get(null, (all) => {
-          const keys = Object.keys(all).filter((k) => k.startsWith('train_delay_cache_') || k.startsWith('irctc_delay_'));
-          cacheRecordsCount.textContent = `${keys.length} records`;
-        });
-      }
-    });
-  }
-
-  function populateForm(settings: any) {
-    masterSwitch.checked = settings.extensionEnabled !== false;
-    primaryProviderSelect.value = settings.activeProvider || 'rapidapi-irctc1';
-    autoFailoverSwitch.checked = settings.autoFailover !== false;
-    if (autoFetchAllSwitch) autoFetchAllSwitch.checked = settings.autoFetchAllTrains === true;
-    cacheTtlSelect.value = `${settings.cacheTtlMinutes || 15}`;
-    showHudSwitch.checked = settings.showFloatingHUD !== false;
-
-    renderSitesGrid(settings.disabledSites || [], settings.sitePositions || {});
-    renderProviderPools(settings.providers || {});
-  }
-
-  function saveCurrentSettings(showToastMessage = true, customMsg?: string) {
-    const disabledSites: string[] = [];
-    document.querySelectorAll<HTMLInputElement>('.site-toggle').forEach((cb) => {
-      const host = cb.getAttribute('data-host');
-      if (host && !cb.checked) {
-        disabledSites.push(host.toLowerCase());
-      }
-    });
-
-    const sitePositions: Record<string, BadgePosition> = {};
-    document.querySelectorAll<HTMLSelectElement>('.site-pos-select').forEach((sel) => {
-      const host = sel.getAttribute('data-host');
-      if (host) {
-        sitePositions[host.toLowerCase()] = sel.value as BadgePosition;
-      }
-    });
-
-    const customUrlInput = document.getElementById('custom-endpoint-url') as HTMLInputElement | null;
-    const providerUpdates: Record<string, any> = {};
-    if (customUrlInput && customUrlInput.value.trim()) {
-      providerUpdates['custom'] = { apiEndpoint: customUrlInput.value.trim() };
-    }
-
-    const payload: Partial<MultiProviderSettings> = {
-      extensionEnabled: masterSwitch.checked,
-      disabledSites,
-      sitePositions,
-      activeProvider: primaryProviderSelect.value as ProviderId,
-      autoFailover: autoFailoverSwitch.checked,
-      autoFetchAllTrains: autoFetchAllSwitch ? autoFetchAllSwitch.checked : false,
-      fetchOnHover: false,
-      cacheTtlMinutes: parseInt(cacheTtlSelect.value, 10) || 15,
-      showFloatingHUD: showHudSwitch.checked,
-      providers: providerUpdates as any,
-    };
-
-    chrome.runtime.sendMessage({ type: 'SAVE_SETTINGS', payload } as ExtensionMessage, (res) => {
-      if (res?.success) {
-        if (showToastMessage) {
-          showToast(customMsg || '✅ Settings updated successfully!');
-        }
-      } else if (showToastMessage) {
-        showToast(`❌ ${res?.error || 'Failed to save settings'}`, true);
-      }
-    });
-  }
-
-  await loadData();
-
-  // Instant Auto-Save on form input changes
-  masterSwitch.addEventListener('change', () => {
-    saveCurrentSettings(true, `Extension ${masterSwitch.checked ? 'Enabled Globally ✅' : 'Disabled ⏸'}`);
-  });
+  // Primary Provider Select Change
   primaryProviderSelect.addEventListener('change', () => {
-    saveCurrentSettings(true, `Primary provider set to: ${primaryProviderSelect.options[primaryProviderSelect.selectedIndex].text}`);
+    currentSettings.activeProvider = primaryProviderSelect.value as ProviderId;
+    saveSettings(currentSettings);
+    showSaveBanner(`Primary provider set to: ${PROVIDER_METADATA_MAP[currentSettings.activeProvider]?.name || currentSettings.activeProvider}`);
   });
+
+  // Auto-Failover Switch Change
   autoFailoverSwitch.addEventListener('change', () => {
-    saveCurrentSettings(true, `Auto-Failover ${autoFailoverSwitch.checked ? 'Enabled' : 'Disabled'}`);
+    currentSettings.autoFailover = autoFailoverSwitch.checked;
+    saveSettings(currentSettings);
+    showSaveBanner('Failover setting saved');
   });
-  autoFetchAllSwitch?.addEventListener('change', () => {
-    saveCurrentSettings(true, `Auto-Fetch on Page Load ${autoFetchAllSwitch.checked ? 'Enabled ⚡' : 'Disabled (On-Demand)'}`);
+
+  // Auto-Fetch All Switch Change
+  autoFetchAllSwitch.addEventListener('change', () => {
+    currentSettings.autoFetchAllTrains = autoFetchAllSwitch.checked;
+    saveSettings(currentSettings);
+    showSaveBanner('Auto-fetch setting saved');
   });
+
+  // Cache TTL Change
   cacheTtlSelect.addEventListener('change', () => {
-    saveCurrentSettings(true, `Cache TTL set to ${cacheTtlSelect.value} minutes`);
-  });
-  showHudSwitch.addEventListener('change', () => {
-    saveCurrentSettings(true, `Floating HUD ${showHudSwitch.checked ? 'Enabled' : 'Hidden'}`);
-  });
-
-  saveAllBtn.addEventListener('click', () => {
-    saveAllBtn.disabled = true;
-    saveAllBtn.textContent = 'Saving...';
-    saveCurrentSettings(true, '✅ All settings, per-site badge positions, and token pools saved!');
-    setTimeout(() => {
-      saveAllBtn.disabled = false;
-      saveAllBtn.textContent = '💾 Save All Changes';
-    }, 1000);
+    currentSettings.cacheTtlMinutes = parseInt(cacheTtlSelect.value, 10) || 15;
+    saveSettings(currentSettings);
+    showSaveBanner(`Cache retention set to ${currentSettings.cacheTtlMinutes} minutes`);
   });
 
-  clearCacheBtn.addEventListener('click', () => {
-    clearCacheBtn.disabled = true;
-    chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' } as ExtensionMessage, (res) => {
-      clearCacheBtn.disabled = false;
-      if (res?.success) {
-        cacheRecordsCount.textContent = '0';
-        showToast('🗑 Local storage cache cleared successfully!');
-      }
+  // Clear All Cache
+  clearAllCacheBtn?.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
+      showSaveBanner('✓ All cached train delays cleared from memory');
     });
   });
+
+  renderUI();
 });

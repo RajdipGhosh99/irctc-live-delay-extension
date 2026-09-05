@@ -1,7 +1,7 @@
 {
-  "name": "irctc-live-delay-extension",
-  "version": "1.5.0",
-  "description": "High-performance, open-source real-time live train delay tracker across IRCTC, MakeMyTrip, ConfirmTkt, ClearTrip, Ixigo, Goibibo, and Paytm.",
+  "name": "live-train-delay-tracker",
+  "version": "2.0.0",
+  "description": "High-performance, open-source real-time live train delay tracker across ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.",
   "author": "Rajdip Ghosh <https://github.com/RajdipGhosh99>",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/RajdipGhosh99/irctc-live-delay-extension#readme",
@@ -13,10 +13,10 @@
     "url": "https://github.com/RajdipGhosh99/irctc-live-delay-extension/issues"
   },
   "keywords": [
-    "irctc",
-    "train-delay",
-    "live-running-status",
     "chrome-extension",
+    "train-delay-tracker",
+    "live-running-status",
+    "train-punctuality",
     "confirmtkt",
     "makemytrip",
     "cleartrip",
@@ -27,14 +27,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "package": "npm run build && cd dist && zip -r ../irctc-live-delay-tracker-v1.5.0.zip . && cd .."
+    "preview": "vite preview",
+    "package": "npm run build && cd dist && zip -r ../train-delay-tracker-v2.0.0.zip . && cd .."
   },
-  "dependencies": {
-    "rxjs": "^7.8.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.28",
     "typescript": "^5.2.2",
-    "vite": "^5.4.21"
+    "vite": "^5.0.0"
   }
 }

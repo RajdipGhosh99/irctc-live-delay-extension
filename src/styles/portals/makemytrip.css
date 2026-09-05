@@ -1,0 +1,9 @@
+/**
+ * MakeMyTrip Specific CSS Overrides
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+.rail-delay-wrapper.vendor-makemytrip {
+  margin-left: 10px !important;
+  vertical-align: middle !important;
+}

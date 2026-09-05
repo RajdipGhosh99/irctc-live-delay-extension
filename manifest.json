@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Live Train Delay Tracker",
-  "version": "1.5.0",
-  "description": "Real-time live train delay tracker & historical punctuality across IRCTC, ConfirmTkt, MakeMyTrip, ClearTrip & Ixigo.",
+  "version": "2.0.0",
+  "description": "Real-time live train delay tracker & historical punctuality across ConfirmTkt, MakeMyTrip, ClearTrip & Ixigo.",
   "homepage_url": "https://github.com/RajdipGhosh99",
   "icons": {
     "16": "icons/icon16.png",
@@ -17,12 +17,12 @@
     "tabs"
   ],
   "host_permissions": [
-    "*://www.irctc.co.in/*",
-    "*://irctc.co.in/*",
-    "*://*.makemytrip.com/*",
-    "*://makemytrip.com/*",
     "*://*.confirmtkt.com/*",
     "*://confirmtkt.com/*",
+    "*://*.makemytrip.com/*",
+    "*://makemytrip.com/*",
+    "*://www.irctc.co.in/*",
+    "*://irctc.co.in/*",
     "*://*.cleartrip.com/*",
     "*://cleartrip.com/*",
     "*://*.ixigo.com/*",
@@ -37,7 +37,6 @@
     "*://railyatri.in/*",
     "https://*.rapidapi.com/*",
     "https://*.indianrailapi.com/*",
-    "http://localhost/*",
     "https://*/*"
   ],
   "action": {
@@ -56,18 +55,18 @@
     "open_in_tab": true
   },
   "background": {
-    "service_worker": "src/background.ts",
+    "service_worker": "src/background/index.ts",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": [
-        "*://www.irctc.co.in/*",
-        "*://irctc.co.in/*",
-        "*://*.makemytrip.com/*",
-        "*://makemytrip.com/*",
         "*://*.confirmtkt.com/*",
         "*://confirmtkt.com/*",
+        "*://*.makemytrip.com/*",
+        "*://makemytrip.com/*",
+        "*://www.irctc.co.in/*",
+        "*://irctc.co.in/*",
         "*://*.cleartrip.com/*",
         "*://cleartrip.com/*",
         "*://*.ixigo.com/*",
@@ -81,21 +80,14 @@
         "*://*.railyatri.in/*",
         "*://railyatri.in/*"
       ],
-      "js": ["src/content.ts"],
-      "css": ["src/styles.css"],
-      "all_frames": true,
-      "run_at": "document_idle"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "icons/*",
-        "options.html",
-        "popup.html",
-        "assets/*"
+      "js": [
+        "src/content/index.ts"
       ],
-      "matches": ["<all_urls>"]
+      "css": [
+        "src/styles/styles.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ]
 }

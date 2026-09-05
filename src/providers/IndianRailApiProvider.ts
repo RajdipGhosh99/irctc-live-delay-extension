@@ -1,18 +1,15 @@
-import { ProviderConfig, TrainDelayData } from '../types';
-import { getIso8601Date } from '../iso-utils';
+/**
+ * IndianRailAPI Provider
+ * Dedicated Indian Railways direct token provider
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+import { PROVIDER_METADATA_MAP } from '../core/constants';
+import { ProviderConfig, TrainDelayData } from '../core/types';
+import { getIso8601Date } from '../core/utils';
 import { normalizeUnifiedTrainResponse } from './unified-adapter';
 
-export const INDIAN_RAIL_API_METADATA = {
-  id: 'indianrailapi' as const,
-  name: 'IndianRailAPI.com',
-  description: 'Direct Indian Railways API service provider (Non-RapidAPI direct key).',
-  freeTierLimit: '250 calls/day free per token',
-  perTokenQuota: 250,
-  signupUrl: 'https://indianrailapi.com/',
-  requiresKey: true,
-  defaultEndpoint: 'https://indianrailapi.com/api/v2/LiveTrainStatus/apikey',
-  isoStandardCompliant: true,
-};
+export const INDIAN_RAIL_API_METADATA = PROVIDER_METADATA_MAP['indianrailapi'];
 
 export async function fetchIndianRailApiStatus(
   trainNumber: string,
@@ -23,7 +20,7 @@ export async function fetchIndianRailApiStatus(
   const now = new Date();
   const dateStr = travelDate ? travelDate.replace(/-/g, '') : getIso8601Date(now).replace(/-/g, '');
   const cleanKey = apiKey.trim().replace(/^["']|["']$/g, '');
-  const endpoint = config.apiEndpoint || INDIAN_RAIL_API_METADATA.defaultEndpoint;
+  const endpoint = config.apiEndpoint || INDIAN_RAIL_API_METADATA.defaultEndpoint!;
 
   if (!cleanKey) {
     throw new Error('IndianRailAPI: Missing API Key.');
@@ -61,7 +58,7 @@ export async function fetchIndianRailApiStatus(
 
   return normalizeUnifiedTrainResponse(
     json,
-    INDIAN_RAIL_API_METADATA.id,
+    'indianrailapi',
     INDIAN_RAIL_API_METADATA.name,
     trainNumber,
     travelDate

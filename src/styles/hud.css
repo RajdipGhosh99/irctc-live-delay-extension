@@ -1,0 +1,141 @@
+/**
+ * Floating Action Controller HUD Styles
+ * Viewport-pinned bottom-right placement
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+.rail-floating-hud {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  width: 240px !important;
+  background: var(--rail-glass-bg) !important;
+  backdrop-filter: var(--rail-glass-blur) !important;
+  -webkit-backdrop-filter: var(--rail-glass-blur) !important;
+  border: 1px solid var(--rail-glass-border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16) !important;
+  font-family: var(--rail-font-family) !important;
+  color: var(--rail-text-main) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+  animation: rail-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.rail-hud-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 6px !important;
+}
+
+.rail-hud-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+.rail-hud-controls {
+  display: flex !important;
+  gap: 4px !important;
+}
+
+.rail-hud-btn-mini,
+.rail-hud-btn-close {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  padding: 0 4px !important;
+  border-radius: 4px !important;
+}
+
+.rail-hud-btn-mini:hover,
+.rail-hud-btn-close:hover {
+  color: #0f172a !important;
+  background: #f1f5f9 !important;
+}
+
+.rail-hud-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.rail-hud-status-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 10.5px !important;
+  color: #64748b !important;
+}
+
+.rail-hud-live-indicator {
+  color: var(--rail-success) !important;
+  font-weight: 700 !important;
+}
+
+.rail-hud-actions {
+  display: flex !important;
+  gap: 6px !important;
+}
+
+.rail-hud-action-btn {
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 5px 10px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.rail-hud-action-btn.primary {
+  flex: 1 !important;
+  background: var(--rail-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.rail-hud-action-btn.primary:hover {
+  background: var(--rail-primary-hover) !important;
+}
+
+.rail-hud-action-btn.secondary {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.rail-hud-action-btn.secondary:hover {
+  background: #e2e8f0 !important;
+}
+
+/* Minimized Floating Bubble */
+.rail-floating-hud-minimized {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  width: 38px !important;
+  height: 38px !important;
+  background: var(--rail-primary) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  z-index: 2147483647 !important;
+  transition: transform 0.2s ease !important;
+}
+
+.rail-floating-hud-minimized:hover {
+  transform: scale(1.1) !important;
+}

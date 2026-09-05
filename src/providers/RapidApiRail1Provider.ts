@@ -1,31 +1,27 @@
-import { ProviderConfig, TrainDelayData } from '../types';
+/**
+ * RapidAPI Rail Provider 1
+ * High-speed secondary live running gateway hosted on RapidAPI
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+import { PROVIDER_METADATA_MAP } from '../core/constants';
+import { ProviderConfig, TrainDelayData } from '../core/types';
 import { normalizeUnifiedTrainResponse } from './unified-adapter';
 
-export const IRCTC1_METADATA = {
-  id: 'rapidapi-irctc1' as const,
-  name: 'RapidAPI - IRCTC1',
-  description: 'Most popular RapidAPI endpoint for live IRCTC train running status.',
-  freeTierLimit: '500 requests/month free per token',
-  perTokenQuota: 500,
-  signupUrl: 'https://rapidapi.com/IRCTCAPI/api/irctc1',
-  requiresKey: true,
-  defaultHost: 'irctc1.p.rapidapi.com',
-  defaultEndpoint: 'https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus',
-  isoStandardCompliant: true,
-};
+export const RAPIDAPI_RAIL1_METADATA = PROVIDER_METADATA_MAP['rapidapi-rail-v1'];
 
-export async function fetchIrctc1Status(
+export async function fetchRapidApiRail1Status(
   trainNumber: string,
   config: ProviderConfig,
   apiKey: string,
   travelDate?: string
 ): Promise<TrainDelayData> {
-  const endpoint = config.apiEndpoint || IRCTC1_METADATA.defaultEndpoint;
-  const host = config.apiHost || IRCTC1_METADATA.defaultHost;
+  const endpoint = config.apiEndpoint || RAPIDAPI_RAIL1_METADATA.defaultEndpoint!;
+  const host = config.apiHost || RAPIDAPI_RAIL1_METADATA.defaultHost!;
   const cleanKey = apiKey.trim().replace(/^["']|["']$/g, '');
 
   if (!cleanKey) {
-    throw new Error('RapidAPI IRCTC1: Missing API Key.');
+    throw new Error('RapidAPI Rail Engine 1: Missing API Key.');
   }
 
   const url = new URL(endpoint);
@@ -49,7 +45,7 @@ export async function fetchIrctc1Status(
   } catch (err: any) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      throw new Error('RapidAPI IRCTC1: Request timed out (8s).');
+      throw new Error('RapidAPI Rail Engine 1: Request timed out (8s).');
     }
     throw err;
   } finally {
@@ -57,15 +53,15 @@ export async function fetchIrctc1Status(
   }
 
   if (response.status === 401 || response.status === 403) {
-    throw new Error('AUTH_ERROR: Invalid or expired RapidAPI Key for IRCTC1.');
+    throw new Error('AUTH_ERROR: Invalid or expired RapidAPI Key.');
   }
 
   if (response.status === 429) {
-    throw new Error('RATE_LIMIT: RapidAPI IRCTC1 quota limit reached for this token.');
+    throw new Error('RATE_LIMIT: RapidAPI Rail Engine 1 quota limit reached for this token.');
   }
 
   if (!response.ok) {
-    throw new Error(`RapidAPI IRCTC1 HTTP error: ${response.status}`);
+    throw new Error(`RapidAPI Rail Engine 1 HTTP error: ${response.status} ${response.statusText}`);
   }
 
   const json = await response.json();
@@ -73,18 +69,17 @@ export async function fetchIrctc1Status(
   if (json.message) {
     const msg = String(json.message).toLowerCase();
     if (msg.includes('exceeded') || msg.includes('quota') || msg.includes('rate limit') || msg.includes('blocked')) {
-      throw new Error('RATE_LIMIT: RapidAPI IRCTC1 quota limit reached for this token.');
+      throw new Error('RATE_LIMIT: RapidAPI quota limit reached for this token.');
     }
-  }
-
-  if (json.status === false && json.message) {
-    throw new Error(json.message);
+    if (msg.includes('invalid key') || msg.includes('unauthorized') || msg.includes('forbidden')) {
+      throw new Error('AUTH_ERROR: RapidAPI authorization failed.');
+    }
   }
 
   return normalizeUnifiedTrainResponse(
     json,
-    IRCTC1_METADATA.id,
-    IRCTC1_METADATA.name,
+    'rapidapi-rail-v1',
+    RAPIDAPI_RAIL1_METADATA.name,
     trainNumber,
     travelDate
   );

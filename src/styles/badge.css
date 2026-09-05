@@ -1,0 +1,138 @@
+/**
+ * Live Delay Badge Styles
+ * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
+ */
+
+.rail-delay-wrapper {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  margin: 0 6px !important;
+  padding: 0 !important;
+  font-family: var(--rail-font-family) !important;
+  box-sizing: border-box !important;
+  z-index: 100 !important;
+}
+
+.rail-delay-wrapper:hover,
+.rail-delay-wrapper:focus-within {
+  z-index: 999999 !important;
+}
+
+.rail-delay-wrapper.position-beside-name {
+  margin-left: 8px !important;
+  margin-right: 4px !important;
+}
+
+.rail-delay-wrapper.position-below-name {
+  display: flex !important;
+  width: 100% !important;
+  margin: 4px 0 !important;
+}
+
+.rail-delay-wrapper.position-card-header-right {
+  margin-left: auto !important;
+}
+
+.rail-delay-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 3px 9px !important;
+  font-family: var(--rail-font-family) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: #334155 !important;
+  background: var(--rail-glass-bg) !important;
+  border: 1px solid var(--rail-glass-border) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  text-decoration: none !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+}
+
+.rail-delay-badge:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.rail-delay-badge:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.rail-badge-reload-icon {
+  font-size: 11px !important;
+  opacity: 0.65 !important;
+  transition: transform 0.25s ease, opacity 0.2s ease !important;
+}
+
+.rail-delay-badge:hover .rail-badge-reload-icon {
+  opacity: 1 !important;
+  transform: rotate(180deg) !important;
+}
+
+/* State: Idle */
+.rail-delay-badge.state-idle {
+  color: #2563eb !important;
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+
+.rail-delay-badge.state-idle:hover {
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
+}
+
+/* State: Loading */
+.rail-delay-badge.state-loading {
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  cursor: wait !important;
+}
+
+.rail-delay-spinner {
+  display: inline-block !important;
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid #94a3b8 !important;
+  border-top-color: #2563eb !important;
+  border-radius: 50% !important;
+  animation: rail-spin 0.75s linear infinite !important;
+}
+
+/* State: On Time */
+.rail-delay-badge.state-on-time {
+  color: #15803d !important;
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.rail-delay-badge.state-on-time:hover {
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+/* State: Delayed */
+.rail-delay-badge.state-delayed {
+  color: #b91c1c !important;
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.rail-delay-badge.state-delayed:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* State: Error */
+.rail-delay-badge.state-error {
+  color: #c2410c !important;
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+}

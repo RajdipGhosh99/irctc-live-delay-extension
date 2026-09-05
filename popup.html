@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Train Delay Tracker</title>
-  <link rel="stylesheet" href="./src/popup.css" />
+  <link rel="stylesheet" href="./src/popup/popup.css" />
 </head>
 <body>
   <div class="popup-container">
@@ -14,7 +14,7 @@
         <img src="./icons/icon32.png" alt="Icon" class="header-logo" width="24" height="24" />
         <div>
           <h2>Train Delay Tracker</h2>
-          <span class="author-tag">by <strong>Rajdip Ghosh</strong> • ISO Standard</span>
+          <span class="author-tag">by <strong>Rajdip Ghosh</strong></span>
         </div>
       </div>
       <span id="global-status-badge" class="badge badge-active">Active</span>
@@ -38,37 +38,38 @@
         <span>⚡ Quick Train Tracker</span>
         <span class="quick-tracker-sub">Track any train instantly</span>
       </div>
-      <div class="quick-tracker-row">
+      <div class="quick-input-group">
         <input
           type="text"
           id="quick-train-input"
           class="quick-input"
-          placeholder="Train # (e.g. 12002, 16223)"
-          maxlength="5"
-          pattern="[0-9]*"
-          aria-label="Enter Train Number"
+          placeholder="Enter 5-digit train # (e.g. 12952)"
+          maxlength="6"
+          autocomplete="off"
         />
-        <button type="button" id="quick-train-btn" class="btn btn-primary btn-sm">
+        <button type="button" id="quick-train-btn" class="btn btn-primary btn-track">
           🔍 Track
         </button>
       </div>
-      <div id="quick-train-result" class="quick-train-result hidden" aria-live="polite"></div>
+
+      <!-- Quick Result Card Slot -->
+      <div id="quick-train-result" class="quick-result-area" style="display: none;"></div>
     </div>
 
-    <!-- Auto-Fetch All Trains on Page Switch -->
-    <div class="toggle-box" style="background: #f0fdf4; border-color: #bbf7d0; margin-bottom: 8px;">
+    <!-- Auto-Fetch All Toggle -->
+    <div class="toggle-box" style="margin-top: 10px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
       <div class="toggle-label-group">
-        <strong style="color: #166534;">⚡ Auto-Fetch All Trains</strong>
-        <span id="auto-fetch-toggle-text" style="color: #15803d; font-size: 10px;">Load all trains on search page</span>
+        <strong style="font-size: 11.5px;">⚡ Auto-Fetch All Trains</strong>
+        <span id="auto-fetch-toggle-text" style="font-size: 10px; color: #64748b;">Automatically fetch status for visible trains</span>
       </div>
       <label class="switch">
-        <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Toggle Auto Fetch for All Trains" />
+        <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
         <span class="slider round"></span>
       </label>
     </div>
 
     <!-- Quick Batch Action: Fetch All on Current Tab -->
-    <button type="button" id="fetch-page-trains-btn" class="btn btn-sm" style="width: 100%; background: #0284c7; color: #fff; margin-bottom: 10px; padding: 7px; font-size: 11.5px; font-weight: 700; border-radius: 8px; border: none;">
+    <button type="button" id="fetch-page-trains-btn" class="btn btn-sm" style="width: 100%; background: #0284c7; color: #fff; margin-bottom: 10px; padding: 7px; font-size: 11.5px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;">
       ⚡ Fetch All Statuses on Current Tab
     </button>
 
@@ -84,11 +85,11 @@
     <div class="form-group">
       <label for="active-provider-select">Primary API Provider:</label>
       <select id="active-provider-select" class="select-input">
-        <option value="irctc-official">Official IRCTC (NTES Direct - Free)</option>
-        <option value="rapidapi-irctc1">RapidAPI - IRCTC1 (500 free/mo)</option>
-        <option value="rapidapi-indianrail">RapidAPI - Indian Rail (500 free/mo)</option>
-        <option value="indianrailapi">IndianRailAPI.com (250 free/day)</option>
-        <option value="custom">Custom Proxy / Self-Hosted</option>
+        <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
+        <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
+        <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
+        <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
+        <option value="custom-webhook">Custom Webhook / Private Proxy</option>
       </select>
     </div>
 
@@ -97,29 +98,23 @@
       ⚙️ Open Full Settings Dashboard ↗
     </button>
 
-    <!-- Cache Management (150 MB Capacity) -->
+    <!-- Cache Management -->
     <div class="cache-section">
       <div class="cache-info">
-        <span style="font-weight: 600;">⚡ Cache (150 MB Pool):</span>
-        <div id="cache-count" style="font-size: 10.5px; color: #1e40af; font-weight: 700;">0 records (0 KB)</div>
+        <span style="font-weight: 600;">⚡ Cache (15-min TTL):</span>
+        <div id="cache-count" style="font-size: 10.5px; color: #1e40af; font-weight: 700;">0 records</div>
       </div>
       <button type="button" id="clear-cache-btn" class="btn btn-secondary btn-sm">
         🗑 Clear
       </button>
     </div>
 
-    <!-- Developer Footer -->
+    <!-- Footer -->
     <footer class="popup-footer">
-      <a href="https://github.com/RajdipGhosh99" target="_blank" rel="noopener noreferrer" class="dev-link-box" aria-label="Author GitHub">
-        <div class="dev-avatar-sm">RG</div>
-        <div class="dev-text">
-          <span class="dev-line-1">Created by <strong>Rajdip Ghosh</strong></span>
-          <span class="dev-line-2">github.com/RajdipGhosh99 ↗</span>
-        </div>
-      </a>
+      <span>100% Free & Open Source under GNU GPL-3.0</span>
     </footer>
   </div>
 
-  <script type="module" src="./src/popup.ts"></script>
+  <script type="module" src="./src/popup/popup.ts"></script>
 </body>
 </html>
