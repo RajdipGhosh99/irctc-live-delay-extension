@@ -12,7 +12,7 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["chrome", "node"]
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src/**/*.ts", "vite.config.ts", "manifest.json"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "vite.config.ts", "manifest.json"]
 }
