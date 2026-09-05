@@ -205,7 +205,38 @@ body {
   background: #1e293b;
 }
 
+/* Floating Save Toast Banner */
+.save-banner {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  z-index: 999999;
+  background: #15803d;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-16px) scale(0.95);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-banner.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
 /* Content Area */
+.options-main,
 .options-content {
   flex: 1;
   padding: 36px 40px;
