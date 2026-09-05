@@ -28,7 +28,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "package": "npm run build && cd dist && zip -r ../train-delay-tracker-v2.0.0.zip . && cd .."
+    "package": "npm run build && cd dist && zip -r ../train-delay-tracker-v2.0.0.zip . && cd ..",
+    "release": "./scripts/release.sh"
   },
   "dependencies": {},
   "devDependencies": {
