@@ -8,11 +8,11 @@
 </head>
 <body>
   <div class="popup-wrapper">
-    <!-- 1. Hero Brand Header -->
+    <!-- 1. Brand Header -->
     <header class="popup-header">
       <div class="header-brand">
         <div class="logo-wrapper">
-          <img src="./icons/icon32.png" alt="Train Delay Tracker Logo" class="brand-logo" width="26" height="26" />
+          <img src="./icons/icon32.png" alt="Train Delay Tracker Logo" class="brand-logo" width="24" height="24" />
         </div>
         <div class="brand-text">
           <div class="brand-title-row">
@@ -61,7 +61,7 @@
 
       <div class="search-input-box">
         <span class="search-icon">
-          <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="16" height="16" x="4" y="3" rx="2"/>
             <path d="M4 11h16"/>
             <path d="M12 3v8"/>
@@ -81,8 +81,8 @@
           aria-label="Train Number"
         />
         <button type="button" id="quick-train-btn" class="btn-track-action">
-          <span>Track Live</span>
-          <svg class="svg-icon-sm" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <span>Track</span>
+          <svg class="svg-icon-sm" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
         </button>
@@ -100,12 +100,12 @@
       <div id="quick-train-result" class="quick-result-area" style="display: none;"></div>
     </section>
 
-    <!-- 4. Current Tab Context & Batch Actions -->
+    <!-- 4. Active Tab Context Action -->
     <section class="tab-context-section" id="tab-context-section">
       <div class="context-header">
         <div class="site-detect-badge" id="site-detect-badge">
           <span class="portal-icon">
-            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" x2="22" y1="12" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -113,105 +113,42 @@
           </span>
           <span id="current-site-label">Checking active tab...</span>
         </div>
-        <button type="button" id="site-toggle-btn" class="site-toggle-pill">
+        <button type="button" id="site-toggle-btn" class="site-toggle-pill" style="display: none;">
           Enabled
         </button>
       </div>
 
-      <div class="context-body" id="context-body">
+      <div class="context-body" id="context-body" style="display: none;">
         <button type="button" id="fetch-page-trains-btn" class="btn-fetch-all">
           <span class="lightning-icon">
-            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
           </span>
           <span>Fetch All Delays on Current Page</span>
         </button>
-
-        <div class="context-toggle-row">
-          <div class="toggle-text">
-            <strong>Auto-Fetch Visible Trains</strong>
-            <span>Automatically load delays while scrolling</span>
-          </div>
-          <label class="modern-switch modern-switch-sm">
-            <input type="checkbox" id="popup-auto-fetch-switch" aria-label="Auto Fetch All Trains" />
-            <span class="switch-slider"></span>
-          </label>
-        </div>
       </div>
 
       <div id="non-supported-tip" class="non-supported-banner" style="display: none;">
         <span class="tip-icon">
-          <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" x2="12" y1="16" y2="12"/>
             <line x1="12" x2="12.01" y1="8" y2="8"/>
           </svg>
         </span>
-        <span><strong>Tip:</strong> Open <em>ConfirmTkt, MakeMyTrip, Ixigo, or ClearTrip</em> to see inline delay badges automatically, or use the quick tracker above!</span>
+        <span>Open <em>ConfirmTkt, MakeMyTrip, Ixigo, or ClearTrip</em> to see inline delay badges automatically.</span>
       </div>
     </section>
 
-    <!-- 5. Gateway & 50 MB Cache Controls -->
-    <section class="settings-mini-section">
-      <div class="mini-grid">
-        <div class="mini-control">
-          <label for="active-provider-select">Primary API Gateway:</label>
-          <div class="select-wrapper">
-            <select id="active-provider-select" class="modern-select">
-              <option value="direct-rail-gateway">National Rail Network (Direct - Free)</option>
-              <option value="rapidapi-rail-v1">RapidAPI Rail Engine 1 (500 free/mo)</option>
-              <option value="rapidapi-rail-v2">RapidAPI Rail Engine 2 (500 free/mo)</option>
-              <option value="indianrailapi">IndianRail Gateway (250 free/day)</option>
-              <option value="custom-webhook">Custom Webhook / Private Proxy</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mini-control">
-          <div class="label-with-badge">
-            <label for="popup-cache-select">Cache Retention:</label>
-            <span class="quota-cap-chip" id="cache-quota-text">Limit: 50 MB</span>
-          </div>
-          <div class="select-wrapper">
-            <select id="popup-cache-select" class="modern-select">
-              <option value="0" selected>No Cache (Always Live Fetch - Default)</option>
-              <option value="1">1 Minute (Ultra Fresh)</option>
-              <option value="5">5 Minutes (Recommended)</option>
-              <option value="15">15 Minutes</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Storage Meter & Clear -->
-      <div class="storage-mini-bar">
-        <div class="storage-meta">
-          <span class="storage-title">Local Cache Memory:</span>
-          <span class="storage-value" id="cache-count">0 KB (0 records)</span>
-        </div>
-        <button type="button" id="clear-cache-btn" class="btn-clear-mini" title="Clear locally cached train records">
-          <span class="btn-icon">
-            <svg class="svg-icon-sm" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              <line x1="10" x2="10" y1="11" y2="17"/>
-              <line x1="14" x2="14" y1="11" y2="17"/>
-            </svg>
-          </span>
-          <span>Clear</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- 6. Full Dashboard Link -->
+    <!-- 5. Full Settings Dashboard Link -->
     <button type="button" id="open-options-btn" class="btn-full-options">
       <span class="btn-options-label">
         <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
           <circle cx="12" cy="12" r="3"/>
         </svg>
-        Open Full Settings Dashboard
+        Open Settings & API Hub
       </span>
       <span class="arrow-icon">
         <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -221,15 +158,15 @@
       </span>
     </button>
 
-    <!-- 7. Legal Disclaimer Micro-Notice -->
+    <!-- 6. Legal Disclaimer Micro-Notice -->
     <footer class="popup-legal-footer">
       <span class="legal-badge-icon">
-        <svg class="svg-icon-sm" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="svg-icon-sm" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           <path d="m9 12 2 2 4-4"/>
         </svg>
       </span>
-      <strong>Individual Non-Commercial Tool:</strong> Independent open-source project. Rate policies apply. Verify schedules at station.
+      <span><strong>Individual Non-Commercial Tool:</strong> Independent open-source project. Rate policies apply. Verify at station.</span>
     </footer>
   </div>
 

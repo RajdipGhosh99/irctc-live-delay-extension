@@ -3,7 +3,7 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
-import { ExtensionMessage, MultiProviderSettings, ProviderId, TrainDelayData } from '../core/types';
+import { ExtensionMessage, MultiProviderSettings, TrainDelayData } from '../core/types';
 import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
 import {
   alertTriangleIcon,
@@ -13,7 +13,6 @@ import {
   mapPinIcon,
   radioIcon,
   shieldCheckIcon,
-  trashIcon,
   trendingUpIcon,
   zapIcon,
 } from '../ui/icons';
@@ -34,21 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const globalStatusBadge = document.getElementById('global-status-badge') as HTMLElement;
   const openOptionsHeaderBtn = document.getElementById('open-options-header-btn') as HTMLButtonElement;
   const popupMasterSwitch = document.getElementById('popup-master-switch') as HTMLInputElement;
-  const popupAutoFetchSwitch = document.getElementById('popup-auto-fetch-switch') as HTMLInputElement;
   const masterToggleText = document.getElementById('master-toggle-text') as HTMLElement;
   const currentSiteLabel = document.getElementById('current-site-label') as HTMLElement;
   const siteToggleBtn = document.getElementById('site-toggle-btn') as HTMLButtonElement;
   const contextBody = document.getElementById('context-body') as HTMLElement;
   const nonSupportedTip = document.getElementById('non-supported-tip') as HTMLElement;
-  const activeProviderSelect = document.getElementById('active-provider-select') as HTMLSelectElement;
-  const popupCacheSelect = document.getElementById('popup-cache-select') as HTMLSelectElement;
   const quickTrainInput = document.getElementById('quick-train-input') as HTMLInputElement;
   const quickTrainBtn = document.getElementById('quick-train-btn') as HTMLButtonElement;
   const quickTrainResult = document.getElementById('quick-train-result') as HTMLElement;
   const recentChipsContainer = document.getElementById('recent-chips-container') as HTMLElement;
-  const cacheCountEl = document.getElementById('cache-count') as HTMLElement;
-  const cacheQuotaText = document.getElementById('cache-quota-text') as HTMLElement;
-  const clearCacheBtn = document.getElementById('clear-cache-btn') as HTMLButtonElement;
   const openOptionsBtn = document.getElementById('open-options-btn') as HTMLButtonElement;
   const fetchPageTrainsBtn = document.getElementById('fetch-page-trains-btn') as HTMLButtonElement;
   const termsModal = document.getElementById('terms-modal') as HTMLElement;
@@ -140,21 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderRecentChips();
   }
 
-  async function updateCacheInfo() {
-    chrome.runtime.sendMessage({ type: 'GET_CACHE_STATS' }, (res) => {
-      if (res?.success && res.info) {
-        const { count, formattedSize, maxBytes } = res.info;
-        const maxMb = Math.round(maxBytes / (1024 * 1024));
-        if (cacheCountEl) {
-          cacheCountEl.textContent = `${formattedSize} (${count} record${count === 1 ? '' : 's'})`;
-        }
-        if (cacheQuotaText) {
-          cacheQuotaText.textContent = `Limit: ${maxMb} MB`;
-        }
-      }
-    });
-  }
-
   async function loadState() {
     chrome.runtime.sendMessage({ type: 'GET_SETTINGS' } as ExtensionMessage, (res) => {
       if (res?.success && res.settings) {
@@ -162,8 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateUI();
       }
     });
-
-    updateCacheInfo();
   }
 
   function updateUI() {
@@ -178,9 +154,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const isGlobalActive = loadedSettings.extensionEnabled !== false;
     popupMasterSwitch.checked = isGlobalActive;
-    if (popupAutoFetchSwitch) {
-      popupAutoFetchSwitch.checked = Boolean(loadedSettings.autoFetchAllTrains);
-    }
 
     if (isGlobalActive) {
       globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Active';
@@ -190,14 +163,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Paused';
       globalStatusBadge.className = 'live-status-badge badge-disabled';
       masterToggleText.textContent = 'Monitoring paused globally';
-    }
-
-    if (activeProviderSelect && loadedSettings.activeProvider) {
-      activeProviderSelect.value = loadedSettings.activeProvider;
-    }
-
-    if (popupCacheSelect) {
-      popupCacheSelect.value = String(loadedSettings.cacheTtlMinutes ?? 0);
     }
 
     renderRecentChips();
@@ -226,22 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateUI();
   });
 
-  if (popupAutoFetchSwitch) {
-    popupAutoFetchSwitch.addEventListener('change', () => {
-      if (!loadedSettings) return;
-      loadedSettings.autoFetchAllTrains = popupAutoFetchSwitch.checked;
-      saveCurrentSettings();
-    });
-  }
-
-  // Cache Selector Change
-  popupCacheSelect?.addEventListener('change', () => {
-    if (!loadedSettings) return;
-    loadedSettings.cacheTtlMinutes = parseInt(popupCacheSelect.value, 10) || 0;
-    saveCurrentSettings();
-    updateCacheInfo();
-  });
-
   // Toggle for Current Site
   siteToggleBtn?.addEventListener('click', () => {
     if (!loadedSettings || !currentHostname) return;
@@ -258,36 +207,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateSiteContextUI();
   });
 
-  // Change Active Provider
-  activeProviderSelect?.addEventListener('change', () => {
-    if (!loadedSettings) return;
-    loadedSettings.activeProvider = activeProviderSelect.value as ProviderId;
-    saveCurrentSettings();
-  });
-
   // Open Options Dashboard (Both header button & bottom button)
   const handleOpenOptions = () => {
     chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
   };
   openOptionsBtn?.addEventListener('click', handleOpenOptions);
   openOptionsHeaderBtn?.addEventListener('click', handleOpenOptions);
-
-  // Clear Cache
-  clearCacheBtn?.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
-      updateCacheInfo();
-      clearCacheBtn.innerHTML = `
-        <span class="btn-icon">${checkIcon({ size: 12 })}</span>
-        <span>Cleared</span>
-      `;
-      setTimeout(() => {
-        clearCacheBtn.innerHTML = `
-          <span class="btn-icon">${trashIcon({ size: 12 })}</span>
-          <span>Clear</span>
-        `;
-      }, 1500);
-    });
-  });
 
   // Fetch Page Trains Button
   if (fetchPageTrainsBtn) {
@@ -300,12 +225,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tabs[0]?.id) {
           chrome.tabs.sendMessage(tabs[0].id, { type: 'TRIGGER_FETCH_ALL' });
           fetchPageTrainsBtn.innerHTML = `
-            <span class="lightning-icon">${checkIcon({ size: 14 })}</span>
+            <span class="lightning-icon">${checkIcon({ size: 13 })}</span>
             <span>Fetching Page Trains...</span>
           `;
           setTimeout(() => {
             fetchPageTrainsBtn.innerHTML = `
-              <span class="lightning-icon">${zapIcon({ size: 14 })}</span>
+              <span class="lightning-icon">${zapIcon({ size: 13 })}</span>
               <span>Fetch All Delays on Current Page</span>
             `;
           }, 2000);
@@ -342,7 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.runtime.sendMessage(
       { type: 'FETCH_DELAY', trainNumber: query },
       (res) => {
-        updateCacheInfo();
         if (res?.success && res.data) {
           renderQuickResult(res.data);
         } else {
@@ -399,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const todayAvgHhMm = formatDelayHhMm(stats.todayAvgDelayMinutes, false);
 
     let locationText = data.statusSummary || data.currentStationName || 'En route to destination';
-    locationText = shortenLiveLocation(locationText, 42);
+    locationText = shortenLiveLocation(locationText, 38);
 
     const updatedText = data.lastUpdatedIso ? formatIsoHumanTime(data.lastUpdatedIso) : 'Just now';
 
@@ -415,31 +339,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="location-banner">
           <span class="location-pulse"></span>
-          <span class="location-icon">${mapPinIcon({ size: 12, className: 'svg-icon-muted' })}</span>
+          <span class="location-icon">${mapPinIcon({ size: 11, className: 'svg-icon-muted' })}</span>
           <span class="location-text">${locationText}</span>
         </div>
 
         <div class="stats-grid">
           <div class="stat-cell">
             <span class="cell-label">
-              ${radioIcon({ size: 10, className: 'stat-icon-svg' })}
-              Live Today
+              ${radioIcon({ size: 9, className: 'stat-icon-svg' })}
+              Live
             </span>
             <strong class="cell-val">${liveHhMm}</strong>
             <span class="cell-sub">${liveSub}</span>
           </div>
           <div class="stat-cell">
             <span class="cell-label">
-              ${barChartIcon({ size: 10, className: 'stat-icon-svg' })}
+              ${barChartIcon({ size: 9, className: 'stat-icon-svg' })}
               4-Wk Avg
             </span>
             <strong class="cell-val">${todayAvgHhMm}</strong>
-            <span class="cell-sub">Typical Run</span>
+            <span class="cell-sub">Typical</span>
           </div>
           <div class="stat-cell">
             <span class="cell-label">
-              ${trendingUpIcon({ size: 10, className: 'stat-icon-svg' })}
-              Reliability
+              ${trendingUpIcon({ size: 9, className: 'stat-icon-svg' })}
+              Reliable
             </span>
             <strong class="cell-val">${stats.punctualityRatePercent}%</strong>
             <span class="cell-sub">Punctual</span>
@@ -448,12 +372,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="result-footer">
           <span class="footer-meta-item">
-            ${clockIcon({ size: 11, className: 'svg-icon-muted' })}
+            ${clockIcon({ size: 10, className: 'svg-icon-muted' })}
             Synced ${updatedText}
           </span>
           <span class="footer-meta-item">
-            ${shieldCheckIcon({ size: 11, className: 'svg-icon-muted' })}
-            Direct Gateway
+            ${shieldCheckIcon({ size: 10, className: 'svg-icon-muted' })}
+            Direct Rail Gateway
           </span>
         </div>
       </div>
