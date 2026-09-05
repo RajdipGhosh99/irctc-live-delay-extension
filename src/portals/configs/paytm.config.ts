@@ -17,13 +17,17 @@ export const paytmConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'div._2q7r',
       'div._3_8g',
       'div[class*="train-item"]',
       'div[class*="trainCard"]',
       'div[class*="TrainCard"]',
       'div[class*="_3-train"]',
+      'div[class*="_2q7r"]',
     ],
     titleSelectors: [
+      'div._1Xv1',
+      'div[class*="_1Xv1"]',
       'div[class*="train-name"]',
       'div[class*="name"]',
       'h3',
@@ -34,6 +38,8 @@ export const paytmConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'div._1Xv1',
+      'div[class*="_1Xv1"]',
       'div[class*="train-name"]',
       'div[class*="name"]',
       'h3',

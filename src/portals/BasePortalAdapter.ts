@@ -43,9 +43,18 @@ export class BasePortalAdapter implements PortalAdapter {
     }
   }
 
-  public matches(_url: string, hostname: string): boolean {
+  public matches(url: string, hostname: string): boolean {
     const host = (hostname || '').toLowerCase();
-    return this.domains.some((d) => host === d || host.endsWith(`.${d}`));
+    const isDomainMatch = this.domains.some((d) => host === d || host.endsWith(`.${d}`));
+    if (isDomainMatch) return true;
+
+    // Support local test fixtures and mock runners (e.g. localhost:3456/makemytrip or 127.0.0.1:3456/confirmtkt)
+    if (host === 'localhost' || host === '127.0.0.1') {
+      const pathLower = (url || '').toLowerCase();
+      return pathLower.includes(`/${this.id}`) || this.domains.some((d) => pathLower.includes(d.split('.')[0]));
+    }
+
+    return false;
   }
 
   public getSearchContainer(root: ParentNode): HTMLElement | null {
