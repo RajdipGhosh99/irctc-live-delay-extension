@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://microsoftedge.microsoft.com/addons/detail/live-train-delay-tracker/pknpnmpklieceipblhgfniafbcmpakao"><img src="https://img.shields.io/badge/Microsoft%20Edge-Available%20on%20Edge%20Add--ons-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white" alt="Available on Microsoft Edge Add-ons" /></a>
   <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release%20(v2.0.0)-blue?style=for-the-badge&logo=github" alt="Download Release" /></a>
   <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=for-the-badge" alt="GPL 3.0 License" /></a>
   <a href="https://github.com/RajdipGhosh99"><img src="https://img.shields.io/badge/Author-Rajdip%20Ghosh-indigo?style=for-the-badge&logo=github" alt="Author" /></a>
@@ -18,18 +19,25 @@
 
 ---
 
-## 📥 Download & 30-Second Installation Guide
+## 📥 Installation & Setup Guide
 
-You do **not** need a Chrome Web Store account or subscription to use this extension. You can install it directly on **Google Chrome**, **Microsoft Edge**, **Brave**, **Opera**, **Vivaldi**, or any Chromium browser in 30 seconds:
+### Method 1: Install from Microsoft Edge Add-ons Store (Recommended)
+You can install the extension directly from the official store with one click on Microsoft Edge or any Chromium browser:  
+👉 **[Get Live Train Delay Tracker on Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/live-train-delay-tracker/pknpnmpklieceipblhgfniafbcmpakao)**
 
-### Step 1: Download the Extension Zip
+---
+
+### Method 2: Manual 30-Second Sideload (Chrome, Brave, Edge, Opera, Vivaldi)
+You can also install the latest release directly via developer mode in 30 seconds:
+
+#### Step 1: Download the Extension Zip
 👉 **[Download Latest Release (`train-delay-tracker-v2.0.0.zip`)](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest/download/train-delay-tracker-v2.0.0.zip)**  
 *(Or browse all versions on the [GitHub Releases Page](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases))*
 
-### Step 2: Extract / Unzip
+#### Step 2: Extract / Unzip
 - Extract the downloaded `.zip` file into a permanent folder on your computer (e.g. `Documents/train-delay-tracker` or `Downloads/train-delay-tracker-v2.0.0`).
 
-### Step 3: Load into your Browser
+#### Step 3: Load into your Browser
 1. Open your browser and go to the extension management page:
    - **Google Chrome / Brave / Vivaldi:** `chrome://extensions/`
    - **Microsoft Edge:** `edge://extensions/`
@@ -38,9 +46,9 @@ You do **not** need a Chrome Web Store account or subscription to use this exten
 3. Click the **Load unpacked** button (top-left corner).
 4. Select the extracted folder.
 
-### Step 4: Accept Terms & Enjoy!
+#### Step 4: Accept Terms & Start Tracking!
 - Click the 🚆 icon in your browser toolbar to open the extension popup.
-- Accept the Fair Non-Commercial Terms and start tracking live train statuses across any supported booking website!
+- Accept the Non-Commercial Terms and start tracking live train delays across any supported booking website!
 
 ---
 
