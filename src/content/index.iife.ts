@@ -108,10 +108,29 @@ class ContentScriptOrchestrator {
         const trainNumber = this.adapter.extractTrainNumber(card);
         if (!trainNumber) continue;
 
-        // Ensure card does not already have a badge attached
-        if (card.querySelector('.rail-delay-wrapper')) {
+        // 1. Ensure card or any ancestor does not already have a badge attached
+        if (
+          card.querySelector('.rail-delay-wrapper') ||
+          card.closest('.rail-delay-wrapper') ||
+          card.closest(`[data-rail-train="${trainNumber}"]`) ||
+          card.getAttribute('data-rail-train') === trainNumber
+        ) {
           this.processedElements.add(card);
           continue;
+        }
+
+        // 2. Ensure badge anchor or its immediate parent doesn't already have a badge
+        const anchor = this.adapter.getBadgeAnchor(card);
+        if (anchor) {
+          const parent = anchor.parentElement;
+          if (
+            anchor.querySelector('.rail-delay-wrapper') ||
+            anchor.closest('.rail-delay-wrapper') ||
+            (parent && parent.querySelector('.rail-delay-wrapper'))
+          ) {
+            this.processedElements.add(card);
+            continue;
+          }
         }
 
         const travelDate = this.adapter.extractTravelDate(card) || undefined;
@@ -132,6 +151,7 @@ class ContentScriptOrchestrator {
     position: any
   ): void {
     const wrapper = BadgeComponent.createBadgeWrapper(trainNumber, travelDate);
+    wrapper.setAttribute('data-train', trainNumber);
     const badge = BadgeComponent.createBadgeButton(trainNumber);
     wrapper.appendChild(badge);
 
@@ -158,6 +178,7 @@ class ContentScriptOrchestrator {
     }
 
     this.adapter.injectBadge(card, wrapper, position);
+    card.setAttribute('data-rail-train', trainNumber);
     this.injectedWidgets.set(`${trainNumber}_${travelDate || 'today'}`, widget);
 
     // Auto-fetch if enabled in settings

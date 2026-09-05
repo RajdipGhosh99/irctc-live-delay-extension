@@ -24,10 +24,7 @@ export const confirmTktConfig: VendorPortalConfig = {
       '[class*="trainCard"]',
       '[class*="TrainCard"]',
       '.route-link-container',
-      'a[href*="/train-schedule/"]',
-      'a[href*="/train-seat-availability/"]',
       '.train-update',
-      '.train-info',
       '.well',
     ],
     titleSelectors: [

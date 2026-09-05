@@ -21,7 +21,6 @@ export const paytmConfig: VendorPortalConfig = {
       'div[class*="train-item"]',
       'div[class*="trainCard"]',
       'div[class*="TrainCard"]',
-      'div[class*="train-details"]',
       'div[class*="_3-train"]',
     ],
     titleSelectors: [

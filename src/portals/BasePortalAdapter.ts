@@ -76,9 +76,14 @@ export class BasePortalAdapter implements PortalAdapter {
       }
     }
 
-    // 2. If vendor-specific selectors found cards, return them
+    // 2. If vendor-specific selectors found cards, deduplicate nested sub-elements
     if (cards.length > 0) {
-      return cards;
+      // Keep ONLY the outermost container cards.
+      // If card A contains card B, discard card B so we never create duplicate badges for sub-elements!
+      const topLevelCards = cards.filter((card) => {
+        return !cards.some((other) => other !== card && other.contains(card));
+      });
+      return topLevelCards;
     }
 
     // 3. Resilient Fallback: Scan root for containers containing 5-digit train numbers
@@ -102,7 +107,12 @@ export class BasePortalAdapter implements PortalAdapter {
       }
     }
 
-    return cards;
+    // Deduplicate nested elements in fallback
+    const topLevelCandidates = cards.filter((card) => {
+      return !cards.some((other) => other !== card && other.contains(card));
+    });
+
+    return topLevelCandidates;
   }
 
   public extractTrainNumber(cardOrElement: HTMLElement): string | null {

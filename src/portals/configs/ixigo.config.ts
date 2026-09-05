@@ -18,12 +18,11 @@ export const ixigoConfig: VendorPortalConfig = {
   selectors: {
     cardSelectors: [
       '.c-train-list-item',
-      '.train-info',
+      'div.org-train-list-item',
+      'div.train-item',
+      '[data-testid*="train-card"]',
       '[class*="trainCard"]',
       '[class*="trainItem"]',
-      'div.train-item',
-      'div.org-train-list-item',
-      '[data-testid*="train"]',
     ],
     titleSelectors: [
       '.train-name',

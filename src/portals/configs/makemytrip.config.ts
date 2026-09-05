@@ -17,12 +17,10 @@ export const makeMyTripConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
-      '.train-name-wrap',
-      '.single-train-detail',
-      '.train-heading',
+      'div.train-list-item',
       '[class*="trainCard"]',
       '[class*="trainList"]',
-      'div.train-list-item',
+      '.single-train-detail',
       '[class*="railway-card"]',
     ],
     titleSelectors: [

@@ -18,11 +18,9 @@ export const irctcConfig: VendorPortalConfig = {
   selectors: {
     cardSelectors: [
       'app-train-item',
-      '.train-heading',
-      '.bull-back',
-      'div.form-group.no-pad.col-xs-12',
       'div[class*="train-card"]',
       'div.train-details',
+      '.bull-back',
     ],
     titleSelectors: [
       '.train-heading strong',

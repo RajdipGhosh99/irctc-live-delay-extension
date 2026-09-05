@@ -55,6 +55,16 @@ class MockElement {
     return newChild;
   }
 
+  contains(node) {
+    if (!node) return false;
+    let curr = node.parentNode;
+    while (curr) {
+      if (curr === this) return true;
+      curr = curr.parentNode;
+    }
+    return false;
+  }
+
   closest(selector) {
     if (selector.startsWith('.') && this.classList.contains(selector.slice(1))) return this;
     if (selector.startsWith('#') && this.id === selector.slice(1)) return this;
@@ -167,5 +177,28 @@ const cardsMmt = rootMmt.querySelectorAll('[class*="trainCard"]');
 assert.strictEqual(cardsMmt.length, 1);
 assert.strictEqual(extractTrainNumberRegex(cardsMmt[0].textContent), '12004');
 console.log('  ✅ MakeMyTrip card successfully extracted train 12004');
+
+// 6. Test Hierarchical Containment Deduplication (Preventing 5-6 duplicate cards for 1 train)
+console.log('\nTest 6: Hierarchical Containment Deduplication');
+const nestedParent = new MockElement('div', { id: 'train-12952', class: 'border-b border-tertiary' });
+const subCard1 = new MockElement('div', { class: 'rounded-10' });
+const subCard2 = new MockElement('div', { class: 'route-link-container' });
+const subCard3 = new MockElement('div', { class: 'train-update' });
+subCard2.appendChild(subCard3);
+subCard1.appendChild(subCard2);
+nestedParent.appendChild(subCard1);
+
+// Suppose a multi-selector query returned all 4 nested elements
+const rawSelectedCards = [nestedParent, subCard1, subCard2, subCard3];
+assert.strictEqual(rawSelectedCards.length, 4, 'Raw match returns 4 nested items');
+
+// Apply hierarchical containment deduplication
+const deduplicated = rawSelectedCards.filter((card) => {
+  return !rawSelectedCards.some((other) => other !== card && other.contains(card));
+});
+
+assert.strictEqual(deduplicated.length, 1, 'Deduplication must eliminate all 3 inner nested items');
+assert.strictEqual(deduplicated[0].id, 'train-12952', 'Must retain only the outermost card container');
+console.log('  ✅ Successfully collapsed 4 nested matches into EXACTLY 1 top-level card (zero duplicates)!');
 
 console.log('\n🎉 ALL AUTOMATED ADAPTER & CONFIG INTEGRITY TESTS PASSED!\n');
