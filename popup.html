@@ -23,10 +23,10 @@
         </div>
       </div>
       <div class="header-actions">
-        <span id="global-status-badge" class="live-status-badge badge-active" title="Extension Monitoring Status">
+        <span id="global-status-badge" class="live-status-badge badge-active" title="Extension Status">
           <span class="pulse-dot"></span> Active
         </span>
-        <button type="button" id="open-options-header-btn" class="icon-btn" title="Open Full Settings Dashboard" aria-label="Settings">
+        <button type="button" id="open-options-header-btn" class="icon-btn" title="Open Settings" aria-label="Settings">
           <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
             <circle cx="12" cy="12" r="3"/>
@@ -38,11 +38,11 @@
     <!-- 2. Master Status Quick Toggle -->
     <div class="master-status-card">
       <div class="master-info">
-        <div class="master-title">Live Delay Tracking</div>
-        <div class="master-desc" id="master-toggle-text">Active across all supported portals</div>
+        <div class="master-title">Live Delay Badges</div>
+        <div class="master-desc" id="master-toggle-text">Active on booking websites</div>
       </div>
-      <label class="modern-switch" title="Toggle Extension Globally">
-        <input type="checkbox" id="popup-master-switch" checked aria-label="Toggle Extension Globally" />
+      <label class="modern-switch" title="Turn Extension On / Off">
+        <input type="checkbox" id="popup-master-switch" checked aria-label="Turn Extension On / Off" />
         <span class="switch-slider"></span>
       </label>
     </div>
@@ -56,7 +56,7 @@
           </svg>
           INSTANT LOOKUP
         </span>
-        <span class="section-tag-sub">Track any train in real-time</span>
+        <span class="section-tag-sub">Check any train in real-time</span>
       </div>
 
       <div class="search-input-box">
@@ -81,7 +81,7 @@
           aria-label="Train Number"
         />
         <button type="button" id="quick-train-btn" class="btn-track-action">
-          <span>Track</span>
+          <span>Track Live</span>
           <svg class="svg-icon-sm" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
@@ -125,7 +125,7 @@
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
           </span>
-          <span>Fetch All Delays on Current Page</span>
+          <span>Fetch All Delays on This Page</span>
         </button>
       </div>
 
@@ -137,7 +137,7 @@
             <line x1="12" x2="12.01" y1="8" y2="8"/>
           </svg>
         </span>
-        <span>Open <em>ConfirmTkt, MakeMyTrip, Ixigo, or ClearTrip</em> to see inline delay badges automatically.</span>
+        <span>Open <em>ConfirmTkt, MakeMyTrip, Ixigo, or ClearTrip</em> to see live delay badges automatically.</span>
       </div>
     </section>
 
@@ -148,7 +148,7 @@
           <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
           <circle cx="12" cy="12" r="3"/>
         </svg>
-        Open Settings & API Hub
+        Open Settings & Custom Keys
       </span>
       <span class="arrow-icon">
         <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

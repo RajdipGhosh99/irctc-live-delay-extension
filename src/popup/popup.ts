@@ -158,11 +158,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isGlobalActive) {
       globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Active';
       globalStatusBadge.className = 'live-status-badge badge-active';
-      masterToggleText.textContent = 'Active across all supported portals';
+      masterToggleText.textContent = 'Active on booking websites';
     } else {
       globalStatusBadge.innerHTML = '<span class="pulse-dot"></span> Paused';
       globalStatusBadge.className = 'live-status-badge badge-disabled';
-      masterToggleText.textContent = 'Monitoring paused globally';
+      masterToggleText.textContent = 'Paused — delays are hidden';
     }
 
     renderRecentChips();
@@ -226,12 +226,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           chrome.tabs.sendMessage(tabs[0].id, { type: 'TRIGGER_FETCH_ALL' });
           fetchPageTrainsBtn.innerHTML = `
             <span class="lightning-icon">${checkIcon({ size: 13 })}</span>
-            <span>Fetching Page Trains...</span>
+            <span>Checking Page Trains...</span>
           `;
           setTimeout(() => {
             fetchPageTrainsBtn.innerHTML = `
               <span class="lightning-icon">${zapIcon({ size: 13 })}</span>
-              <span>Fetch All Delays on Current Page</span>
+              <span>Fetch All Delays on This Page</span>
             `;
           }, 2000);
         }

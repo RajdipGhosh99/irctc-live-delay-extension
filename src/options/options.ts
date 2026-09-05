@@ -117,13 +117,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (dashboardGlobalStatus) {
       if (isGloballyActive) {
-        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot"></span> Live Monitoring Active';
+        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot"></span> Live Delay Tracking Active';
         dashboardGlobalStatus.className = 'global-status-pill';
         dashboardGlobalStatus.style.background = '';
         dashboardGlobalStatus.style.color = '';
         dashboardGlobalStatus.style.borderColor = '';
       } else {
-        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot" style="background:#dc2626;"></span> Monitoring Paused';
+        dashboardGlobalStatus.innerHTML = '<span class="pulse-dot" style="background:#dc2626;"></span> Delay Tracking Paused';
         dashboardGlobalStatus.className = 'global-status-pill';
         dashboardGlobalStatus.style.background = '#fee2e2';
         dashboardGlobalStatus.style.color = '#dc2626';
@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   masterEnableSwitch.addEventListener('change', () => {
     currentSettings.extensionEnabled = masterEnableSwitch.checked;
     saveSettings(currentSettings);
-    showSaveBanner(`Extension ${masterEnableSwitch.checked ? 'Enabled Globally' : 'Paused'}`);
+    showSaveBanner(`Live delay badges ${masterEnableSwitch.checked ? 'enabled' : 'paused'}`);
     renderUI();
   });
 
@@ -435,28 +435,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   floatingHudSwitch.addEventListener('change', () => {
     currentSettings.showFloatingHUD = floatingHudSwitch.checked;
     saveSettings(currentSettings);
-    showSaveBanner(`Floating HUD ${floatingHudSwitch.checked ? 'Enabled' : 'Disabled'}`);
+    showSaveBanner(`Floating quick-action button ${floatingHudSwitch.checked ? 'enabled' : 'disabled'}`);
   });
 
   // Primary Provider Select Change
   primaryProviderSelect.addEventListener('change', () => {
     currentSettings.activeProvider = primaryProviderSelect.value as ProviderId;
     saveSettings(currentSettings);
-    showSaveBanner(`Primary provider set to: ${PROVIDER_METADATA_MAP[currentSettings.activeProvider]?.name || currentSettings.activeProvider}`);
+    showSaveBanner(`Primary data source set to: ${PROVIDER_METADATA_MAP[currentSettings.activeProvider]?.name || currentSettings.activeProvider}`);
   });
 
   // Auto-Failover Switch Change
   autoFailoverSwitch.addEventListener('change', () => {
     currentSettings.autoFailover = autoFailoverSwitch.checked;
     saveSettings(currentSettings);
-    showSaveBanner('Failover setting saved');
+    showSaveBanner(`Automatic backup failover ${autoFailoverSwitch.checked ? 'enabled' : 'disabled'}`);
   });
 
   // Auto-Fetch All Switch Change
   autoFetchAllSwitch.addEventListener('change', () => {
     currentSettings.autoFetchAllTrains = autoFetchAllSwitch.checked;
     saveSettings(currentSettings);
-    showSaveBanner('Auto-fetch setting saved');
+    showSaveBanner(`Auto-check all trains ${autoFetchAllSwitch.checked ? 'enabled' : 'disabled'}`);
   });
 
   // Cache TTL Change
@@ -465,8 +465,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveSettings(currentSettings);
     showSaveBanner(
       currentSettings.cacheTtlMinutes === 0
-        ? 'Cache retention set to No Cache (Live Fetch Only)'
-        : `Cache retention set to ${currentSettings.cacheTtlMinutes} minutes`
+        ? 'Memory retention turned off (Always fetch fresh)'
+        : `Checked trains will be remembered for ${currentSettings.cacheTtlMinutes} minute${currentSettings.cacheTtlMinutes === 1 ? '' : 's'}`
     );
     updateStorageMeter();
   });
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Clear All Cache
   clearAllCacheBtn?.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
-      showSaveBanner('All cached train delays cleared from memory');
+      showSaveBanner('Saved train delay records cleared');
       updateStorageMeter();
     });
   });
