@@ -163,19 +163,44 @@ class ContentScriptOrchestrator {
       state: 'idle',
     };
 
-    // Attach click and hover events
-    badge.addEventListener('click', (e) => {
+    // 1. Double-click opens the detailed analytics card
+    badge.addEventListener('dblclick', (e) => {
       e.stopPropagation();
-      this.handleBadgeClick(widget);
+      e.preventDefault();
+      if (widget.state === 'idle' || widget.state === 'error') {
+        this.fetchTrainDelay(widget).then(() => {
+          this.openPopover(widget);
+        });
+      } else {
+        this.togglePopover(widget);
+      }
     });
 
+    // 2. Single click: fetches data if idle/error, or closes popover if open
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.activePopoverWidget === widget) {
+        this.closeActivePopover();
+        return;
+      }
+      if (widget.state === 'idle' || widget.state === 'error') {
+        this.fetchTrainDelay(widget);
+      }
+    });
+
+    // 3. Hover: remains closed by default (optionally fetches delay in background if enabled)
     if (this.settings?.fetchOnHover) {
       wrapper.addEventListener('mouseenter', () => {
         if (widget.state === 'idle') {
-          this.fetchTrainDelay(widget);
+          this.fetchTrainDelay(widget); // updates badge dot/time without opening popover
         }
       });
     }
+
+    // 4. Mouse leave: automatically closes popover
+    wrapper.addEventListener('mouseleave', () => {
+      this.closeActivePopover();
+    });
 
     this.adapter.injectBadge(card, wrapper, position);
     card.setAttribute('data-rail-train', trainNumber);
@@ -187,11 +212,22 @@ class ContentScriptOrchestrator {
     }
   }
 
+  private openPopover(widget: InjectedWidget): void {
+    if (this.activePopoverWidget && this.activePopoverWidget !== widget) {
+      this.closeActivePopover();
+    }
+    if (widget.popover) {
+      widget.popover.style.display = 'block';
+      widget.popover.classList.add('is-open');
+      this.activePopoverWidget = widget;
+    }
+  }
+
   private handleBadgeClick(widget: InjectedWidget): void {
-    if (widget.state === 'idle' || widget.state === 'error') {
+    if (this.activePopoverWidget === widget) {
+      this.closeActivePopover();
+    } else if (widget.state === 'idle' || widget.state === 'error') {
       this.fetchTrainDelay(widget);
-    } else if (widget.popover) {
-      this.togglePopover(widget);
     }
   }
 
@@ -236,6 +272,10 @@ class ContentScriptOrchestrator {
       () => this.closeActivePopover()
     );
 
+    // Strictly ensure closed by default
+    popover.style.display = 'none';
+    popover.classList.remove('is-open');
+
     widget.wrapper.appendChild(popover);
     widget.popover = popover;
     widget.wrapper.classList.add('has-data');
@@ -245,17 +285,14 @@ class ContentScriptOrchestrator {
     if (this.activePopoverWidget === widget) {
       this.closeActivePopover();
     } else {
-      this.closeActivePopover();
-      if (widget.popover) {
-        widget.popover.style.display = 'block';
-        this.activePopoverWidget = widget;
-      }
+      this.openPopover(widget);
     }
   }
 
   private closeActivePopover(): void {
     if (this.activePopoverWidget && this.activePopoverWidget.popover) {
       this.activePopoverWidget.popover.style.display = 'none';
+      this.activePopoverWidget.popover.classList.remove('is-open');
       this.activePopoverWidget = null;
     }
   }

@@ -191,6 +191,21 @@ export class BasePortalAdapter implements PortalAdapter {
     }
 
     // Default: beside-name
+    if (anchor !== card && anchor.parentElement) {
+      const parent = anchor.parentElement;
+      // If parent is block or inline, ensure it uses inline-flex / flex row to keep badge beside the title
+      if (!parent.classList.contains('flex') && !parent.classList.contains('makeFlex') && !parent.classList.contains('d-flex')) {
+        parent.style.display = 'inline-flex';
+        parent.style.alignItems = 'center';
+        parent.style.flexWrap = 'wrap';
+        parent.style.gap = '8px';
+      } else {
+        parent.style.alignItems = 'center';
+      }
+      parent.insertBefore(badgeWrapper, anchor.nextSibling);
+      return;
+    }
+
     if (anchor.parentNode) {
       anchor.parentNode.insertBefore(badgeWrapper, anchor.nextSibling);
     } else {

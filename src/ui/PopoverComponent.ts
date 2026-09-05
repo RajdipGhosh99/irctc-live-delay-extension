@@ -28,6 +28,7 @@ export class PopoverComponent {
   ): HTMLElement {
     const popover = document.createElement('div');
     popover.className = 'rail-delay-popover';
+    popover.style.display = 'none';
     popover.setAttribute('role', 'dialog');
     popover.setAttribute('aria-label', `Live Delay Analytics for Train ${data.trainNumber}`);
 

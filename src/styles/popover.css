@@ -5,6 +5,7 @@
  */
 
 .rail-delay-popover {
+  display: none !important;
   position: absolute !important;
   top: calc(100% + 8px) !important;
   left: 0 !important;
@@ -21,6 +22,10 @@
   z-index: 999999 !important;
   animation: rail-fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   box-sizing: border-box !important;
+}
+
+.rail-delay-popover.is-open {
+  display: block !important;
 }
 
 .rail-popover-header {
