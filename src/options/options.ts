@@ -7,6 +7,13 @@ import { PROVIDER_METADATA_MAP } from '../core/constants';
 import { getCacheStorageInfo, loadSettings, saveSettings } from '../core/storage';
 import { ApiKeyItem, BadgePosition, MultiProviderSettings, ProviderId } from '../core/types';
 import { maskIsoCredential, sanitizeHtml } from '../core/utils';
+import {
+  alertTriangleIcon,
+  checkIcon,
+  copyIcon,
+  trashIcon,
+  zapIcon,
+} from '../ui/icons';
 
 const SUPPORTED_SITES = [
   { name: 'ConfirmTkt', host: 'confirmtkt.com', note: 'Clean train card header' },
@@ -112,6 +119,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (isGloballyActive) {
         dashboardGlobalStatus.innerHTML = '<span class="pulse-dot"></span> Live Monitoring Active';
         dashboardGlobalStatus.className = 'global-status-pill';
+        dashboardGlobalStatus.style.background = '';
+        dashboardGlobalStatus.style.color = '';
+        dashboardGlobalStatus.style.borderColor = '';
       } else {
         dashboardGlobalStatus.innerHTML = '<span class="pulse-dot" style="background:#dc2626;"></span> Monitoring Paused';
         dashboardGlobalStatus.className = 'global-status-pill';
@@ -127,13 +137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dateStr = currentSettings.termsAcceptedAt
           ? new Date(currentSettings.termsAcceptedAt).toLocaleDateString()
           : 'Active';
-        termsStatusText.textContent = `✓ Verified & Accepted for Personal Fair Use (${dateStr})`;
+        termsStatusText.innerHTML = `${checkIcon({ size: 14, className: 'svg-icon-inline' })} Verified & Accepted for Personal Fair Use (${dateStr})`;
         termsStatusText.style.color = '#15803d';
         if (reacceptTermsBtn) {
           reacceptTermsBtn.style.display = 'none';
         }
       } else {
-        termsStatusText.textContent = '⚠️ Pending Acceptance (Accept terms to enable tracking)';
+        termsStatusText.innerHTML = `${alertTriangleIcon({ size: 14, className: 'svg-icon-inline' })} Pending Acceptance (Accept terms to enable tracking)`;
         termsStatusText.style.color = '#dc2626';
         if (reacceptTermsBtn) {
           reacceptTermsBtn.style.display = 'inline-block';
@@ -150,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentSettings.termsAccepted = true;
     currentSettings.termsAcceptedAt = new Date().toISOString();
     saveSettings(currentSettings);
-    showSaveBanner('✓ Terms accepted for Personal Fair Use');
+    showSaveBanner('Terms accepted for Personal Fair Use');
     renderUI();
   });
 
@@ -182,9 +192,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="site-position-row">
           <label for="pos-${site.host}">Badge Position:</label>
           <select id="pos-${site.host}" class="site-pos-select" data-host="${site.host}">
-            <option value="beside-name" ${currentPos === 'beside-name' ? 'selected' : ''}>📍 Beside Train Name (Inline Right)</option>
-            <option value="card-header-right" ${currentPos === 'card-header-right' ? 'selected' : ''}>↗ Top-Right of Card</option>
-            <option value="below-name" ${currentPos === 'below-name' ? 'selected' : ''}>⬇ Below Train Name</option>
+            <option value="beside-name" ${currentPos === 'beside-name' ? 'selected' : ''}>Beside Train Name (Inline Right)</option>
+            <option value="card-header-right" ${currentPos === 'card-header-right' ? 'selected' : ''}>Top-Right of Card</option>
+            <option value="below-name" ${currentPos === 'below-name' ? 'selected' : ''}>Below Train Name</option>
           </select>
         </div>
       `;
@@ -250,7 +260,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               <strong>${sanitizeHtml(meta.name)}</strong>
               <span class="quota-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">100% Free & Unlimited (Zero Setup)</span>
             </div>
-            <span style="font-size: 11.5px; color: #16a34a; font-weight: 700;">● Active Default</span>
+            <span class="active-default-pill">
+              <span class="dot-active"></span>
+              Active Default
+            </span>
           </div>
           <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0; line-height: 1.45;">
             ${sanitizeHtml(meta.description)}
@@ -263,16 +276,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       const keysHtml = keys.length === 0
         ? `<div class="no-tokens-msg" style="font-size: 12px; color: #64748b; padding: 6px 0;">No keys added yet. Add a token below to enable redundant failover for this gateway.</div>`
         : keys.map((k) => `
-          <div class="token-row" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 6px; gap: 8px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 12px; font-weight: 700; color: #0f172a;">${sanitizeHtml(k.label || 'Token')}</span>
-              <code style="font-size: 11px; color: #334155; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${maskIsoCredential(k.key)}</code>
-              <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 9999px; background: ${k.status === 'active' ? '#dcfce7; color: #166534;' : '#fee2e2; color: #991b1b;'}">${k.status}</span>
+          <div class="token-row">
+            <div class="token-identity">
+              <span class="token-label">${sanitizeHtml(k.label || 'Token')}</span>
+              <code class="token-code">${maskIsoCredential(k.key)}</code>
+              <span class="token-status-badge ${k.status === 'active' ? 'status-active' : 'status-exhausted'}">${k.status}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button type="button" class="btn-copy-token" data-key="${k.key}" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: #334155;" title="Copy key">📋 Copy</button>
-              <button type="button" class="btn-test-token" data-provider="${pid}" data-key="${k.key}" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 700; cursor: pointer; color: #1e40af;" title="Test live key validity">⚡ Test Key</button>
-              <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 13px; padding: 2px 6px;" title="Delete token">🗑</button>
+            <div class="token-actions">
+              <button type="button" class="btn-copy-token" data-key="${k.key}" title="Copy key">
+                ${copyIcon({ size: 12, className: 'svg-icon-inline' })} Copy
+              </button>
+              <button type="button" class="btn-test-token" data-provider="${pid}" data-key="${k.key}" title="Test live key validity">
+                ${zapIcon({ size: 12, className: 'svg-icon-inline' })} Test Key
+              </button>
+              <button type="button" class="btn-remove-token" data-provider="${pid}" data-token-id="${k.id}" title="Delete token">
+                ${trashIcon({ size: 14 })}
+              </button>
             </div>
           </div>
         `).join('');
@@ -293,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="add-token-form" style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
           <input type="text" id="label-input-${pid}" placeholder="Token Label (e.g. Backup Key)" style="flex: 1; min-width: 140px; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
           <input type="password" id="key-input-${pid}" placeholder="Paste API Key / Token" style="flex: 2; min-width: 200px; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" />
-          <button type="button" class="btn-add-token" data-provider="${pid}" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">
+          <button type="button" class="btn-add-token" data-provider="${pid}">
             + Add Key
           </button>
         </div>
@@ -303,7 +322,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (totalQuotaBadge) {
-      totalQuotaBadge.textContent = `⚡ Total Pool: ${totalTokens} Active Tokens`;
+      totalQuotaBadge.innerHTML = `
+        ${zapIcon({ size: 13, className: 'svg-icon-inline' })}
+        Total Pool: ${totalTokens} Active Token${totalTokens === 1 ? '' : 's'}
+      `;
     }
 
     // Attach copy token listeners
@@ -311,9 +333,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', () => {
         const key = btn.getAttribute('data-key') || '';
         navigator.clipboard.writeText(key).then(() => {
-          btn.textContent = '✓ Copied';
+          btn.innerHTML = `${checkIcon({ size: 12, className: 'svg-icon-inline' })} Copied`;
           setTimeout(() => {
-            btn.textContent = '📋 Copy';
+            btn.innerHTML = `${copyIcon({ size: 12, className: 'svg-icon-inline' })} Copy`;
           }, 1500);
         });
       });
@@ -332,17 +354,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           (res) => {
             btn.disabled = false;
             if (res?.success && res.data) {
-              btn.textContent = '✓ Valid Key';
+              btn.innerHTML = `${checkIcon({ size: 12, className: 'svg-icon-inline' })} Valid Key`;
               btn.style.color = '#15803d';
               btn.style.background = '#dcfce7';
               showSaveBanner(`Key test passed for ${PROVIDER_METADATA_MAP[pid]?.name || pid}`);
             } else {
-              btn.textContent = '❌ Test Failed';
+              btn.innerHTML = `${alertTriangleIcon({ size: 12, className: 'svg-icon-inline' })} Test Failed`;
               btn.style.color = '#b91c1c';
               btn.style.background = '#fee2e2';
             }
             setTimeout(() => {
-              btn.textContent = '⚡ Test Key';
+              btn.innerHTML = `${zapIcon({ size: 12, className: 'svg-icon-inline' })} Test Key`;
               btn.style.color = '';
               btn.style.background = '';
             }, 3000);
@@ -452,11 +474,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Clear All Cache
   clearAllCacheBtn?.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
-      showSaveBanner('✓ All cached train delays cleared from memory');
+      showSaveBanner('All cached train delays cleared from memory');
       updateStorageMeter();
     });
   });
 
   renderUI();
 });
-

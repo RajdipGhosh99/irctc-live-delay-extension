@@ -46,6 +46,44 @@ body {
 }
 
 /* ==========================================================================
+   SVG Icon Utilities
+   ========================================================================== */
+.svg-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.svg-icon-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.svg-icon-inline {
+  display: inline-flex;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+
+.svg-icon-muted {
+  color: #64748b;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.stat-icon-svg {
+  display: inline-flex;
+  vertical-align: -1px;
+  margin-right: 2px;
+  color: #64748b;
+}
+
+/* ==========================================================================
    1. Hero Brand Header
    ========================================================================== */
 .popup-header {
@@ -161,13 +199,12 @@ body {
 .icon-btn {
   background: #ffffff;
   border: 1px solid var(--card-border);
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
   cursor: pointer;
   color: #475569;
   transition: all 0.15s ease;
@@ -290,6 +327,9 @@ body {
 }
 
 .section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -307,7 +347,7 @@ body {
 .search-input-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: #f8fafc;
   border: 1.5px solid var(--card-border);
   border-radius: var(--radius-sm);
@@ -322,7 +362,9 @@ body {
 }
 
 .search-icon {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  color: #64748b;
 }
 
 .search-field {
@@ -350,9 +392,9 @@ body {
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   transition: all 0.15s ease;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
 }
@@ -441,7 +483,9 @@ body {
 }
 
 .result-error .error-title {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-weight: 700;
   margin-bottom: 2px;
 }
@@ -542,9 +586,19 @@ body {
   border: 1px solid #e2e8f0;
   padding: 6px 8px;
   border-radius: 6px;
+}
+
+.location-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #64748b;
+}
+
+.location-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
 }
 
 .location-pulse {
@@ -571,7 +625,10 @@ body {
 }
 
 .cell-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   font-size: 8.5px;
   color: #64748b;
   font-weight: 700;
@@ -599,7 +656,13 @@ body {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid #f1f5f9;
-  padding-top: 4px;
+  padding-top: 5px;
+}
+
+.footer-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* ==========================================================================
@@ -631,6 +694,12 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.portal-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #2563eb;
 }
 
 .site-toggle-pill {
@@ -679,6 +748,11 @@ body {
   box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
 }
 
+.lightning-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
 .context-toggle-row {
   display: flex;
   align-items: center;
@@ -698,6 +772,9 @@ body {
 }
 
 .non-supported-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
   padding: 8px 10px;
   background: #f8fafc;
   border: 1px dashed #cbd5e1;
@@ -705,6 +782,13 @@ body {
   font-size: 10.5px;
   color: #64748b;
   line-height: 1.4;
+}
+
+.tip-icon {
+  display: inline-flex;
+  color: #2563eb;
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -818,7 +902,15 @@ body {
   padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   transition: all 0.15s ease;
+}
+
+.btn-clear-mini .btn-icon {
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn-clear-mini:hover {
@@ -847,6 +939,12 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+.btn-options-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .btn-full-options:hover {
   background: #f1f5f9;
   border-color: #94a3b8;
@@ -854,7 +952,8 @@ body {
 }
 
 .arrow-icon {
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
   color: #64748b;
 }
 
@@ -870,6 +969,17 @@ body {
   line-height: 1.4;
   color: #64748b;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.legal-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #2563eb;
 }
 
 /* ==========================================================================
@@ -924,7 +1034,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   flex-shrink: 0;
 }
 
@@ -996,6 +1105,10 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   transition: all 0.15s ease;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
@@ -1025,4 +1138,3 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-

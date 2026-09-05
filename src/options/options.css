@@ -39,6 +39,23 @@ body {
 }
 
 /* ==========================================================================
+   SVG Utilities
+   ========================================================================== */
+.svg-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.svg-icon-inline {
+  display: inline-flex;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+
+/* ==========================================================================
    1. Layout & Sidebar
    ========================================================================== */
 .options-layout {
@@ -86,10 +103,12 @@ body {
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 18px;
+  padding: 6px 10px;
   cursor: pointer;
   color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Options Sidebar */
@@ -188,7 +207,8 @@ body {
 }
 
 .nav-icon {
-  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-item:hover {
@@ -326,6 +346,12 @@ body {
   margin-bottom: 8px;
 }
 
+.github-btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .github-btn:hover {
   background: #1e293b;
   border-color: #475569;
@@ -333,7 +359,8 @@ body {
 }
 
 .arrow-ext {
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
   color: #60a5fa;
 }
 
@@ -345,7 +372,7 @@ body {
 
 /* ==========================================================================
    2. Floating Save Toast Banner
-   ========================================================================== */
+   ========================================================================= */
 .save-banner {
   position: fixed;
   top: 24px;
@@ -376,7 +403,8 @@ body {
 }
 
 .toast-check {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ==========================================================================
@@ -470,7 +498,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   flex-shrink: 0;
 }
 
@@ -496,6 +523,9 @@ body {
 }
 
 .pool-aggregate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: linear-gradient(135deg, #2563eb, #4f46e5);
   color: #ffffff;
   padding: 6px 14px;
@@ -684,7 +714,9 @@ body {
 }
 
 .spotlight-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 10.5px;
   font-weight: 800;
   color: #166534;
@@ -794,6 +826,9 @@ body {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   transition: all 0.15s ease;
 }
 
@@ -842,6 +877,148 @@ body {
   border-radius: 9999px;
 }
 
+.active-default-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.dot-active {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.token-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.token-identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.token-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.token-code {
+  font-size: 11px;
+  color: #334155;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.token-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 9999px;
+}
+
+.token-status-badge.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.token-status-badge.status-exhausted {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.token-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-copy-token {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-token:hover {
+  background: #e2e8f0;
+}
+
+.btn-test-token {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #1e40af;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-test-token:hover {
+  background: #dbeafe;
+}
+
+.btn-remove-token {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 3px 6px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-token:hover {
+  background: #fee2e2;
+}
+
+.btn-add-token {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-add-token:hover {
+  background: #1d4ed8;
+}
+
 /* Compliance Grid */
 .compliance-grid {
   display: grid;
@@ -858,8 +1035,9 @@ body {
 }
 
 .compliance-icon {
-  font-size: 20px;
-  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .compliance-card strong {
@@ -896,6 +1074,9 @@ body {
   font-size: 12.5px;
   font-weight: 700;
   color: #15803d;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .btn-reaccept-terms {
@@ -947,4 +1128,3 @@ body {
     min-width: unset;
   }
 }
-

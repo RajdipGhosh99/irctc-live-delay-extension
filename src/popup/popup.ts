@@ -5,6 +5,18 @@
 
 import { ExtensionMessage, MultiProviderSettings, ProviderId, TrainDelayData } from '../core/types';
 import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
+import {
+  alertTriangleIcon,
+  barChartIcon,
+  checkIcon,
+  clockIcon,
+  mapPinIcon,
+  radioIcon,
+  shieldCheckIcon,
+  trashIcon,
+  trendingUpIcon,
+  zapIcon,
+} from '../ui/icons';
 
 const SUPPORTED_HOSTNAMES = [
   'confirmtkt.com',
@@ -264,9 +276,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   clearCacheBtn?.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_CACHE' }, () => {
       updateCacheInfo();
-      clearCacheBtn.textContent = '✓ Cleared';
+      clearCacheBtn.innerHTML = `
+        <span class="btn-icon">${checkIcon({ size: 12 })}</span>
+        <span>Cleared</span>
+      `;
       setTimeout(() => {
-        clearCacheBtn.textContent = '🗑 Clear';
+        clearCacheBtn.innerHTML = `
+          <span class="btn-icon">${trashIcon({ size: 12 })}</span>
+          <span>Clear</span>
+        `;
       }, 1500);
     });
   });
@@ -281,9 +299,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
           chrome.tabs.sendMessage(tabs[0].id, { type: 'TRIGGER_FETCH_ALL' });
-          fetchPageTrainsBtn.innerHTML = '<span class="lightning-icon">✓</span> Fetching Page Trains...';
+          fetchPageTrainsBtn.innerHTML = `
+            <span class="lightning-icon">${checkIcon({ size: 14 })}</span>
+            <span>Fetching Page Trains...</span>
+          `;
           setTimeout(() => {
-            fetchPageTrainsBtn.innerHTML = '<span class="lightning-icon">⚡</span> Fetch All Delays on Current Page';
+            fetchPageTrainsBtn.innerHTML = `
+              <span class="lightning-icon">${zapIcon({ size: 14 })}</span>
+              <span>Fetch All Delays on Current Page</span>
+            `;
           }, 2000);
         }
       });
@@ -327,7 +351,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           quickTrainResult.innerHTML = `
             <div class="result-error">
-              <span class="error-title">⚠️ Status Unavailable</span>
+              <span class="error-title">
+                ${alertTriangleIcon({ size: 14, className: 'svg-icon-inline' })}
+                Status Unavailable
+              </span>
               <p class="error-msg">${res?.error || 'Could not fetch live delay status. Please verify the train number and retry.'}</p>
             </div>
           `;
@@ -370,9 +397,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const todayAvgHhMm = formatDelayHhMm(stats.todayAvgDelayMinutes, false);
-    const monthAvgHhMm = formatDelayHhMm(stats.monthAvgDelayMinutes, false);
 
-    let locationText = data.statusSummary || data.currentStationName || 'En route';
+    let locationText = data.statusSummary || data.currentStationName || 'En route to destination';
     locationText = shortenLiveLocation(locationText, 42);
 
     const updatedText = data.lastUpdatedIso ? formatIsoHumanTime(data.lastUpdatedIso) : 'Just now';
@@ -389,30 +415,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="location-banner">
           <span class="location-pulse"></span>
-          <span>📍 ${locationText}</span>
+          <span class="location-icon">${mapPinIcon({ size: 12, className: 'svg-icon-muted' })}</span>
+          <span class="location-text">${locationText}</span>
         </div>
 
         <div class="stats-grid">
           <div class="stat-cell">
-            <span class="cell-label">🟢 Live Today</span>
+            <span class="cell-label">
+              ${radioIcon({ size: 10, className: 'stat-icon-svg' })}
+              Live Today
+            </span>
             <strong class="cell-val">${liveHhMm}</strong>
             <span class="cell-sub">${liveSub}</span>
           </div>
           <div class="stat-cell">
-            <span class="cell-label">📊 4-Wk Avg</span>
+            <span class="cell-label">
+              ${barChartIcon({ size: 10, className: 'stat-icon-svg' })}
+              4-Wk Avg
+            </span>
             <strong class="cell-val">${todayAvgHhMm}</strong>
             <span class="cell-sub">Typical Run</span>
           </div>
           <div class="stat-cell">
-            <span class="cell-label">📈 Reliability</span>
+            <span class="cell-label">
+              ${trendingUpIcon({ size: 10, className: 'stat-icon-svg' })}
+              Reliability
+            </span>
             <strong class="cell-val">${stats.punctualityRatePercent}%</strong>
             <span class="cell-sub">Punctual</span>
           </div>
         </div>
 
         <div class="result-footer">
-          <span>⏱️ Synced ${updatedText}</span>
-          <span>⚡ Direct Gateway</span>
+          <span class="footer-meta-item">
+            ${clockIcon({ size: 11, className: 'svg-icon-muted' })}
+            Synced ${updatedText}
+          </span>
+          <span class="footer-meta-item">
+            ${shieldCheckIcon({ size: 11, className: 'svg-icon-muted' })}
+            Direct Gateway
+          </span>
         </div>
       </div>
     `;
@@ -425,4 +467,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   loadState();
 });
-

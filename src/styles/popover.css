@@ -90,8 +90,11 @@
   color: #94a3b8 !important;
   font-size: 13px !important;
   cursor: pointer !important;
-  padding: 0 4px !important;
+  padding: 2px 4px !important;
   border-radius: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .rail-popover-close-btn:hover {
@@ -112,7 +115,9 @@
   font-size: 11px !important;
   font-weight: 600 !important;
   color: #334155 !important;
-  display: block !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -135,7 +140,11 @@
 }
 
 .rail-stat-label {
-  font-size: 9.5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
   color: #64748b !important;
   margin-bottom: 2px !important;
@@ -143,7 +152,7 @@
 }
 
 .rail-stat-value {
-  font-size: 14px !important;
+  font-size: 13.5px !important;
   font-weight: 800 !important;
   color: #0f172a !important;
   line-height: 1.2 !important;
@@ -168,6 +177,9 @@
 }
 
 .rail-insight-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
   font-size: 10px !important;
   font-weight: 600 !important;
   color: #475569 !important;
@@ -179,6 +191,8 @@
 
 /* Disclaimer */
 .rail-popover-disclaimer {
+  display: flex !important;
+  align-items: center !important;
   font-size: 8.8px !important;
   line-height: 1.35 !important;
   color: #64748b !important;
@@ -217,6 +231,9 @@
   font-weight: 600 !important;
   padding: 3px 7px !important;
   cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
   transition: all 0.15s ease !important;
 }
 

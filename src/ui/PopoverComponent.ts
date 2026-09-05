@@ -6,6 +6,19 @@
 
 import { TrainDelayData } from '../core/types';
 import { formatDelayHhMm, formatIsoHumanTime, shortenLiveLocation } from '../core/utils';
+import {
+  barChartIcon,
+  checkIcon,
+  clockIcon,
+  copyIcon,
+  mapPinIcon,
+  radioIcon,
+  refreshIcon,
+  shieldCheckIcon,
+  trendingUpIcon,
+  xIcon,
+  zapIcon,
+} from './icons';
 
 export class PopoverComponent {
   public static renderPopover(
@@ -52,12 +65,8 @@ export class PopoverComponent {
     const monthAvgHhMm = formatDelayHhMm(stats.monthAvgDelayMinutes, false);
 
     // Live station location string
-    let locationText = 'En route to destination';
-    if (data.currentStationName) {
-      locationText = `📍 ${shortenLiveLocation(data.statusSummary || data.currentStationName, 44)}`;
-    } else if (data.statusSummary) {
-      locationText = `📍 ${shortenLiveLocation(data.statusSummary, 44)}`;
-    }
+    let rawLocation = data.statusSummary || data.currentStationName || 'En route to destination';
+    const locationText = shortenLiveLocation(rawLocation, 44);
 
     const updatedText = data.lastUpdatedIso ? formatIsoHumanTime(data.lastUpdatedIso) : 'Just now';
 
@@ -65,53 +74,73 @@ export class PopoverComponent {
       <!-- Header -->
       <div class="rail-popover-header">
         <div class="rail-popover-title-group">
-          <div class="rail-popover-train-no">${data.trainNumber}</div>
+          <div class="rail-popover-train-no">#${data.trainNumber}</div>
           <div class="rail-popover-train-name" title="${data.trainName || 'Express'}">${data.trainName || 'Express'}</div>
         </div>
         <div class="rail-popover-header-actions">
           <span class="rail-popover-status-pill ${statusPillClass}">${statusPillText}</span>
-          <button type="button" class="rail-popover-close-btn" title="Close Popover" aria-label="Close">✕</button>
+          <button type="button" class="rail-popover-close-btn" title="Close Popover" aria-label="Close">
+            ${xIcon({ size: 12 })}
+          </button>
         </div>
       </div>
 
       <!-- Live Location Micro-Banner -->
       <div class="rail-popover-location-bar">
-        <span class="rail-popover-location-text">${locationText}</span>
+        <span class="rail-popover-location-text">
+          ${mapPinIcon({ size: 12, className: 'svg-icon-muted' })}
+          ${locationText}
+        </span>
       </div>
 
       <!-- 3-Metric Analytics Grid -->
       <div class="rail-popover-stats-grid">
         <!-- Box 1: Today Live -->
         <div class="rail-stat-box box-today-live">
-          <div class="rail-stat-label">🟢 Today Live</div>
+          <div class="rail-stat-label">
+            ${radioIcon({ size: 9, className: 'stat-icon-svg' })}
+            Today Live
+          </div>
           <div class="rail-stat-value">${todayLiveHhMm}</div>
           <div class="rail-stat-sub">${todayLiveSub}</div>
         </div>
 
         <!-- Box 2: Today Avg (Last 4 Weeks) -->
         <div class="rail-stat-box box-today-avg">
-          <div class="rail-stat-label">📊 Today Avg</div>
+          <div class="rail-stat-label">
+            ${barChartIcon({ size: 9, className: 'stat-icon-svg' })}
+            4-Wk Avg
+          </div>
           <div class="rail-stat-value">${todayAvgHhMm}</div>
-          <div class="rail-stat-sub">Last 4 Weeks</div>
+          <div class="rail-stat-sub">Typical Run</div>
         </div>
 
         <!-- Box 3: 30-Day Avg -->
         <div class="rail-stat-box box-month-avg">
-          <div class="rail-stat-label">📈 30-Day Avg</div>
-          <div class="rail-stat-value">${monthAvgHhMm}</div>
-          <div class="rail-stat-sub">${stats.punctualityRatePercent}% On-Time</div>
+          <div class="rail-stat-label">
+            ${trendingUpIcon({ size: 9, className: 'stat-icon-svg' })}
+            Reliability
+          </div>
+          <div class="rail-stat-value">${stats.punctualityRatePercent}%</div>
+          <div class="rail-stat-sub">${monthAvgHhMm} 30-Day Avg</div>
         </div>
       </div>
 
       <!-- Historical Insight Pills -->
       <div class="rail-popover-insights">
-        <span class="rail-insight-pill">⚡ ${stats.punctualityRatePercent}% Punctuality Rate</span>
-        <span class="rail-insight-pill">🕒 ${stats.historicalRunsAnalyzed} Runs Analyzed</span>
+        <span class="rail-insight-pill">
+          ${zapIcon({ size: 10, className: 'svg-icon-inline' })}
+          ${stats.punctualityRatePercent}% Punctuality
+        </span>
+        <span class="rail-insight-pill">
+          ${clockIcon({ size: 10, className: 'svg-icon-inline' })}
+          ${stats.historicalRunsAnalyzed} Runs Analyzed
+        </span>
       </div>
 
       <!-- Legal & Anti-Abuse Notice -->
       <div class="rail-popover-disclaimer">
-        <span>⚠️ Personal Fair Use Only. Anti-scraping policy applies. Verify at station.</span>
+        <span>${shieldCheckIcon({ size: 9, className: 'svg-icon-inline' })} Personal Fair Use Only. Verify at station.</span>
       </div>
 
       <!-- Action Footer -->
@@ -120,8 +149,12 @@ export class PopoverComponent {
           <span>Updated: ${updatedText}</span>
         </div>
         <div class="rail-popover-actions">
-          <button type="button" class="rail-action-btn rail-btn-copy" title="Copy delay status to clipboard">📋 Copy</button>
-          <button type="button" class="rail-action-btn rail-btn-refresh" title="Refresh live status">↻ Refresh</button>
+          <button type="button" class="rail-action-btn rail-btn-copy" title="Copy delay status to clipboard">
+            ${copyIcon({ size: 11, className: 'svg-icon-inline' })} Copy
+          </button>
+          <button type="button" class="rail-action-btn rail-btn-refresh" title="Refresh live status">
+            ${refreshIcon({ size: 11, className: 'svg-icon-inline' })} Refresh
+          </button>
         </div>
       </div>
     `;
@@ -147,11 +180,11 @@ export class PopoverComponent {
     if (copyBtn) {
       copyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const copyText = `Train #${data.trainNumber} (${data.trainName || 'Express'}): ${data.statusSummary || statusPillText} | Live Delay: ${todayLiveHhMm} (Today Avg: ${todayAvgHhMm}, 30-Day: ${monthAvgHhMm})`;
+        const copyText = `Train #${data.trainNumber} (${data.trainName || 'Express'}): ${data.statusSummary || statusPillText} | Live Delay: ${todayLiveHhMm} (4-Wk Avg: ${todayAvgHhMm}, 30-Day: ${monthAvgHhMm})`;
         navigator.clipboard?.writeText(copyText).then(() => {
-          copyBtn.textContent = '✓ Copied!';
+          copyBtn.innerHTML = `${checkIcon({ size: 11, className: 'svg-icon-inline' })} Copied!`;
           setTimeout(() => {
-            copyBtn.textContent = '📋 Copy';
+            copyBtn.innerHTML = `${copyIcon({ size: 11, className: 'svg-icon-inline' })} Copy`;
           }, 2000);
         });
       });

@@ -3,6 +3,15 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
+import {
+  minusIcon,
+  settingsIcon,
+  shieldCheckIcon,
+  trainIcon,
+  xIcon,
+  zapIcon,
+} from './icons';
+
 export class FloatingHudComponent {
   private static hudElement: HTMLElement | null = null;
   private static minimizedElement: HTMLElement | null = null;
@@ -26,7 +35,7 @@ export class FloatingHudComponent {
     minBubble.id = 'rail-hud-minimized';
     minBubble.className = `rail-floating-hud-minimized ${vendorClass}`;
     minBubble.title = 'Click to expand Live Train Delay HUD';
-    minBubble.innerHTML = `<span>🚆</span>`;
+    minBubble.innerHTML = `<span>${trainIcon({ size: 18 })}</span>`;
     minBubble.style.display = this.isMinimized ? 'flex' : 'none';
     minBubble.addEventListener('click', () => this.expand());
     this.minimizedElement = minBubble;
@@ -43,29 +52,33 @@ export class FloatingHudComponent {
     hud.innerHTML = `
       <div class="rail-hud-header">
         <div class="rail-hud-title">
-          <span class="rail-hud-icon">🚆</span>
+          <span class="rail-hud-icon">${trainIcon({ size: 14 })}</span>
           <strong>Train Delay Tracker</strong>
         </div>
         <div class="rail-hud-controls">
-          <button type="button" class="rail-hud-btn-mini" id="rail-hud-minimize-btn" title="Minimize to icon">_</button>
-          <button type="button" class="rail-hud-btn-close" id="rail-hud-close-btn" title="Dismiss for this tab">✕</button>
+          <button type="button" class="rail-hud-btn-mini" id="rail-hud-minimize-btn" title="Minimize to icon">
+            ${minusIcon({ size: 12 })}
+          </button>
+          <button type="button" class="rail-hud-btn-close" id="rail-hud-close-btn" title="Dismiss for this tab">
+            ${xIcon({ size: 12 })}
+          </button>
         </div>
       </div>
       <div class="rail-hud-body">
         <div class="rail-hud-status-row">
           <span id="rail-hud-count-text">0 trains detected</span>
-          <span class="rail-hud-live-indicator">${termsAccepted ? '● Active' : '⚠️ Terms Required'}</span>
+          <span class="rail-hud-live-indicator">${termsAccepted ? '● Active' : 'Terms Required'}</span>
         </div>
         <div class="rail-hud-actions">
           <button type="button" class="rail-hud-action-btn primary" id="rail-hud-fetch-all-btn" ${termsAccepted ? '' : 'title="Please accept terms first"'}>
-            ⚡ Fetch All
+            ${zapIcon({ size: 12, className: 'svg-icon-inline' })} Fetch All
           </button>
           <button type="button" class="rail-hud-action-btn secondary" id="rail-hud-settings-btn" title="Open Settings">
-            ⚙️
+            ${settingsIcon({ size: 13 })}
           </button>
         </div>
         <div class="rail-hud-disclaimer">
-          <span>${termsAccepted ? '⚠️ Personal Fair Use Only' : '⚠️ Please accept Fair Use Terms in popup'}</span>
+          <span>${shieldCheckIcon({ size: 10, className: 'svg-icon-inline' })} ${termsAccepted ? 'Personal Fair Use Only' : 'Please accept Fair Use Terms in popup'}</span>
         </div>
       </div>
     `;

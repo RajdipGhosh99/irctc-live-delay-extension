@@ -65,8 +65,29 @@
   transform: translateY(0) scale(0.98) !important;
 }
 
+.rail-status-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.rail-status-dot.on-time {
+  background: #16a34a !important;
+}
+
+.rail-status-dot.delayed {
+  background: #dc2626 !important;
+}
+
+.rail-status-dot.error {
+  background: #ea580c !important;
+}
+
 .rail-badge-reload-icon {
-  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
   opacity: 0.65 !important;
   transition: transform 0.25s ease, opacity 0.2s ease !important;
 }

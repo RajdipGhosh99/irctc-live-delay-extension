@@ -17,7 +17,11 @@
       </div>
     </div>
     <button type="button" id="mobile-menu-toggle" class="mobile-menu-btn" aria-label="Toggle Menu" aria-expanded="false">
-      ☰
+      <svg class="svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" x2="20" y1="12" y2="12"/>
+        <line x1="4" x2="20" y1="6" y2="6"/>
+        <line x1="4" x2="20" y1="18" y2="18"/>
+      </svg>
     </button>
   </header>
 
@@ -39,19 +43,43 @@
 
       <nav class="sidebar-nav" aria-label="Settings Navigation">
         <a href="#general" class="nav-item active" data-target="general">
-          <span class="nav-icon">🌐</span>
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" x2="22" y1="12" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </span>
           <span>Supported Sites & Placement</span>
         </a>
         <a href="#ondemand" class="nav-item" data-target="ondemand">
-          <span class="nav-icon">⚡</span>
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </span>
           <span>Click-to-Fetch & 50MB Cache</span>
         </a>
         <a href="#tokens" class="nav-item" data-target="tokens">
-          <span class="nav-icon">🔑</span>
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="7.5" cy="15.5" r="5.5"/>
+              <path d="m21 2-9.6 9.6"/>
+              <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+            </svg>
+          </span>
           <span>Multi-Provider & Token Pools</span>
         </a>
         <a href="#compliance" class="nav-item" data-target="compliance">
-          <span class="nav-icon">⚖️</span>
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="M7 21h10"/>
+              <path d="M12 3v18"/>
+              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+            </svg>
+          </span>
           <span>Fair Use & Legal Hub</span>
         </a>
       </nav>
@@ -81,8 +109,18 @@
           </div>
         </div>
         <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension" target="_blank" rel="noopener noreferrer" class="github-btn">
-          <span>★ Star on GitHub</span>
-          <span class="arrow-ext">↗</span>
+          <span class="github-btn-text">
+            <svg class="svg-icon-inline" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Star on GitHub
+          </span>
+          <span class="arrow-ext">
+            <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17 17 7"/>
+              <path d="M7 7h10v10"/>
+            </svg>
+          </span>
         </a>
         <p class="license-text">GNU GPL-3.0 • 100% Free & Open Source</p>
       </div>
@@ -92,7 +130,11 @@
     <main class="options-main">
       <!-- Floating Save Toast Banner -->
       <div class="save-banner" id="save-banner">
-        <span class="toast-check">✓</span>
+        <span class="toast-check">
+          <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
         <span id="save-banner-text">Settings saved successfully</span>
       </div>
 
@@ -110,7 +152,13 @@
       <!-- Section 1: Supported Sites & Badge Placement -->
       <section id="general" class="settings-card active">
         <div class="card-header">
-          <div class="header-icon-box">🌐</div>
+          <div class="header-icon-box">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" x2="22" y1="12" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
           <div>
             <h3>Supported Booking Portals & Live Badge Placement</h3>
             <p>Customize badge position for each supported booking site or disable tracking on specific portals.</p>
@@ -154,7 +202,11 @@
       <!-- Section 2: Click-to-Fetch & 50 MB Cache Settings -->
       <section id="ondemand" class="settings-card">
         <div class="card-header">
-          <div class="header-icon-box">⚡</div>
+          <div class="header-icon-box">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
           <div>
             <h3>On-Demand Click-to-Fetch & 50 MB Cache Quota</h3>
             <p>Zero unexpected network queries. Live train metrics are fetched only when you click or opt in.</p>
@@ -163,7 +215,12 @@
 
         <!-- Feature Spotlight Banner -->
         <div class="feature-spotlight-banner">
-          <div class="spotlight-badge">100% ON-DEMAND ⚡</div>
+          <div class="spotlight-badge">
+            <svg class="svg-icon-inline" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            100% ON-DEMAND
+          </div>
           <strong>Strict Click-to-Fetch Protection Enabled</strong>
           <p>Hovering over train listings does NOT make background API requests. Network queries occur strictly on user interaction.</p>
         </div>
@@ -203,7 +260,13 @@
             <p>All cached train data is stored securely in your browser and automatically evicted on expiration or 50 MB limit.</p>
           </div>
           <button type="button" id="clear-all-cache-btn" class="btn-danger-action">
-            🗑 Clear Entire Local Cache
+            <svg class="svg-icon-inline" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="10" x2="10" y1="11" y2="17"/>
+              <line x1="14" x2="14" y1="11" y2="17"/>
+            </svg>
+            Clear Entire Local Cache
           </button>
         </div>
       </section>
@@ -211,14 +274,23 @@
       <!-- Section 3: Multi-Provider & Token Pools -->
       <section id="tokens" class="settings-card">
         <div class="card-header">
-          <div class="header-icon-box">🔑</div>
+          <div class="header-icon-box">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="7.5" cy="15.5" r="5.5"/>
+              <path d="m21 2-9.6 9.6"/>
+              <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+            </svg>
+          </div>
           <div class="header-with-badge">
             <div>
               <h3>API Gateways & Multi-Token Key Pools</h3>
               <p>Direct Rail Network works out-of-the-box with zero keys. Power users can add redundant backup tokens.</p>
             </div>
             <div class="pool-aggregate-badge" id="total-quota-badge">
-              ⚡ Total Pool: 0 Active Tokens
+              <svg class="svg-icon-inline" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              Total Pool: 0 Active Tokens
             </div>
           </div>
         </div>
@@ -261,7 +333,15 @@
       <!-- Section 4: Fair Use & Legal Hub -->
       <section id="compliance" class="settings-card">
         <div class="card-header">
-          <div class="header-icon-box">⚖️</div>
+          <div class="header-icon-box">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="M7 21h10"/>
+              <path d="M12 3v18"/>
+              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+            </svg>
+          </div>
           <div>
             <h3>Personal Fair Use & Legal Compliance Hub</h3>
             <p>Guidelines and fair-use terms governing the interactive use of this open-source tool.</p>
@@ -270,25 +350,46 @@
 
         <div class="compliance-grid">
           <div class="compliance-card">
-            <div class="compliance-icon">👤</div>
+            <div class="compliance-icon">
+              <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5"/>
+                <path d="M20 21a8 8 0 0 0-16 0"/>
+              </svg>
+            </div>
             <strong>1. Personal Fair Use Only</strong>
             <p>Developed strictly for interactive personal passenger lookups. Automated commercial scraping or data resale is prohibited.</p>
           </div>
 
           <div class="compliance-card">
-            <div class="compliance-icon">🛡️</div>
+            <div class="compliance-icon">
+              <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
             <strong>2. Anti-Abuse & Rate Protection</strong>
             <p>Automated crawler loops, denial-of-service queries, and high-frequency bulk requests are actively prevented.</p>
           </div>
 
           <div class="compliance-card">
-            <div class="compliance-icon">🌐</div>
+            <div class="compliance-icon">
+              <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" x2="22" y1="12" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
             <strong>3. Independent Open-Source Tool</strong>
             <p>This extension is independent and is not affiliated with, endorsed by, or connected to any third-party booking portals.</p>
           </div>
 
           <div class="compliance-card">
-            <div class="compliance-icon">⏱️</div>
+            <div class="compliance-icon">
+              <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
             <strong>4. Informational Estimates</strong>
             <p>Delays and running metrics are public estimates. Always verify official display indicators at railway stations before boarding.</p>
           </div>
@@ -298,7 +399,7 @@
         <div class="terms-status-box" id="terms-status-container">
           <div>
             <span class="status-box-title">Terms & Conditions Status:</span>
-            <div id="terms-status-text" class="status-box-val">✓ Accepted for Personal Fair Use</div>
+            <div id="terms-status-text" class="status-box-val">Verified & Accepted for Personal Fair Use</div>
           </div>
           <button type="button" id="reaccept-terms-btn" class="btn-reaccept-terms" style="display: none;">
             Review & Accept Terms
@@ -311,4 +412,3 @@
   <script type="module" src="./src/options/options.ts"></script>
 </body>
 </html>
-

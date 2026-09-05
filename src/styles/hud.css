@@ -41,8 +41,15 @@
   color: #0f172a !important;
 }
 
+.rail-hud-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  color: var(--rail-primary) !important;
+}
+
 .rail-hud-controls {
   display: flex !important;
+  align-items: center !important;
   gap: 4px !important;
 }
 
@@ -53,8 +60,11 @@
   color: #94a3b8 !important;
   font-size: 12px !important;
   cursor: pointer !important;
-  padding: 0 4px !important;
+  padding: 2px 4px !important;
   border-radius: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .rail-hud-btn-mini:hover,
@@ -101,6 +111,10 @@
   background: var(--rail-primary) !important;
   color: #ffffff !important;
   border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
 }
 
 .rail-hud-action-btn.primary:hover {
@@ -111,6 +125,10 @@
   background: #f1f5f9 !important;
   color: #334155 !important;
   border: 1px solid #cbd5e1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 5px 8px !important;
 }
 
 .rail-hud-action-btn.secondary:hover {
@@ -138,7 +156,7 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 16px !important;
+  color: #ffffff !important;
   cursor: pointer !important;
   z-index: 2147483647 !important;
   transition: transform 0.2s ease !important;
