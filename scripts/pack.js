@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Industry-Standard Deterministic Extension Packager
+ * Industry-Standard Automated Extension Validator & Deterministic Packager
  * Author: Rajdip Ghosh (https://github.com/RajdipGhosh99)
  * 
- * Creates cross-platform, deterministic zip packages and computes SHA-256 checksums.
+ * Performs automated pre-package validation, deterministic Level-9 zip archiving, and SHA-256 calculation.
  */
 
 const fs = require('fs');
@@ -15,10 +15,10 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const RELEASE_DIR = path.join(ROOT_DIR, 'release');
 const PKG_PATH = path.join(ROOT_DIR, 'package.json');
+const MANIFEST_PATH = path.join(ROOT_DIR, 'manifest.json');
 
-function getVersion() {
-  const pkg = JSON.parse(fs.readFileSync(PKG_PATH, 'utf8'));
-  return pkg.version || '2.0.0';
+function getPackageJson() {
+  return JSON.parse(fs.readFileSync(PKG_PATH, 'utf8'));
 }
 
 function calculateSha256(filePath) {
@@ -34,6 +34,49 @@ function formatBytes(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function runIntegrityChecks(version) {
+  console.log(`🔍 Running Automated Pre-Package Integrity Checks...`);
+
+  // 1. Check dist/ directory
+  if (!fs.existsSync(DIST_DIR)) {
+    throw new Error(`'dist/' directory does not exist. Please run 'npm run build' first.`);
+  }
+
+  // 2. Check manifest in dist
+  const distManifestPath = path.join(DIST_DIR, 'manifest.json');
+  if (!fs.existsSync(distManifestPath)) {
+    throw new Error(`'dist/manifest.json' is missing from build output.`);
+  }
+
+  const distManifest = JSON.parse(fs.readFileSync(distManifestPath, 'utf8'));
+
+  // 3. Check version synchronization
+  if (distManifest.version !== version) {
+    console.warn(`⚠️ Warning: Manifest version (${distManifest.version}) does not match package.json (${version}). Synchronizing...`);
+    distManifest.version = version;
+    fs.writeFileSync(distManifestPath, JSON.stringify(distManifest, null, 2));
+  }
+
+  // 4. Verify essential UI files
+  const requiredFiles = ['popup.html', 'options.html'];
+  for (const file of requiredFiles) {
+    if (!fs.existsSync(path.join(DIST_DIR, file))) {
+      throw new Error(`Critical UI file 'dist/${file}' is missing.`);
+    }
+  }
+
+  // 5. Verify icons
+  const iconSizes = ['16', '32', '48', '128'];
+  for (const size of iconSizes) {
+    const iconPath = path.join(DIST_DIR, 'icons', `icon${size}.png`);
+    if (!fs.existsSync(iconPath)) {
+      console.warn(`⚠️ Icon missing at: dist/icons/icon${size}.png`);
+    }
+  }
+
+  console.log(`✅ All Pre-Package Integrity Checks Passed!`);
 }
 
 async function createZip(sourceDir, outPath) {
@@ -60,16 +103,15 @@ async function createZip(sourceDir, outPath) {
 }
 
 async function pack() {
-  const version = getVersion();
+  const pkg = getPackageJson();
+  const version = pkg.version || '2.0.0';
+
   console.log(`\n======================================================`);
-  console.log(`📦 Packaging Live Train Delay Tracker v${version}`);
+  console.log(`📦 Automatic Package Builder — Live Train Delay Tracker v${version}`);
   console.log(`======================================================`);
 
-  // Verify build output exists
-  if (!fs.existsSync(DIST_DIR) || !fs.existsSync(path.join(DIST_DIR, 'manifest.json'))) {
-    console.error(`❌ Error: 'dist/manifest.json' not found. Run 'npm run build' first.`);
-    process.exit(1);
-  }
+  // Run integrity tests
+  runIntegrityChecks(version);
 
   // Ensure release directory exists
   if (!fs.existsSync(RELEASE_DIR)) {
@@ -82,7 +124,7 @@ async function pack() {
   const latestZipPath = path.join(RELEASE_DIR, latestZipName);
   const rootVersionedZipPath = path.join(ROOT_DIR, versionedZipName);
 
-  console.log(`🗜️ Compressing 'dist/' folder with maximum compression (level 9)...`);
+  console.log(`🗜️ Packaging 'dist/' folder into high-compression ZIP archives...`);
 
   const bytesWritten = await createZip(DIST_DIR, versionedZipPath);
   fs.copyFileSync(versionedZipPath, latestZipPath);
@@ -101,13 +143,13 @@ async function pack() {
 
   fs.writeFileSync(path.join(RELEASE_DIR, 'SHA256SUMS.txt'), checksumFileContent);
 
-  console.log(`\n✨ Packaging Completed Successfully!`);
+  console.log(`\n✨ Packaging & Validation Completed Successfully!`);
   console.log(`------------------------------------------------------`);
-  console.log(`📄 Artifact 1: release/${versionedZipName} (${formatBytes(bytesWritten)})`);
-  console.log(`📄 Artifact 2: release/${latestZipName}`);
-  console.log(`📄 Artifact 3: ${versionedZipName}`);
-  console.log(`🔒 SHA-256   : ${sha256}`);
-  console.log(`📋 Checksums : release/SHA256SUMS.txt`);
+  console.log(`📄 Versioned Archive : release/${versionedZipName} (${formatBytes(bytesWritten)})`);
+  console.log(`📄 Latest Pointer    : release/${latestZipName}`);
+  console.log(`📄 Root Copy         : ${versionedZipName}`);
+  console.log(`🔒 SHA-256 Hash      : ${sha256}`);
+  console.log(`📋 Checksums File    : release/SHA256SUMS.txt`);
   console.log(`------------------------------------------------------\n`);
 }
 

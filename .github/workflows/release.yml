@@ -1,26 +1,28 @@
-name: Release Extension Package
+name: Automated Release & Packaging
 
 on:
   push:
+    branches: [ main ]
     tags:
       - 'v*'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version tag (e.g. v2.0.0)'
-        required: true
-        default: 'v2.0.0'
+        description: 'Explicit version override (e.g. v2.0.1)'
+        required: false
 
 permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  check-and-release:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,14 +33,45 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build & Package Extension
-        run: npm run package
+      - name: Determine Release Tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            TAG="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            PKG_VER=$(node -p "require('./package.json').version")
+            TAG="v${PKG_VER}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Determined release tag: ${TAG}"
 
-      - name: Create GitHub Release
+      - name: Check If Release Already Exists
+        id: check_release
+        run: |
+          TAG="${{ steps.get_version.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1 && [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.ref }}" != refs/tags/* ]]; then
+            echo "Release tag $TAG already exists in git history. Skipping duplicate release creation."
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Automated Integrity Checks & Build
+        if: steps.check_release.outputs.should_release == 'true'
+        run: npm run build
+
+      - name: Automated Package Generation & Checksum
+        if: steps.check_release.outputs.should_release == 'true'
+        run: npm run pack
+
+      - name: Publish GitHub Release
+        if: steps.check_release.outputs.should_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          name: "Live Train Delay Tracker ${{ github.ref_name || github.event.inputs.version }}"
-          tag_name: ${{ github.ref_name || github.event.inputs.version }}
+          name: "Live Train Delay Tracker ${{ steps.get_version.outputs.tag }}"
+          tag_name: ${{ steps.get_version.outputs.tag }}
           files: |
             release/train-delay-tracker-*.zip
             release/SHA256SUMS.txt
@@ -46,18 +79,18 @@ jobs:
           prerelease: false
           generate_release_notes: true
           body: |
-            ## 🚆 Live Train Delay Tracker (${{ github.ref_name || github.event.inputs.version }})
+            ## 🚆 Live Train Delay Tracker (${{ steps.get_version.outputs.tag }})
 
-            Open-source, real-time live train delay tracker and punctuality analytics for ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.
+            High-performance real-time train running delay metrics and punctuality statistics for ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.
 
             ---
 
-            ### 📥 30-Second Manual Installation Guide
+            ### 📥 Download & 30-Second Installation Guide
 
             Works on **Google Chrome**, **Microsoft Edge**, **Brave**, **Opera**, **Vivaldi**, and all Chromium browsers (No Web Store account required).
 
             #### Step 1: Download
-            - Download **[`train-delay-tracker-${{ github.ref_name || github.event.inputs.version }}.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/${{ github.ref_name || github.event.inputs.version }}/train-delay-tracker-${{ github.ref_name || github.event.inputs.version }}.zip)** from the assets below.
+            - Download **[`train-delay-tracker-${{ steps.get_version.outputs.tag }}.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/${{ steps.get_version.outputs.tag }}/train-delay-tracker-${{ steps.get_version.outputs.tag }}.zip)** from the assets below.
 
             #### Step 2: Unzip
             - Extract/unzip the `.zip` archive to a folder on your computer (e.g. `Documents/train-delay-tracker`).
@@ -75,4 +108,4 @@ jobs:
             - Accept the Fair Personal Use Terms in the extension popup and navigate to any supported booking portal!
 
             ---
-            *Licensed under GNU General Public License v3.0 (GPL-3.0).*
+            *100% Free & Open Source under GNU General Public License v3.0.*
