@@ -49,5 +49,5 @@ Under no circumstances shall the author (**Rajdip Ghosh**), contributors, or dis
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
 - **Author & Maintainer:** Rajdip Ghosh
-- **Repository:** [https://github.com/RajdipGhosh99/irctc-live-delay-extension](https://github.com/RajdipGhosh99/irctc-live-delay-extension)
-- **Issues & Legal Inquiries:** [https://github.com/RajdipGhosh99/irctc-live-delay-extension/issues](https://github.com/RajdipGhosh99/irctc-live-delay-extension/issues)
+- **Repository:** [https://github.com/RajdipGhosh99/live-train-running-status-browser-extension](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension)
+- **Issues & Legal Inquiries:** [https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/issues](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/issues)

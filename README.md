@@ -8,8 +8,8 @@
 
 <p align="center">
   <a href="https://microsoftedge.microsoft.com/addons/detail/live-train-delay-tracker/pknpnmpklieceipblhgfniafbcmpakao"><img src="https://img.shields.io/badge/Microsoft%20Edge-Available%20on%20Edge%20Add--ons-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white" alt="Edge Add-ons" /></a>
-  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github" alt="Download Release" /></a>
-  <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-green.svg?style=for-the-badge" alt="GPL 3.0" /></a>
+  <a href="https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=github" alt="Download Release" /></a>
+  <a href="https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-green.svg?style=for-the-badge" alt="GPL 3.0" /></a>
   <img src="https://img.shields.io/badge/Manifest-V3-success?style=for-the-badge" alt="Manifest V3" />
 </p>
 
@@ -22,7 +22,7 @@ Install with one click on **Microsoft Edge** or any Chromium browser:
 👉 **[Add to Edge from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/live-train-delay-tracker/pknpnmpklieceipblhgfniafbcmpakao)**
 
 ### Option 2: Chrome / Brave / Vivaldi / Opera (Manual Sideload)
-1. **Download:** Grab the latest [`train-delay-tracker-v2.0.4.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/latest/download/train-delay-tracker-v2.0.4.zip).
+1. **Download:** Grab the latest [`train-delay-tracker-v2.0.4.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/latest/download/train-delay-tracker-v2.0.4.zip).
 2. **Unzip:** Extract the archive into a permanent folder on your computer.
 3. **Load:** Open `chrome://extensions/` (or `edge://extensions/`), enable **Developer mode** (top-right), click **Load unpacked**, and select the extracted folder.
 
@@ -30,12 +30,12 @@ Install with one click on **Microsoft Edge** or any Chromium browser:
 
 | Version | Release Date | Archive Package | Highlights | Release Notes |
 | :--- | :---: | :---: | :--- | :---: |
-| **`v2.0.4`** (Latest) | `2026-09-06` | [📥 `v2.0.4.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.4/train-delay-tracker-v2.0.4.zip) | Default auto-check all trains enabled, single-line HUD header title fix | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.4) |
-| **`v2.0.3`** | `2026-09-06` | [📥 `v2.0.3.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.3/train-delay-tracker-v2.0.3.zip) | Settings tabs linking fix (`#providers`, `#caching`), scroll-spy sync, card decoupling | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.3) |
-| **`v2.0.2`** | `2026-09-06` | [📥 `v2.0.2.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.2/train-delay-tracker-v2.0.2.zip) | HUD SPA auto-hide fix, Restore HUD popup action, Alt+H hotkey, launcher pill | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.2) |
-| **`v2.0.1`** | `2026-09-06` | [📥 `v2.0.1.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.1/train-delay-tracker-v2.0.1.zip) | New Indian Flag Squircle vector identity, modular Playwright E2E suite, layout fixes | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.1) |
-| **`v2.0.0`** | `2026-09-05` | [📥 `v2.0.0.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.0/train-delay-tracker-v2.0.0.zip) | Manifest V3 complete rewrite, 50 MB strict cache limit, multi-portal engine | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.0) |
-| **`v1.5.0`** | `2026-08-29` | [📥 `v1.5.0.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v1.5.0/train-delay-tracker-v1.5.0.zip) | Initial public release with 3-metric statistics and Quick Search popup | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0) |
+| **`v2.0.4`** (Latest) | `2026-09-06` | [📥 `v2.0.4.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v2.0.4/train-delay-tracker-v2.0.4.zip) | Default auto-check all trains enabled, single-line HUD header title fix | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v2.0.4) |
+| **`v2.0.3`** | `2026-09-06` | [📥 `v2.0.3.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v2.0.3/train-delay-tracker-v2.0.3.zip) | Settings tabs linking fix (`#providers`, `#caching`), scroll-spy sync, card decoupling | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v2.0.3) |
+| **`v2.0.2`** | `2026-09-06` | [📥 `v2.0.2.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v2.0.2/train-delay-tracker-v2.0.2.zip) | HUD SPA auto-hide fix, Restore HUD popup action, Alt+H hotkey, launcher pill | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v2.0.2) |
+| **`v2.0.1`** | `2026-09-06` | [📥 `v2.0.1.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v2.0.1/train-delay-tracker-v2.0.1.zip) | New Indian Flag Squircle vector identity, modular Playwright E2E suite, layout fixes | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v2.0.1) |
+| **`v2.0.0`** | `2026-09-05` | [📥 `v2.0.0.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v2.0.0/train-delay-tracker-v2.0.0.zip) | Manifest V3 complete rewrite, 50 MB strict cache limit, multi-portal engine | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v2.0.0) |
+| **`v1.5.0`** | `2026-08-29` | [📥 `v1.5.0.zip`](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/download/v1.5.0/train-delay-tracker-v1.5.0.zip) | Initial public release with 3-metric statistics and Quick Search popup | [Release Notes](https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/releases/tag/v1.5.0) |
 
 > 📜 **Detailed Changelog:** Review [CHANGELOG.md](CHANGELOG.md) for the complete semantic change log and commit diffs across all versions.
 
@@ -109,8 +109,8 @@ Open **Settings** by clicking the gear icon ⚙️ in the extension popup or via
 ### Getting Started
 ```bash
 # Clone the repository
-git clone https://github.com/RajdipGhosh99/irctc-live-delay-extension.git
-cd irctc-live-delay-extension
+git clone https://github.com/RajdipGhosh99/live-train-running-status-browser-extension.git
+cd live-train-running-status-browser-extension
 
 # Install dependencies
 npm install

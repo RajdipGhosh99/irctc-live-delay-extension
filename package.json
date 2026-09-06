@@ -4,13 +4,13 @@
   "description": "High-performance, open-source real-time live train delay tracker across ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.",
   "author": "Rajdip Ghosh <https://github.com/RajdipGhosh99>",
   "license": "GPL-3.0-or-later",
-  "homepage": "https://github.com/RajdipGhosh99/irctc-live-delay-extension#readme",
+  "homepage": "https://github.com/RajdipGhosh99/live-train-running-status-browser-extension#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RajdipGhosh99/irctc-live-delay-extension.git"
+    "url": "https://github.com/RajdipGhosh99/live-train-running-status-browser-extension.git"
   },
   "bugs": {
-    "url": "https://github.com/RajdipGhosh99/irctc-live-delay-extension/issues"
+    "url": "https://github.com/RajdipGhosh99/live-train-running-status-browser-extension/issues"
   },
   "keywords": [
     "chrome-extension",
