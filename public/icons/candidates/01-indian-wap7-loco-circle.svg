@@ -1,62 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- Live Dot Glow Filter -->
-    <filter id="liveDotGlow" x="-50%" y="-50%" width="200%" height="200%">
+    <filter id="glow1" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+    <linearGradient id="saffron1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7700"/>
+      <stop offset="100%" stop-color="#FF4800"/>
+    </linearGradient>
+    <linearGradient id="green1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#00C853"/>
+    </linearGradient>
   </defs>
 
-  <!-- Indian Tricolor Outer Border Ring -->
-  <!-- Saffron Top Arc (180 deg) -->
-  <path d="M 20 256 A 236 236 0 0 1 492 256" fill="none" stroke="#FF9933" stroke-width="28" stroke-linecap="round"/>
-  <!-- White Separator Ring Base -->
-  <circle cx="256" cy="256" r="222" fill="none" stroke="#000000" stroke-width="4"/>
-  <!-- India Green Bottom Arc (180 deg) -->
-  <path d="M 492 256 A 236 236 0 0 1 20 256" fill="none" stroke="#138808" stroke-width="28" stroke-linecap="round"/>
+  <!-- Outer Ring with Tricolor Energy Arcs -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
+  <path d="M 256 30 A 226 226 0 0 1 458 154" fill="none" stroke="url(#saffron1)" stroke-width="26" stroke-linecap="round"/>
+  <path d="M 256 482 A 226 226 0 0 1 54 358" fill="none" stroke="url(#green1)" stroke-width="26" stroke-linecap="round"/>
 
-  <!-- Top Overhead Pantograph -->
-  <rect x="220" y="78" width="72" height="18" rx="8" fill="#000000"/>
-  <path d="M 230 96 L 256 128 L 282 96 Z" fill="#000000"/>
-  <line x1="256" y1="124" x2="256" y2="148" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
+  <!-- Train Glyph Body -->
+  <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
+  <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
 
-  <!-- Main Locomotive Cabin Body -->
-  <path d="M 172 148 C 172 136, 184 126, 198 126 L 314 126 C 328 126, 340 136, 340 148 L 348 296 C 348 310, 336 322, 322 322 L 190 322 C 176 322, 164 310, 164 296 Z" fill="#000000"/>
+  <!-- Windshield Cutout -->
+  <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
 
-  <!-- Windshield Cutout (Negative Space) -->
-  <rect x="188" y="152" width="136" height="54" rx="10" fill="#FFFFFF"/>
-  <rect x="251" y="152" width="10" height="54" fill="#000000"/>
+  <!-- Headlights -->
+  <circle cx="198" cy="272" r="22" fill="#FFFFFF"/>
+  <circle cx="314" cy="272" r="22" fill="#FFFFFF"/>
 
-  <!-- Twin Big Headlights -->
-  <circle cx="204" cy="242" r="19" fill="#FFFFFF"/>
-  <circle cx="308" cy="242" r="19" fill="#FFFFFF"/>
+  <!-- 3 Radiator Pills -->
+  <rect x="240" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
+  <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
 
-  <!-- Center IR Air Grill Slits -->
-  <rect x="242" y="222" width="8" height="40" rx="4" fill="#FFFFFF"/>
-  <rect x="252" y="220" width="8" height="44" rx="4" fill="#FFFFFF"/>
-  <rect x="262" y="222" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- Tracks & Ties -->
+  <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
+  <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
+  <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
+  <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
+  <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
 
-  <!-- Indian Tricolor Mini Decal Plate on Engine Front -->
-  <rect x="216" y="294" width="80" height="4" fill="#FF9933" rx="1"/>
-  <rect x="216" y="298" width="80" height="4" fill="#FFFFFF"/>
-  <rect x="216" y="302" width="80" height="4" fill="#138808" rx="1"/>
-
-  <!-- Converging Railway Tracks Beneath -->
-  <polygon points="204,332 222,332 178,442 156,442" fill="#000000"/>
-  <polygon points="290,332 308,332 356,442 334,442" fill="#000000"/>
-
-  <!-- Track Sleepers / Ties -->
-  <rect x="194" y="348" width="124" height="14" rx="4" fill="#000000"/>
-  <rect x="182" y="378" width="148" height="16" rx="4" fill="#000000"/>
-  <rect x="168" y="412" width="176" height="18" rx="4" fill="#000000"/>
-
-  <!-- LIVE STATUS DOT BEACON (Emerald Green Glow at 2 o'clock) -->
-  <g transform="translate(412, 100)">
-    <circle cx="0" cy="0" r="32" fill="#10B981" opacity="0.28" filter="url(#liveDotGlow)"/>
-    <circle cx="0" cy="0" r="22" fill="#10B981" stroke="#FFFFFF" stroke-width="4"/>
-    <circle cx="-5" cy="-5" r="5" fill="#FFFFFF" opacity="0.8"/>
+  <!-- Glowing Live Dot Beacon -->
+  <g transform="translate(422, 90)">
+    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow1)"/>
+    <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
+    <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
+    <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>

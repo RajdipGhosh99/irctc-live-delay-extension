@@ -3,187 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indian 2D Vector Extension Icons Preview</title>
+  <title>5 Polished Gen-Z Indian Rail Icons Preview</title>
   <style>
     :root {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
-      --primary: #2563eb;
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --border: #1f2937;
+      --accent: #FF7700;
+      --live: #00E676;
+      --love: #FF2A6D;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 32px 24px;
+      padding: 40px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+    .header {
+      text-align: center;
+      max-width: 800px;
+      margin-bottom: 36px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 119, 0, 0.12);
+      border: 1px solid rgba(255, 119, 0, 0.3);
+      color: #FF9100;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
     h1 {
-      margin: 0 0 8px 0;
-      font-size: 26px;
-      font-weight: 800;
+      margin: 0 0 10px 0;
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     p.subtitle {
-      color: #64748b;
-      margin: 0 0 32px 0;
-      font-size: 15px;
+      color: var(--subtext);
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1280px;
     }
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
     .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-4px);
+      border-color: #374151;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
     }
-    .preview-box {
-      width: 180px;
-      height: 180px;
+    .preview-stage {
+      width: 200px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #ffffff;
-      border: 1px solid #f1f5f9;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      padding: 16px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
     }
-    .preview-box img {
+    .preview-stage img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
-    .dark-preview-box {
-      background: #0f172a;
-      border-radius: 8px;
-      padding: 8px 12px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .dark-preview-box img {
-      background: #ffffff;
-      border-radius: 50%;
-    }
     .title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 8px;
       text-align: center;
+      color: #ffffff;
+      letter-spacing: -0.3px;
     }
     .desc {
-      font-size: 13px;
-      color: #64748b;
+      font-size: 13.5px;
+      color: var(--subtext);
       text-align: center;
-      line-height: 1.4;
-      margin-bottom: 16px;
+      line-height: 1.45;
+      margin-bottom: 20px;
+      flex-grow: 1;
     }
-    .sizes-row {
+    .sizes-box {
       display: flex;
       align-items: center;
-      gap: 12px;
-      background: #f8fafc;
-      padding: 8px 16px;
-      border-radius: 20px;
+      justify-content: center;
+      gap: 16px;
+      background: #1e293b;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid #334155;
+      width: fit-content;
     }
-    .sizes-row span {
+    .size-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .size-label {
       font-size: 11px;
-      font-weight: 600;
-      color: #94a3b8;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .size-item img {
+      background: #ffffff;
+      border-radius: 50%;
     }
   </style>
 </head>
 <body>
-  <h1>🇮🇳 5 Indian Rail Vector Icons (Tricolor + Live Status Dot)</h1>
-  <p class="subtitle">Clean 2D vector circular artwork with Indian Tricolor accents (Saffron & Green) and glowing Emerald Live Status Dot beacon, optimized for 16px, 32px, 48px, 128px toolbar scales.</p>
+  <div class="header">
+    <div class="badge">✨ Gen-Z Polish Edition</div>
+    <h1>🇮🇳 5 Polished Modern Rail Icons</h1>
+    <p class="subtitle">Elevated aesthetic featuring electric Indian tricolor neon gradients, glowing real-time Live/Love beacons, and high-contrast precision glyph geometry.</p>
+  </div>
 
   <div class="grid">
-    <!-- Icon 1 -->
+    <!-- Option 1 -->
     <div class="card">
-      <div class="preview-box">
-        <img src="01-indian-wap7-loco-circle.svg" alt="WAP-7 Electric Loco" />
+      <div class="preview-stage">
+        <img src="01-indian-wap7-loco-circle.svg" alt="Option 1" />
       </div>
-      <div class="title">Option 1: WAP-7 Electric (Tricolor + Live Dot)</div>
-      <div class="desc">Iconic Indian Railways WAP-7 locomotive with saffron & green border arcs, overhead pantograph, twin headlights, and glowing emerald live dot.</div>
-      <div class="sizes-row">
-        <span>16px:</span><img src="01-indian-wap7-loco-circle.svg" width="16" height="16"/>
-        <span>32px:</span><img src="01-indian-wap7-loco-circle.svg" width="32" height="32"/>
-        <span>48px:</span><img src="01-indian-wap7-loco-circle.svg" width="48" height="48"/>
+      <div class="title">Option 1: The Linear Neo-Glyph</div>
+      <div class="desc">Hyper-clean evolution of your reference image with electric saffron & mint energy arcs, deep obsidian train cabin, and glowing live pulse beacon.</div>
+      <div class="sizes-box">
+        <div class="size-item"><span class="size-label">16</span><img src="01-indian-wap7-loco-circle.svg" width="16" height="16"/></div>
+        <div class="size-item"><span class="size-label">32</span><img src="01-indian-wap7-loco-circle.svg" width="32" height="32"/></div>
+        <div class="size-item"><span class="size-label">48</span><img src="01-indian-wap7-loco-circle.svg" width="48" height="48"/></div>
       </div>
     </div>
 
-    <!-- Icon 2 -->
+    <!-- Option 2 -->
     <div class="card">
-      <div class="preview-box">
-        <img src="02-vande-bharat-bullet-circle.svg" alt="Vande Bharat Bullet" />
+      <div class="preview-stage">
+        <img src="02-vande-bharat-bullet-circle.svg" alt="Option 2" />
       </div>
-      <div class="title">Option 2: Vande Bharat Bullet (Tricolor Tracks + Live Dot)</div>
-      <div class="desc">Aerodynamic semi-high-speed nose with saffron forehead visor, perspective speed tracks in saffron & green, and emerald live status dot.</div>
-      <div class="sizes-row">
-        <span>16px:</span><img src="02-vande-bharat-bullet-circle.svg" width="16" height="16"/>
-        <span>32px:</span><img src="02-vande-bharat-bullet-circle.svg" width="32" height="32"/>
-        <span>48px:</span><img src="02-vande-bharat-bullet-circle.svg" width="48" height="48"/>
+      <div class="title">Option 2: The Love Dot Express ❤️</div>
+      <div class="desc">Aesthetic Gen-Z neon ruby heart "love dot" beacon with radiant aura, high-contrast train body, and Indian Tricolor bumper badge.</div>
+      <div class="sizes-box">
+        <div class="size-item"><span class="size-label">16</span><img src="02-vande-bharat-bullet-circle.svg" width="16" height="16"/></div>
+        <div class="size-item"><span class="size-label">32</span><img src="02-vande-bharat-bullet-circle.svg" width="32" height="32"/></div>
+        <div class="size-item"><span class="size-label">48</span><img src="02-vande-bharat-bullet-circle.svg" width="48" height="48"/></div>
       </div>
     </div>
 
-    <!-- Icon 3 -->
+    <!-- Option 3 -->
     <div class="card">
-      <div class="preview-box">
-        <img src="03-ashoka-chakra-train.svg" alt="Ashoka Chakra Train" />
+      <div class="preview-stage">
+        <img src="03-ashoka-chakra-train.svg" alt="Option 3" />
       </div>
-      <div class="title">Option 3: Ashoka Chakra Rail (Tricolor Rim + Live Dot)</div>
-      <div class="desc">Heritage Indian Railways crest with radiating Dharma Chakra spokes, tricolor circular outer rim, and glowing emerald live beacon.</div>
-      <div class="sizes-row">
-        <span>16px:</span><img src="03-ashoka-chakra-train.svg" width="16" height="16"/>
-        <span>32px:</span><img src="03-ashoka-chakra-train.svg" width="32" height="32"/>
-        <span>48px:</span><img src="03-ashoka-chakra-train.svg" width="48" height="48"/>
+      <div class="title">Option 3: Vande Bharat Cyber-Bullet</div>
+      <div class="desc">Aerodynamic semi-high-speed nose with saffron speed brow, cyberpunk slash headlights, neon tricolor tracks, and live beacon.</div>
+      <div class="sizes-box">
+        <div class="size-item"><span class="size-label">16</span><img src="03-ashoka-chakra-train.svg" width="16" height="16"/></div>
+        <div class="size-item"><span class="size-label">32</span><img src="03-ashoka-chakra-train.svg" width="32" height="32"/></div>
+        <div class="size-item"><span class="size-label">48</span><img src="03-ashoka-chakra-train.svg" width="48" height="48"/></div>
       </div>
     </div>
 
-    <!-- Icon 4 -->
+    <!-- Option 4 -->
     <div class="card">
-      <div class="preview-box">
-        <img src="04-live-clock-rail-delay.svg" alt="Live Clock Rail Delay" />
+      <div class="preview-stage">
+        <img src="04-live-clock-rail-delay.svg" alt="Option 4" />
       </div>
-      <div class="title">Option 4: Live Punctuality Clock (Tricolor Arcs + Live Dot)</div>
-      <div class="desc">Dedicated delay tracking symbol: analog clock dial with tricolor perimeter rings, approaching train, and emerald live signal beacon.</div>
-      <div class="sizes-row">
-        <span>16px:</span><img src="04-live-clock-rail-delay.svg" width="16" height="16"/>
-        <span>32px:</span><img src="04-live-clock-rail-delay.svg" width="32" height="32"/>
-        <span>48px:</span><img src="04-live-clock-rail-delay.svg" width="48" height="48"/>
+      <div class="title">Option 4: The Bento Squircle (iOS App Icon)</div>
+      <div class="desc">Apple iOS squircle superellipse with tricolor gradient perimeter border, crisp white negative space train, and live status chip.</div>
+      <div class="sizes-box">
+        <div class="size-item"><span class="size-label">16</span><img src="04-live-clock-rail-delay.svg" width="16" height="16"/></div>
+        <div class="size-item"><span class="size-label">32</span><img src="04-live-clock-rail-delay.svg" width="32" height="32"/></div>
+        <div class="size-item"><span class="size-label">48</span><img src="04-live-clock-rail-delay.svg" width="48" height="48"/></div>
       </div>
     </div>
 
-    <!-- Icon 5 -->
+    <!-- Option 5 -->
     <div class="card">
-      <div class="preview-box">
-        <img src="05-minimalist-indian-metro-speed.svg" alt="Minimalist Indian Metro" />
+      <div class="preview-stage">
+        <img src="05-minimalist-indian-metro-speed.svg" alt="Option 5" />
       </div>
-      <div class="title">Option 5: Minimalist Reference (Tricolor Ring + Live Dot)</div>
-      <div class="desc">Direct companion to your uploaded example with Indian 3-bar radiator grill, saffron & green ring accents, and emerald live status dot.</div>
-      <div class="sizes-row">
-        <span>16px:</span><img src="05-minimalist-indian-metro-speed.svg" width="16" height="16"/>
-        <span>32px:</span><img src="05-minimalist-indian-metro-speed.svg" width="32" height="32"/>
-        <span>48px:</span><img src="05-minimalist-indian-metro-speed.svg" width="48" height="48"/>
+      <div class="title">Option 5: Pure Reference Remaster</div>
+      <div class="desc">Direct 1:1 perfected remaster of your uploaded image with tricolor accent notches and an emerald radar-wave live beacon dot.</div>
+      <div class="sizes-box">
+        <div class="size-item"><span class="size-label">16</span><img src="05-minimalist-indian-metro-speed.svg" width="16" height="16"/></div>
+        <div class="size-item"><span class="size-label">32</span><img src="05-minimalist-indian-metro-speed.svg" width="32" height="32"/></div>
+        <div class="size-item"><span class="size-label">48</span><img src="05-minimalist-indian-metro-speed.svg" width="48" height="48"/></div>
       </div>
     </div>
   </div>
