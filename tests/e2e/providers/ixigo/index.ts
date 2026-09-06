@@ -4,41 +4,33 @@ import {
   ALL_VENDOR_CONFIGS,
   DEFAULT_GLOBAL_ROUTING,
   formatRoutingDates,
-} from '../../../src/portals/configs';
-import { PlaywrightPortalResult } from '../helpers/types';
-import { injectExtensionInPlaywrightPage } from '../helpers/injector';
+} from '../../../../src/portals/configs';
+import { PlaywrightPortalResult } from '../../helpers/types';
+import { injectExtensionInPlaywrightPage } from '../../helpers/injector';
 import {
   navigatePortalWithResilience,
   testBadgePositionSequence,
   verifyHoverPopoverInteractivity,
-} from '../helpers/verifiers';
+} from '../../helpers/verifiers';
 
-export async function verifyClearTripProvider(
+export async function verifyIxigoProvider(
   context: BrowserContext,
   distDir: string,
   screenshotsDir: string,
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [5/9] OPENING PROVIDER: ClearTrip (Live)');
+  console.log('🚄 [6/9] OPENING PROVIDER: Ixigo Trains (Live Search)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
-  const ctConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'cleartrip')!;
-  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
-  const ctUrl = ctConfig.route!.getLiveUrl(
-    DEFAULT_GLOBAL_ROUTING.sourceCode,
-    DEFAULT_GLOBAL_ROUTING.destCode,
-    dates,
-    DEFAULT_GLOBAL_ROUTING.sourceCity,
-    DEFAULT_GLOBAL_ROUTING.destCity
-  );
-  const screenshotFile = 'playwright-05-cleartrip-live.png';
+  const searchPageUrl = 'https://www.ixigo.com/trains';
+  const screenshotFile = 'playwright-06-ixigo-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 5,
-    portal: 'ClearTrip (Live)',
-    url: ctUrl,
+    step: 6,
+    portal: 'Ixigo Trains (Live)',
+    url: searchPageUrl,
     trainsIdentified: 0,
     buttonInjected: false,
     positions: { besideName: false, headerRight: false, belowName: false },
@@ -58,41 +50,54 @@ export async function verifyClearTripProvider(
   };
 
   try {
-    console.log(`   Navigating to: ${ctUrl}`);
-    await navigatePortalWithResilience(page, ctUrl, 35000);
-    await page.waitForTimeout(4000);
+    console.log(`   Navigating to search page: ${searchPageUrl}`);
+    await navigatePortalWithResilience(page, searchPageUrl, 35000);
+    await page.waitForTimeout(3000);
 
+    // Enter origin station
+    console.log('   Entering origin station: New Delhi (NDLS)...');
+    const origin = page.locator('input[placeholder*="Origin"]').first();
+    await origin.click();
+    await origin.fill('New Delhi');
+    await page.waitForTimeout(1000);
     try {
-      await page.evaluate(`
-        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
-        if (closeBtn) closeBtn.click();
-      `);
-    } catch {}
-
-    let cardCount = await page.locator('[data-test-attrib="train-card"], .train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]').count();
-    result.trainsIdentified = cardCount;
-    console.log(`   ✅ Live Train Cards Identified on ClearTrip: ${cardCount}`);
-
-    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-    let badges = await page.locator('.rail-delay-wrapper').count();
-    if (badges === 0) {
-      await page.evaluate(`
-        (function() {
-          var container = document.querySelector('main, #root, body');
-          if (container) {
-            var card = document.createElement('div');
-            card.className = 'train-card';
-            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
-            container.prepend(card);
-          }
-        })()
-      `);
-      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-      badges = await page.locator('.rail-delay-wrapper').count();
+      await page.locator('text=NDLS').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
     }
+    await page.waitForTimeout(1000);
 
+    // Enter destination station
+    console.log('   Entering destination station: Kanpur (CNB)...');
+    const dest = page.locator('input[placeholder*="Destination"]').first();
+    await dest.click();
+    await dest.fill('Kanpur');
+    await page.waitForTimeout(1000);
+    try {
+      await page.locator('text=CNB').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForTimeout(1000);
+
+    // Click Search
+    console.log('   Clicking "Search" button...');
+    await page.locator('button:has-text("Search")').first().click();
+    await page.waitForTimeout(7000);
+
+    result.url = page.url();
+    console.log(`   Navigated to live results: ${result.url}`);
+
+    let cardCount = await page.locator('div.pt-15.px-15.pb-0, div[class*="rounded-10"], div[class*="pt-15"], .c-train-list-item').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Real Live Train Cards Identified on Ixigo: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '20434', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
     result.buttonInjected = badges > 0;
-    console.log(`   ✅ Live Badges Injected on ClearTrip: ${badges}`);
+    console.log(`   ✅ Live Badges Injected on Ixigo: ${badges}`);
 
     if (badges > 0) {
       console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
@@ -103,8 +108,8 @@ export async function verifyClearTripProvider(
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
           if (!badge) return null;
-          var card = badge.closest('.train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]') || badge.parentElement;
-          var title = card ? card.querySelector('.train-name, h3, h4, [class*="title"], span') : null;
+          var card = badge.closest('div.pt-15, div[class*="rounded-10"], .c-train-list-item') || badge.parentElement;
+          var title = card ? card.querySelector('div.body-sm, [class*="truncate"], .train-name, h3, h4') : null;
           if (!badge || !title) return null;
           var bRect = badge.getBoundingClientRect();
           var tRect = title.getBoundingClientRect();
@@ -137,14 +142,23 @@ export async function verifyClearTripProvider(
         ? 'PASSED'
         : 'FAILED';
 
-    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} ClearTrip: VALIDATION ${result.status}`);
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} Ixigo: VALIDATION ${result.status}`);
   } catch (err: any) {
     result.error = err.message;
-    console.error('   ❌ ClearTrip error:', err.message);
+    console.error('   ❌ Ixigo error:', err.message);
   } finally {
-    console.log('   🔒 Closing ClearTrip tab before next provider...');
+    console.log('   🔒 Closing Ixigo tab before next provider...');
     await page.close();
   }
 
   return result;
+}
+
+import { runStandaloneProvider } from '../../helpers/runner';
+
+if (require.main === module) {
+  runStandaloneProvider(verifyIxigoProvider, 'Ixigo Trains').catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }

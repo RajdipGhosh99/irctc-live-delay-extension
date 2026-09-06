@@ -4,14 +4,14 @@ import {
   ALL_VENDOR_CONFIGS,
   DEFAULT_GLOBAL_ROUTING,
   formatRoutingDates,
-} from '../../../src/portals/configs';
-import { PlaywrightPortalResult } from '../helpers/types';
-import { injectExtensionInPlaywrightPage } from '../helpers/injector';
+} from '../../../../src/portals/configs';
+import { PlaywrightPortalResult } from '../../helpers/types';
+import { injectExtensionInPlaywrightPage } from '../../helpers/injector';
 import {
   navigatePortalWithResilience,
   testBadgePositionSequence,
   verifyHoverPopoverInteractivity,
-} from '../helpers/verifiers';
+} from '../../helpers/verifiers';
 
 export async function verifyPaytmProvider(
   context: BrowserContext,
@@ -148,4 +148,13 @@ export async function verifyPaytmProvider(
   }
 
   return result;
+}
+
+import { runStandaloneProvider } from '../../helpers/runner';
+
+if (require.main === module) {
+  runStandaloneProvider(verifyPaytmProvider, 'Paytm Trains').catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }

@@ -9,6 +9,7 @@ import { verifyGoibiboProvider } from './goibibo';
 import { verifyPaytmProvider } from './paytm';
 import { verifyEaseMyTripProvider } from './easemytrip';
 
+// Re-export individual verification functions
 export * from './makemytrip';
 export * from './confirmtkt';
 export * from './railyatri';
@@ -18,6 +19,17 @@ export * from './ixigo';
 export * from './goibibo';
 export * from './paytm';
 export * from './easemytrip';
+
+// Namespaced folder modules (e.g. providers.makeMyTrip)
+export * as makeMyTrip from './makemytrip';
+export * as confirmTkt from './confirmtkt';
+export * as railYatri from './railyatri';
+export * as irctc from './irctc';
+export * as clearTrip from './cleartrip';
+export * as ixigo from './ixigo';
+export * as goibibo from './goibibo';
+export * as paytm from './paytm';
+export * as easeMyTrip from './easemytrip';
 
 export interface ProviderItem {
   id: string;
@@ -39,7 +51,16 @@ export const ALL_E2E_PROVIDERS: ProviderItem[] = [
 
 export const PROVIDER_ALIASES: Record<string, string> = {
   mmt: 'makemytrip',
+  makemytrip: 'makemytrip',
   ct: 'confirmtkt',
+  confirmtkt: 'confirmtkt',
   ry: 'railyatri',
+  railyatri: 'railyatri',
+  irctc: 'irctc',
+  cleartrip: 'cleartrip',
+  ixigo: 'ixigo',
+  goibibo: 'goibibo',
+  paytm: 'paytm',
   emt: 'easemytrip',
+  easemytrip: 'easemytrip',
 };

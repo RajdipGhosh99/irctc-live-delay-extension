@@ -4,41 +4,41 @@ import {
   ALL_VENDOR_CONFIGS,
   DEFAULT_GLOBAL_ROUTING,
   formatRoutingDates,
-} from '../../../src/portals/configs';
-import { PlaywrightPortalResult } from '../helpers/types';
-import { injectExtensionInPlaywrightPage } from '../helpers/injector';
+} from '../../../../src/portals/configs';
+import { PlaywrightPortalResult } from '../../helpers/types';
+import { injectExtensionInPlaywrightPage } from '../../helpers/injector';
 import {
   navigatePortalWithResilience,
   testBadgePositionSequence,
   verifyHoverPopoverInteractivity,
-} from '../helpers/verifiers';
+} from '../../helpers/verifiers';
 
-export async function verifyEaseMyTripProvider(
+export async function verifyClearTripProvider(
   context: BrowserContext,
   distDir: string,
   screenshotsDir: string,
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [9/9] OPENING PROVIDER: EaseMyTrip (Live)');
+  console.log('🚄 [5/9] OPENING PROVIDER: ClearTrip (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
-  const emtConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'easemytrip')!;
+  const ctConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'cleartrip')!;
   const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
-  const emtUrl = emtConfig.route!.getLiveUrl(
+  const ctUrl = ctConfig.route!.getLiveUrl(
     DEFAULT_GLOBAL_ROUTING.sourceCode,
     DEFAULT_GLOBAL_ROUTING.destCode,
     dates,
     DEFAULT_GLOBAL_ROUTING.sourceCity,
     DEFAULT_GLOBAL_ROUTING.destCity
   );
-  const screenshotFile = 'playwright-09-easemytrip-live.png';
+  const screenshotFile = 'playwright-05-cleartrip-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 9,
-    portal: 'EaseMyTrip (Live)',
-    url: emtUrl,
+    step: 5,
+    portal: 'ClearTrip (Live)',
+    url: ctUrl,
     trainsIdentified: 0,
     buttonInjected: false,
     positions: { besideName: false, headerRight: false, belowName: false },
@@ -58,8 +58,8 @@ export async function verifyEaseMyTripProvider(
   };
 
   try {
-    console.log(`   Navigating to: ${emtUrl}`);
-    await navigatePortalWithResilience(page, emtUrl, 35000);
+    console.log(`   Navigating to: ${ctUrl}`);
+    await navigatePortalWithResilience(page, ctUrl, 35000);
     await page.waitForTimeout(4000);
 
     try {
@@ -69,14 +69,30 @@ export async function verifyEaseMyTripProvider(
       `);
     } catch {}
 
-    let cardCount = await page.locator('li:has(a[href*="/railways/train-coach/"]), a[href*="/railways/train-coach/"], .train-card-wrap, .train-box').count();
+    let cardCount = await page.locator('[data-test-attrib="train-card"], .train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]').count();
     result.trainsIdentified = cardCount;
-    console.log(`   ✅ Real Live Train Cards Identified on EaseMyTrip: ${cardCount}`);
+    console.log(`   ✅ Live Train Cards Identified on ClearTrip: ${cardCount}`);
 
-    await injectExtensionInPlaywrightPage(page, distDir, '12378', 'beside-name');
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
     let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('main, #root, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'train-card';
+            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
     result.buttonInjected = badges > 0;
-    console.log(`   ✅ Live Badges Injected on EaseMyTrip: ${badges}`);
+    console.log(`   ✅ Live Badges Injected on ClearTrip: ${badges}`);
 
     if (badges > 0) {
       console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
@@ -87,8 +103,8 @@ export async function verifyEaseMyTripProvider(
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
           if (!badge) return null;
-          var card = badge.closest('.train-card-wrap, .train-box, [class*="trainCard"]') || badge.parentElement;
-          var title = card ? card.querySelector('.train-name, h3, h4, [class*="name"], span') : null;
+          var card = badge.closest('.train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]') || badge.parentElement;
+          var title = card ? card.querySelector('.train-name, h3, h4, [class*="title"], span') : null;
           if (!badge || !title) return null;
           var bRect = badge.getBoundingClientRect();
           var tRect = title.getBoundingClientRect();
@@ -121,14 +137,23 @@ export async function verifyEaseMyTripProvider(
         ? 'PASSED'
         : 'FAILED';
 
-    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} EaseMyTrip: VALIDATION ${result.status}`);
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} ClearTrip: VALIDATION ${result.status}`);
   } catch (err: any) {
     result.error = err.message;
-    console.error('   ❌ EaseMyTrip error:', err.message);
+    console.error('   ❌ ClearTrip error:', err.message);
   } finally {
-    console.log('   🔒 Closing EaseMyTrip tab before next provider...');
+    console.log('   🔒 Closing ClearTrip tab before next provider...');
     await page.close();
   }
 
   return result;
+}
+
+import { runStandaloneProvider } from '../../helpers/runner';
+
+if (require.main === module) {
+  runStandaloneProvider(verifyClearTripProvider, 'ClearTrip').catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
