@@ -154,19 +154,6 @@ flowchart TD
   - Clean physical station location micro-banner with zero redundant delay text.
   - Action footer featuring compact 24-hour update clock (`Updated: HH:MM`) and interactive **Copy** and **Refresh** buttons.
 
-### 3. Consolidated Real-Site E2E Test Results
-
-Executed on Route: **Kharagpur (`KGP`) ➔ Howrah (`HWH`)**
-
-| Step | Provider Portal | Trains Identified | Badge Injected | Position Switching (`beside`, `right`, `below`) | Hover Popover | Standard Colors (`box-late`, `box-ontime`, `box-neutral`) | Clean 24h & Zero Duplicates | Status |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **[1/4]** | **MakeMyTrip (Live Search)** | 42 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[2/4]** | **ConfirmTkt (Live Route)** | 85 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[3/4]** | **RailYatri (Live Route)** | 121 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[4/4]** | **IRCTC NextGen (Live Official)** | 1 Portal | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-
-> 📸 **Visual Test Evidence:** Timestamped screenshot artifacts for all providers are generated in [`tests/e2e/screenshots/`](tests/e2e/screenshots/).
-
 ---
 
 ## 🔒 Privacy & Terms

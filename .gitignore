@@ -30,8 +30,11 @@ lerna-debug.log*
 .env.local
 .env.*.local
 
-# Playwright Test Profiles
+# Playwright Test Profiles & Screenshots
 .playwright*
 .pw*
 tests/e2e/.playwright*
 tests/e2e/.pw*
+tests/e2e/screenshots/
+screenshots/
+*.png.bak
