@@ -96,7 +96,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   cacheTtlMinutes: 0, // Default: No cache (Always Live Fetch)
   maxCacheSizeMb: 50, // Max cache size: 50 MB
   showFloatingHUD: true,
-  termsAccepted: false, // Requires user acceptance on first run
+  termsAccepted: true, // Default: active immediately for seamless user experience
   recentSearches: ['12952', '12301', '12004'],
   schemaVersion: '2.0.0',
   providers: {

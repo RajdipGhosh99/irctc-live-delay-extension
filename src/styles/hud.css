@@ -121,6 +121,12 @@
   background: var(--rail-primary-hover) !important;
 }
 
+.rail-hud-action-btn.primary:disabled {
+  opacity: 0.8 !important;
+  cursor: wait !important;
+  pointer-events: none !important;
+}
+
 .rail-hud-action-btn.secondary {
   background: #f1f5f9 !important;
   color: #334155 !important;

@@ -6,6 +6,7 @@
 
 import { BadgePosition, InjectedWidget, MultiProviderSettings, TrainDelayData } from '../core/types';
 import { loadSettings } from '../core/storage';
+import { STORAGE_KEYS } from '../core/constants';
 import { PortalRegistry } from '../portals/PortalRegistry';
 import { BadgeComponent } from '../ui/BadgeComponent';
 import { PopoverComponent } from '../ui/PopoverComponent';
@@ -54,6 +55,14 @@ class ContentScriptOrchestrator {
         if (newPos !== oldPos) {
           this.repositionAllBadges(newPos);
         }
+      }
+    });
+
+    // Listen for runtime messages (e.g. TRIGGER_FETCH_ALL from extension popup)
+    chrome.runtime?.onMessage?.addListener((message, _sender, sendResponse) => {
+      if (message?.type === 'TRIGGER_FETCH_ALL') {
+        this.fetchAllTrains(true);
+        sendResponse({ success: true, count: this.injectedWidgets.size });
       }
     });
 
@@ -332,10 +341,8 @@ class ContentScriptOrchestrator {
         const data: TrainDelayData = response.data;
         const isDelayed = data.delayMinutes > 5;
         const state = isDelayed ? 'delayed' : 'on-time';
-
         BadgeComponent.updateState(widget, state, data.delayMinutes);
         this.attachPopover(widget, data);
-        this.updateHudStats();
       } else {
         if (response?.termsRequired) {
           chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
@@ -345,6 +352,8 @@ class ContentScriptOrchestrator {
     } catch (err) {
       console.error('[TrainDelayTracker] Fetch error:', err);
       BadgeComponent.updateState(widget, 'error');
+    } finally {
+      this.updateHudStats();
     }
   }
 
@@ -402,28 +411,68 @@ class ContentScriptOrchestrator {
     }
   }
 
-  public fetchAllTrains(): void {
+  public async fetchAllTrains(forceRefresh = false): Promise<void> {
+    // 1. Auto-accept terms if user explicitly clicked Fetch All
     if (!this.settings?.termsAccepted) {
-      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
+      this.settings = {
+        ...(this.settings || ({} as MultiProviderSettings)),
+        termsAccepted: true,
+        termsAcceptedAt: new Date().toISOString(),
+      };
+      chrome.storage?.local?.set?.({ [STORAGE_KEYS.SETTINGS]: this.settings });
+      FloatingHudComponent.updateTermsStatus(true);
+    }
+
+    // 2. Scan DOM first to capture any dynamically loaded train cards
+    this.scanAndInject();
+
+    const allWidgets = Array.from(this.injectedWidgets.values());
+    if (allWidgets.length === 0) {
+      console.warn('[TrainDelayTracker] No trains found to fetch.');
       return;
     }
 
-    let delayMs = 0;
-    for (const widget of this.injectedWidgets.values()) {
-      if (widget.state === 'idle' || widget.state === 'error') {
-        setTimeout(() => {
-          this.fetchTrainDelay(widget);
-        }, delayMs);
-        delayMs += 140; // Stagger requests gracefully
+    // Target idle and error cards, or all cards if none are idle/error
+    let targets = forceRefresh
+      ? allWidgets
+      : allWidgets.filter((w) => w.state === 'idle' || w.state === 'error');
+
+    if (targets.length === 0) {
+      targets = allWidgets;
+      forceRefresh = true;
+    }
+
+    const total = targets.length;
+    let completed = 0;
+    FloatingHudComponent.setFetchingState(true, { done: 0, total });
+
+    const BATCH_SIZE = 3;
+    const STAGGER_MS = 140;
+
+    for (let i = 0; i < targets.length; i += BATCH_SIZE) {
+      const batch = targets.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map((w) =>
+          this.fetchTrainDelay(w, forceRefresh).finally(() => {
+            completed++;
+            FloatingHudComponent.setFetchingState(true, { done: completed, total });
+          })
+        )
+      );
+      if (i + BATCH_SIZE < targets.length) {
+        await new Promise((resolve) => setTimeout(resolve, STAGGER_MS));
       }
     }
+
+    FloatingHudComponent.setFetchingState(false);
+    this.updateHudStats();
   }
 
   private updateHudStats(): void {
     const total = this.injectedWidgets.size;
     let fetched = 0;
     for (const widget of this.injectedWidgets.values()) {
-      if (widget.state === 'on-time' || widget.state === 'delayed') {
+      if (widget.state === 'on-time' || widget.state === 'delayed' || widget.state === 'error') {
         fetched++;
       }
     }

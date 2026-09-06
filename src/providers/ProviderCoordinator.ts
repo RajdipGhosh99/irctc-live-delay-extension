@@ -14,11 +14,11 @@ import { fetchRapidApiRail1Status } from './RapidApiRail1Provider';
 import { fetchRapidApiRail2Status } from './RapidApiRail2Provider';
 
 const circuitBreakers: Record<ProviderId, CircuitBreaker> = {
-  'direct-rail-gateway': new CircuitBreaker(3, 120000), // 2 min cooldown
-  'rapidapi-rail-v1': new CircuitBreaker(4, 180000),
-  'rapidapi-rail-v2': new CircuitBreaker(4, 180000),
-  'indianrailapi': new CircuitBreaker(3, 180000),
-  'custom-webhook': new CircuitBreaker(3, 180000),
+  'direct-rail-gateway': new CircuitBreaker(8, 60000), // 8 failures, 1 min cooldown
+  'rapidapi-rail-v1': new CircuitBreaker(6, 120000),
+  'rapidapi-rail-v2': new CircuitBreaker(6, 120000),
+  'indianrailapi': new CircuitBreaker(6, 120000),
+  'custom-webhook': new CircuitBreaker(6, 120000),
 };
 
 const inFlightRequests = new Map<string, Promise<TrainDelayData>>();

@@ -4,6 +4,7 @@
  */
 
 import {
+  checkIcon,
   minusIcon,
   settingsIcon,
   shieldCheckIcon,
@@ -101,6 +102,40 @@ export class FloatingHudComponent {
       textEl.textContent = `All ${detectedCount} trains updated`;
     } else {
       textEl.textContent = `${fetchedCount}/${detectedCount} trains loaded`;
+    }
+  }
+
+  public static setFetchingState(isFetching: boolean, count?: { done: number; total: number }): void {
+    const btn = document.getElementById('rail-hud-fetch-all-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+
+    if (isFetching) {
+      btn.disabled = true;
+      btn.style.opacity = '0.8';
+      btn.style.cursor = 'wait';
+      const label = count ? `Fetching (${count.done}/${count.total})…` : 'Fetching…';
+      btn.innerHTML = `<span class="rail-delay-spinner" style="width:10px;height:10px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:4px;"></span> ${label}`;
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      btn.innerHTML = `${checkIcon({ size: 12, className: 'svg-icon-inline' })} All Updated`;
+      setTimeout(() => {
+        if (btn && !btn.disabled) {
+          btn.innerHTML = `${zapIcon({ size: 12, className: 'svg-icon-inline' })} Fetch All`;
+        }
+      }, 2500);
+    }
+  }
+
+  public static updateTermsStatus(accepted: boolean): void {
+    const indicator = document.querySelector('.rail-hud-live-indicator');
+    if (indicator) {
+      indicator.textContent = accepted ? '● Active' : 'Terms Required';
+    }
+    const btn = document.getElementById('rail-hud-fetch-all-btn') as HTMLButtonElement | null;
+    if (btn && accepted) {
+      btn.removeAttribute('title');
     }
   }
 
