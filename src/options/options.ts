@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     floatingHudSwitch.checked = currentSettings.showFloatingHUD !== false;
     primaryProviderSelect.value = currentSettings.activeProvider || 'direct-rail-gateway';
     autoFailoverSwitch.checked = currentSettings.autoFailover !== false;
-    autoFetchAllSwitch.checked = Boolean(currentSettings.autoFetchAllTrains);
+    autoFetchAllSwitch.checked = currentSettings.autoFetchAllTrains !== false;
     cacheTtlSelect.value = String(currentSettings.cacheTtlMinutes ?? 0);
 
     if (dashboardGlobalStatus) {

@@ -92,7 +92,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   activeProvider: 'direct-rail-gateway',
   autoFailover: true,
   fetchOnHover: false,
-  autoFetchAllTrains: false,
+  autoFetchAllTrains: true,
   cacheTtlMinutes: 0, // Default: No cache (Always Live Fetch)
   maxCacheSizeMb: 50, // Max cache size: 50 MB
   showFloatingHUD: true,
