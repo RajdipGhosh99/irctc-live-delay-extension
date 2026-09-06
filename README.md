@@ -1,7 +1,7 @@
 # 🚆 Live Train Delay Tracker
 
 <p align="center">
-  <img src="./public/icons/icon128.png" width="96" height="96" alt="Live Train Delay Tracker Logo" />
+  <img src="./public/icons/icon128.png" width="112" height="112" alt="Live Train Delay Tracker Logo" />
   <br />
   <strong>Real-time Indian Railways live train running status and historical punctuality ratings directly on your favorite booking websites.</strong>
 </p>
@@ -30,6 +30,7 @@ Install with one click on **Microsoft Edge** or any Chromium browser:
 
 ## ✨ Features
 
+- 🇮🇳 **Refreshed Indian Rail & Tricolor Identity:** Features an authentic, modern 2D vector emblem combining the Indian Tricolor canopy (Saffron & India Green), the Ashoka Chakra dial of punctuality, and a glowing Emerald Live Status beacon.
 - 🟢 **Live Delay Badges:** Interactive `[🚆 Check Live]` delay badges placed seamlessly beside train names on booking portals.
 - 📊 **3-Metric Delay Analytics:**
   - **Today Live:** Current real-time delay status and live station arrival/departure.
@@ -38,7 +39,7 @@ Install with one click on **Microsoft Edge** or any Chromium browser:
 - 🎯 **Instant Train Lookup:** Enter any 5-digit train number in the extension popup to check its live status instantly without opening a booking site.
 - 🎛️ **Floating Quick-Action Button:** Convenient button on search results to fetch all train delays on the page in a single click.
 - 💾 **Data Saver & Strict 50 MB Cache:** On-demand fetching only. Remembers checked trains to save mobile data and battery with zero background tracking.
-- 🇮🇳 **Out-of-the-Box National Rail Gateways:** Connects directly to real-time train feeds with zero setup, plus optional backup API key support for power users.
+- ⚡ **Out-of-the-Box National Rail Gateways:** Connects directly to real-time train feeds with zero setup, plus optional backup API key support for power users.
 
 ---
 
