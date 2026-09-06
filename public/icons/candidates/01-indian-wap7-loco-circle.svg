@@ -1,53 +1,62 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="adobeGlow1" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="12" result="blur"/>
+    <clipPath id="squircleClip1">
+      <rect x="24" y="24" width="464" height="464" rx="112"/>
+    </clipPath>
+    <filter id="glowDot1" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <linearGradient id="adobeRedGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FF2416"/>
-      <stop offset="100%" stop-color="#DA0A00"/>
-    </linearGradient>
   </defs>
 
-  <!-- Adobe Acrobat Red Superellipse / Squircle Background -->
-  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#adobeRedGrad1)"/>
-
-  <!-- Subtle Inner Saffron & Green Accent Arcs -->
-  <path d="M 120 48 Q 256 36 392 48" fill="none" stroke="#FF9900" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
-  <path d="M 120 464 Q 256 476 392 464" fill="none" stroke="#00E676" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
-
-  <!-- Pure Snow-White Train Glyph in Center -->
-  <g transform="translate(0, -6)">
-    <!-- Roof Cap -->
-    <rect x="210" y="118" width="92" height="20" rx="8" fill="#FFFFFF"/>
-    <!-- Cabin -->
-    <rect x="162" y="132" width="188" height="188" rx="34" fill="#FFFFFF"/>
-    <!-- Windshield Cutout (Acrobat Red) -->
-    <rect x="182" y="152" width="148" height="70" rx="12" fill="#F40F02"/>
-    <!-- Headlights (Acrobat Red) -->
-    <circle cx="202" cy="270" r="20" fill="#F40F02"/>
-    <circle cx="310" cy="270" r="20" fill="#F40F02"/>
-    <!-- 3 Radiator Pills (Acrobat Red) -->
-    <rect x="242" y="250" width="8" height="38" rx="4" fill="#F40F02"/>
-    <rect x="252" y="246" width="8" height="46" rx="4" fill="#F40F02"/>
-    <rect x="262" y="250" width="8" height="38" rx="4" fill="#F40F02"/>
-
-    <!-- Tracks & Sleepers -->
-    <polygon points="202,336 220,336 188,430 168,430" fill="#FFFFFF"/>
-    <polygon points="292,336 310,336 344,430 324,430" fill="#FFFFFF"/>
-    <rect x="200" y="350" width="112" height="14" rx="7" fill="#FFFFFF"/>
-    <rect x="186" y="380" width="140" height="15" rx="7.5" fill="#FFFFFF"/>
-    <rect x="172" y="412" width="168" height="16" rx="8" fill="#FFFFFF"/>
+  <!-- Squircle Base with Indian Flag 3 Horizontal Bands -->
+  <g clip-path="url(#squircleClip1)">
+    <!-- Saffron Top Band -->
+    <rect x="0" y="0" width="512" height="174" fill="#FF7700"/>
+    <!-- White Middle Band -->
+    <rect x="0" y="174" width="512" height="164" fill="#FFFFFF"/>
+    <!-- India Green Bottom Band -->
+    <rect x="0" y="338" width="512" height="174" fill="#00E676"/>
   </g>
 
-  <!-- Glowing Emerald Live Status Dot Badge (Top Right Corner) -->
-  <g transform="translate(416, 96)">
-    <circle cx="0" cy="0" r="32" fill="#00E676" opacity="0.3" filter="url(#adobeGlow1)"/>
+  <!-- Squircle Border in Deep Obsidian -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="none" stroke="#0F172A" stroke-width="12"/>
+
+  <!-- High-Contrast Reference Train Body in Center -->
+  <g transform="translate(0, -6)">
+    <!-- Roof Cap -->
+    <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
+    <!-- Cabin -->
+    <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
+    <!-- Windshield (White Negative Space) -->
+    <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
+
+    <!-- Headlights in Middle White Band -->
+    <circle cx="198" cy="272" r="22" fill="#FFFFFF"/>
+    <circle cx="198" cy="272" r="14" fill="#0F172A"/>
+    <circle cx="314" cy="272" r="22" fill="#FFFFFF"/>
+    <circle cx="314" cy="272" r="14" fill="#0F172A"/>
+
+    <!-- 3 Radiator Pills in Ashoka Navy Blue -->
+    <rect x="240" y="252" width="8" height="40" rx="4" fill="#003399"/>
+    <rect x="252" y="248" width="8" height="48" rx="4" fill="#003399"/>
+    <rect x="264" y="252" width="8" height="40" rx="4" fill="#003399"/>
+
+    <!-- Tracks in Deep Obsidian -->
+    <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
+    <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
+    <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
+    <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
+    <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
+  </g>
+
+  <!-- Glowing Live Dot Beacon at Top-Right Corner -->
+  <g transform="translate(420, 92)">
+    <circle cx="0" cy="0" r="32" fill="#00E676" opacity="0.35" filter="url(#glowDot1)"/>
     <circle cx="0" cy="0" r="20" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
-    <circle cx="-3" cy="-3" r="3.5" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>

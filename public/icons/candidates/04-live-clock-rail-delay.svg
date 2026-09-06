@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="adobeGlow4" x="-40%" y="-40%" width="180%" height="180%">
+    <linearGradient id="squircleTricolor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7700"/>
+      <stop offset="50%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#00E676"/>
+    </linearGradient>
+    <filter id="glowDot4" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
@@ -9,51 +14,49 @@
     </filter>
   </defs>
 
-  <!-- Outer Ring in Adobe Acrobat Red -->
-  <circle cx="256" cy="256" r="226" fill="none" stroke="#F40F02" stroke-width="26"/>
+  <!-- Deep Obsidian Squircle with Bold Tricolor Gradient Border -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#0B0F19" stroke="url(#squircleTricolor)" stroke-width="18"/>
 
-  <!-- Train Upper Canopy in Adobe Acrobat Red -->
-  <rect x="206" y="112" width="100" height="24" rx="10" fill="#F40F02"/>
-  <path d="M 156 180 C 156 142, 180 128, 216 128 L 296 128 C 332 128, 356 142, 356 180 L 356 200 L 156 200 Z" fill="#F40F02"/>
+  <!-- Ashoka Chakra Dial overhead -->
+  <g transform="translate(256, 96)">
+    <circle cx="0" cy="0" r="20" fill="none" stroke="#003399" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="5" fill="#003399"/>
+    <line x1="0" y1="-19" x2="0" y2="19" stroke="#003399" stroke-width="2"/>
+    <line x1="-19" y1="0" x2="19" y2="0" stroke="#003399" stroke-width="2"/>
+    <line x1="-13" y1="-13" x2="13" y2="13" stroke="#003399" stroke-width="2"/>
+    <line x1="-13" y1="13" x2="13" y2="-13" stroke="#003399" stroke-width="2"/>
+  </g>
 
-  <!-- Saffron Aerodynamic Visor Brow -->
-  <rect x="180" y="142" width="152" height="6" rx="3" fill="#FF7700"/>
+  <!-- Train Glyph in Pure Snow White -->
+  <g transform="translate(0, 4)">
+    <!-- Roof Cap -->
+    <rect x="208" y="120" width="96" height="22" rx="9" fill="#FF7700"/>
+    <!-- Cabin -->
+    <rect x="160" y="134" width="192" height="192" rx="36" fill="#FFFFFF"/>
+    <!-- Windshield -->
+    <rect x="180" y="152" width="152" height="70" rx="12" fill="#0B0F19"/>
 
-  <!-- Clean White Cockpit Section -->
-  <rect x="156" y="200" width="200" height="74" fill="#FFFFFF" stroke="#F40F02" stroke-width="8"/>
+    <!-- Headlights -->
+    <circle cx="200" cy="270" r="20" fill="#0B0F19"/>
+    <circle cx="312" cy="270" r="20" fill="#0B0F19"/>
 
-  <!-- Windshield Cutout in Deep Obsidian -->
-  <rect x="178" y="152" width="156" height="64" rx="12" fill="#0F172A"/>
+    <!-- 3 Radiator Pills in Ashoka Navy -->
+    <rect x="242" y="250" width="8" height="38" rx="4" fill="#003399"/>
+    <rect x="252" y="246" width="8" height="46" rx="4" fill="#003399"/>
+    <rect x="262" y="250" width="8" height="38" rx="4" fill="#003399"/>
 
-  <!-- Headlights in Adobe Red Rim -->
-  <circle cx="198" cy="242" r="22" fill="#F40F02"/>
-  <circle cx="198" cy="242" r="14" fill="#FFFFFF"/>
-  <circle cx="314" cy="242" r="22" fill="#F40F02"/>
-  <circle cx="314" cy="242" r="14" fill="#FFFFFF"/>
+    <!-- Tracks in India Green -->
+    <polygon points="200,338 218,338 186,432 166,432" fill="#00E676"/>
+    <polygon points="294,338 312,338 346,432 326,432" fill="#00E676"/>
+    <rect x="198" y="352" width="116" height="14" rx="7" fill="#FFFFFF"/>
+    <rect x="184" y="382" width="144" height="15" rx="7.5" fill="#FFFFFF"/>
+    <rect x="170" y="414" width="172" height="16" rx="8" fill="#FFFFFF"/>
+  </g>
 
-  <!-- Center Ashoka Navy Grill -->
-  <rect x="242" y="222" width="7" height="38" rx="3.5" fill="#003399"/>
-  <rect x="252" y="218" width="8" height="46" rx="4" fill="#003399"/>
-  <rect x="263" y="222" width="7" height="38" rx="3.5" fill="#003399"/>
-
-  <!-- India Green Lower Cowcatcher & Chassis -->
-  <path d="M 156 274 L 356 274 L 348 326 C 348 340, 334 348, 316 348 L 196 348 C 178 348, 164 340, 164 326 Z" fill="#00E676"/>
-
-  <!-- High-Contrast Outline -->
-  <path d="M 156 180 C 156 142, 180 128, 216 128 L 296 128 C 332 128, 356 142, 356 180 L 356 326 C 356 344, 340 354, 316 354 L 196 354 C 172 354, 156 344, 156 326 Z" fill="none" stroke="#F40F02" stroke-width="10" stroke-linejoin="round"/>
-
-  <!-- Tracks in Adobe Acrobat Red -->
-  <polygon points="196,358 216,358 182,442 160,442" fill="#F40F02"/>
-  <polygon points="296,358 316,358 352,442 330,442" fill="#F40F02"/>
-  <rect x="194" y="368" width="124" height="14" rx="7" fill="#F40F02"/>
-  <rect x="180" y="396" width="152" height="15" rx="7.5" fill="#F40F02"/>
-  <rect x="164" y="424" width="184" height="16" rx="8" fill="#F40F02"/>
-
-  <!-- Glowing Live Dot Beacon at 2 o'clock -->
-  <g transform="translate(422, 90)">
-    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#adobeGlow4)"/>
-    <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
-    <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
+  <!-- Glowing Live Dot Beacon at Top-Right Corner -->
+  <g transform="translate(418, 94)">
+    <circle cx="0" cy="0" r="32" fill="#00E676" opacity="0.35" filter="url(#glowDot4)"/>
+    <circle cx="0" cy="0" r="20" fill="#00E676" stroke="#0B0F19" stroke-width="4.5"/>
     <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>
