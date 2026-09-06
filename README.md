@@ -127,11 +127,10 @@ flowchart TD
     
     subgraph SequentialFlow [Playwright Sequential Execution: One Provider at a Time]
         direction TB
-        S1["1. Open Provider Tab (Google Search Scraper)"] --> V1["Verify ➔ Screenshot ➔ Close Tab"]
-        V1 --> S2["2. Open Provider Tab (MakeMyTrip Live)"] --> V2["Verify ➔ Screenshot ➔ Close Tab"]
-        V2 --> S3["3. Open Provider Tab (ConfirmTkt Live)"] --> V3["Verify ➔ Screenshot ➔ Close Tab"]
-        V3 --> S4["4. Open Provider Tab (RailYatri Live)"] --> V4["Verify ➔ Screenshot ➔ Close Tab"]
-        V4 --> S5["5. Open Provider Tab (IRCTC NextGen Live)"] --> V5["Verify ➔ Screenshot ➔ Close Tab"]
+        S1["1. Open Provider Tab (MakeMyTrip Live)"] --> V1["Verify ➔ Screenshot ➔ Close Tab"]
+        V1 --> S2["2. Open Provider Tab (ConfirmTkt Live)"] --> V2["Verify ➔ Screenshot ➔ Close Tab"]
+        V2 --> S3["3. Open Provider Tab (RailYatri Live)"] --> V3["Verify ➔ Screenshot ➔ Close Tab"]
+        V3 --> S4["4. Open Provider Tab (IRCTC NextGen Live)"] --> V4["Verify ➔ Screenshot ➔ Close Tab"]
     end
     
     Playwright --> SequentialFlow
@@ -160,11 +159,10 @@ Executed on Route: **Kharagpur (`KGP`) ➔ Howrah (`HWH`)**
 
 | Step | Provider Portal | Trains Identified | Badge Injected | Position Switching (`beside`, `right`, `below`) | Hover Popover | Standard Colors (`box-late`, `box-ontime`, `box-neutral`) | Clean 24h & Zero Duplicates | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **[1/5]** | **Google Search (Live Scraper)** | 3 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[2/5]** | **MakeMyTrip (Live Search)** | 42 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[3/5]** | **ConfirmTkt (Live Route)** | 85 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[4/5]** | **RailYatri (Live Route)** | 121 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **[5/5]** | **IRCTC NextGen (Live Official)** | 1 Portal | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[1/4]** | **MakeMyTrip (Live Search)** | 42 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[2/4]** | **ConfirmTkt (Live Route)** | 85 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[3/4]** | **RailYatri (Live Route)** | 121 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[4/4]** | **IRCTC NextGen (Live Official)** | 1 Portal | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
 
 > 📸 **Visual Test Evidence:** Timestamped screenshot artifacts for all providers are generated in [`tests/e2e/screenshots/`](tests/e2e/screenshots/).
 

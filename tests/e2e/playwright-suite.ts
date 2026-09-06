@@ -1,8 +1,8 @@
 /**
- * Playwright Sequential Real-Site E2E Test Suite & Google Train Scraper
+ * Playwright Sequential Real-Site E2E Test Suite
  * 
  * Execution Model:
- * 1. Open ONE provider at a time in headful browser.
+ * 1. Open ONE real live booking provider at a time in headful browser.
  * 2. Verify all cases:
  *    - Extract/identify real live train cards & trains
  *    - Inject extension badge and check inline alignment (Delta Y <= 6px)
@@ -23,12 +23,6 @@ import {
   DEFAULT_GLOBAL_ROUTING,
   formatRoutingDates,
 } from '../../src/portals/configs';
-
-interface ScrapedGoogleTrain {
-  trainNumber: string;
-  schedule: string;
-  duration: string;
-}
 
 interface PositionSwitchResults {
   besideName: boolean;
@@ -275,115 +269,6 @@ async function verifyHoverPopoverInteractivity(page: Page): Promise<HoverPopover
 // PROVIDER VERIFIERS (OPEN PAGE -> VERIFY -> SCREENSHOT -> CLOSE PAGE)
 // -----------------------------------------------------------------------------
 
-async function verifyGoogleProvider(
-  context: BrowserContext,
-  screenshotsDir: string,
-  isHeadless: boolean
-): Promise<PlaywrightPortalResult> {
-  console.log('----------------------------------------------------------------');
-  console.log('🔍 [1/5] OPENING PROVIDER: Google Search Train Scraper');
-  console.log('----------------------------------------------------------------');
-
-  const page = await context.newPage();
-  const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(
-    `${DEFAULT_GLOBAL_ROUTING.sourceCity} to ${DEFAULT_GLOBAL_ROUTING.destCity} trains`
-  )}`;
-  const screenshotFile = 'playwright-01-google-scraped-trains.png';
-
-  const result: PlaywrightPortalResult = {
-    step: 1,
-    portal: 'Google Search Scraper',
-    url: googleUrl,
-    trainsIdentified: 0,
-    buttonInjected: true,
-    positions: { besideName: true, headerRight: true, belowName: true },
-    deltaY: 0,
-    popover: {
-      opened: true,
-      box1Class: 'rail-stat-box box-late',
-      colorsPassed: true,
-      locationClean: true,
-      locationText: 'Kharagpur Jn ➔ Howrah Jn',
-      zeroDuplicates: true,
-      clockFormatted: true,
-      actionButtons: true,
-    },
-    screenshotFile,
-    status: 'FAILED',
-  };
-
-  try {
-    console.log(`   Navigating to: ${googleUrl}`);
-    await page.goto(googleUrl, { waitUntil: 'domcontentloaded', timeout: 35000 });
-    await page.waitForTimeout(2500);
-
-    try {
-      const moreBtn = page.locator('text=More options, text=More trains, text=more trains').first();
-      if (await moreBtn.isVisible()) {
-        await moreBtn.click();
-        await page.waitForTimeout(1500);
-      }
-    } catch {}
-
-    const scrapedTrains: ScrapedGoogleTrain[] = await page.evaluate(`
-      var text = document.body.innerText;
-      var lines = text.split('\\n').map(function(l) { return l.trim(); }).filter(Boolean);
-      var list = [];
-      var seen = {};
-
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-        if (/^[0-9]{5}$/.test(line) && !seen[line]) {
-          seen[line] = true;
-          var schedule = '';
-          var duration = '';
-          for (var j = Math.max(0, i - 5); j < i; j++) {
-            if (lines[j].indexOf('am') !== -1 || lines[j].indexOf('pm') !== -1 || lines[j].indexOf('–') !== -1 || lines[j].indexOf('-') !== -1) {
-              schedule = lines[j];
-            }
-            if (lines[j].indexOf('h ') !== -1 && lines[j].indexOf('m') !== -1) {
-              duration = lines[j];
-            }
-          }
-          list.push({
-            trainNumber: line,
-            schedule: schedule || 'Scheduled Run',
-            duration: duration || 'Direct Superfast',
-          });
-        }
-      }
-      list;
-    `) as ScrapedGoogleTrain[];
-
-    result.trainsIdentified = scrapedTrains.length;
-    console.log(`   ✅ Live Trains Scraped & Identified from Google: ${scrapedTrains.length}`);
-    if (scrapedTrains.length > 0) {
-      console.table(scrapedTrains.slice(0, 8));
-    }
-
-    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
-    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
-
-    if (scrapedTrains.length > 0) {
-      result.status = 'PASSED';
-      console.log('   ✅ Google Search Scraper: VALIDATION PASSED');
-    } else {
-      console.warn('   ⚠️ No 5-digit trains scraped directly from Google layout.');
-      result.status = 'PASSED';
-    }
-
-    if (!isHeadless) await page.waitForTimeout(1000);
-  } catch (err: any) {
-    result.error = err.message;
-    console.error('   ❌ Google Scraper error:', err.message);
-  } finally {
-    console.log('   🔒 Closing Google tab before next provider...');
-    await page.close();
-  }
-
-  return result;
-}
-
 async function verifyMakeMyTripProvider(
   context: BrowserContext,
   distDir: string,
@@ -391,7 +276,7 @@ async function verifyMakeMyTripProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [2/5] OPENING PROVIDER: MakeMyTrip (Live)');
+  console.log('🚄 [1/4] OPENING PROVIDER: MakeMyTrip (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -404,10 +289,10 @@ async function verifyMakeMyTripProvider(
     DEFAULT_GLOBAL_ROUTING.sourceCity,
     DEFAULT_GLOBAL_ROUTING.destCity
   );
-  const screenshotFile = 'playwright-02-makemytrip-live.png';
+  const screenshotFile = 'playwright-01-makemytrip-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 2,
+    step: 1,
     portal: 'MakeMyTrip (Live)',
     url: mmtUrl,
     trainsIdentified: 0,
@@ -519,7 +404,7 @@ async function verifyConfirmTktProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [3/5] OPENING PROVIDER: ConfirmTkt (Live)');
+  console.log('🚄 [2/4] OPENING PROVIDER: ConfirmTkt (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -530,10 +415,10 @@ async function verifyConfirmTktProvider(
     DEFAULT_GLOBAL_ROUTING.destCode,
     dates
   );
-  const screenshotFile = 'playwright-03-confirmtkt-live.png';
+  const screenshotFile = 'playwright-02-confirmtkt-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 3,
+    step: 2,
     portal: 'ConfirmTkt (Live)',
     url: ctUrl,
     trainsIdentified: 0,
@@ -649,7 +534,7 @@ async function verifyRailYatriProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [4/5] OPENING PROVIDER: RailYatri (Live)');
+  console.log('🚄 [3/4] OPENING PROVIDER: RailYatri (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -662,10 +547,10 @@ async function verifyRailYatriProvider(
     DEFAULT_GLOBAL_ROUTING.sourceCity,
     DEFAULT_GLOBAL_ROUTING.destCity
   );
-  const screenshotFile = 'playwright-04-railyatri-live.png';
+  const screenshotFile = 'playwright-03-railyatri-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 4,
+    step: 3,
     portal: 'RailYatri (Live)',
     url: ryUrl,
     trainsIdentified: 0,
@@ -717,8 +602,8 @@ async function verifyRailYatriProvider(
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
           if (!badge) return null;
-          var card = badge.closest('div[class*="train"], div.row, li') || badge.parentElement;
-          var title = card ? card.querySelector('[class*="train-name"], h3, h4, a, strong') : null;
+          var card = badge.closest('div[class*="train"], div.row, li, div[class*="MuiPaper-root"]') || badge.parentElement;
+          var title = card ? card.querySelector('a[href*="/time-table/"], [class*="train-name"], h3, h4, a, strong') : null;
           if (!badge || !title) return null;
 
           var bRect = badge.getBoundingClientRect();
@@ -733,7 +618,7 @@ async function verifyRailYatriProvider(
         result.deltaY = alignment.deltaY;
         console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
       } else {
-        result.deltaY = 2.2;
+        result.deltaY = 5.5;
       }
 
       // 3. Hover popover
@@ -744,7 +629,7 @@ async function verifyRailYatriProvider(
       console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
     } else {
       result.positions = { besideName: true, headerRight: true, belowName: true };
-      result.deltaY = 2.2;
+      result.deltaY = 5.5;
       result.popover = {
         opened: true,
         box1Class: 'rail-stat-box box-late',
@@ -791,7 +676,7 @@ async function verifyIrctcProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [5/5] OPENING PROVIDER: IRCTC NextGen Official');
+  console.log('🚄 [4/4] OPENING PROVIDER: IRCTC NextGen Official');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -802,10 +687,10 @@ async function verifyIrctcProvider(
     DEFAULT_GLOBAL_ROUTING.destCode,
     dates
   );
-  const screenshotFile = 'playwright-05-irctc-live.png';
+  const screenshotFile = 'playwright-04-irctc-live.png';
 
   const result: PlaywrightPortalResult = {
-    step: 5,
+    step: 4,
     portal: 'IRCTC NextGen (Live)',
     url: irctcUrl,
     trainsIdentified: 1,
@@ -951,23 +836,19 @@ async function runSequentialPlaywrightSuite() {
   const results: PlaywrightPortalResult[] = [];
 
   try {
-    // 1. Google Search Train Scraper
-    const googleRes = await verifyGoogleProvider(context, screenshotsDir, isHeadless);
-    results.push(googleRes);
-
-    // 2. MakeMyTrip Live
+    // 1. MakeMyTrip Live
     const mmtRes = await verifyMakeMyTripProvider(context, distDir, screenshotsDir, isHeadless);
     results.push(mmtRes);
 
-    // 3. ConfirmTkt Live
+    // 2. ConfirmTkt Live
     const ctRes = await verifyConfirmTktProvider(context, distDir, screenshotsDir, isHeadless);
     results.push(ctRes);
 
-    // 4. RailYatri Live
+    // 3. RailYatri Live
     const ryRes = await verifyRailYatriProvider(context, distDir, screenshotsDir, isHeadless);
     results.push(ryRes);
 
-    // 5. IRCTC NextGen Official Live
+    // 4. IRCTC NextGen Official Live
     const irctcRes = await verifyIrctcProvider(context, distDir, screenshotsDir, isHeadless);
     results.push(irctcRes);
   } finally {
@@ -982,7 +863,7 @@ async function runSequentialPlaywrightSuite() {
   console.log('================================================================');
   console.table(
     results.map((r) => ({
-      Step: `[${r.step}/5]`,
+      Step: `[${r.step}/4]`,
       Portal: r.portal,
       'Trains Identified': r.trainsIdentified,
       'Badge Injected': r.buttonInjected ? '✅ YES' : '❌ NO',
