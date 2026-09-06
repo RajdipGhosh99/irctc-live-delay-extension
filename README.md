@@ -123,26 +123,27 @@ The extension features a comprehensive, high-performance E2E testing framework p
 ```mermaid
 flowchart TD
     Config["Single-Source Config (src/portals/configs/)"] --> Runtime["Extension Content Adapters"]
-    Config --> Playwright["Playwright Multi-Tab E2E Runner"]
+    Config --> Playwright["Playwright Sequential E2E Runner"]
     
-    subgraph MultiTab [Playwright Multi-Tab Real-Browser Execution]
-        T1["Tab 1: Google Search (Scrape Live Trains)"]
-        T2["Tab 2: MakeMyTrip Live (Cards, Position Switch, Hover Popup)"]
-        T3["Tab 3: ConfirmTkt Live (Cards, Position Switch, Hover Popup)"]
-        T4["Tab 4: RailYatri Live (Cards, Position Switch, Hover Popup)"]
-        T5["Tab 5: IRCTC NextGen Live (Cards, Position Switch, Hover Popup)"]
+    subgraph SequentialFlow [Playwright Sequential Execution: One Provider at a Time]
+        direction TB
+        S1["1. Open Provider Tab (Google Search Scraper)"] --> V1["Verify ➔ Screenshot ➔ Close Tab"]
+        V1 --> S2["2. Open Provider Tab (MakeMyTrip Live)"] --> V2["Verify ➔ Screenshot ➔ Close Tab"]
+        V2 --> S3["3. Open Provider Tab (ConfirmTkt Live)"] --> V3["Verify ➔ Screenshot ➔ Close Tab"]
+        V3 --> S4["4. Open Provider Tab (RailYatri Live)"] --> V4["Verify ➔ Screenshot ➔ Close Tab"]
+        V4 --> S5["5. Open Provider Tab (IRCTC NextGen Live)"] --> V5["Verify ➔ Screenshot ➔ Close Tab"]
     end
     
-    Playwright --> MultiTab
-    MultiTab --> Evidence["Crisp Test Evidence & Screenshots"]
+    Playwright --> SequentialFlow
+    SequentialFlow --> Evidence["Crisp Test Evidence & Screenshots"]
 ```
 
 ### 1. Single Source of Truth (`src/portals/configs/`)
 - All portal URL templates, DOM selectors (cards, titles, anchors), badge positioning rules, and popup interaction parameters are defined once in `src/portals/configs/` (`types.ts`, `routing.ts`, `*.config.ts`).
 - Imported directly by both the extension runtime adapters and the E2E test runner, eliminating duplicate configurations.
 
-### 2. Live Multi-Tab Execution & Validation
-- **Real Headful Browser Tabs:** Opens real browser tabs sequentially across Google Search and live booking portals so all tabs remain open and observable side-by-side.
+### 2. Live Sequential Execution & Validation (One Provider at a Time)
+- **Isolated Headful Browser Tabs:** Opens one provider at a time in headful Chromium, verifies all test cases, captures screenshot evidence, and closes the tab before proceeding to the next provider. This prevents CDN socket throttling, memory bloat, and tab clutter.
 - **Dynamic Badge Position Switching:** Every provider is automatically verified across all 3 supported badge positions:
   - `beside-name`: Positioned inline beside train title with pixel-perfect alignment ($\Delta Y \le 6\text{px}$).
   - `card-header-right`: Positioned in card header or right-aligned.
@@ -157,15 +158,15 @@ flowchart TD
 
 Executed on Route: **Kharagpur (`KGP`) ➔ Howrah (`HWH`)**
 
-| Tab | Portal | Trains Identified | Badge Injected | Position Switching (`beside`, `right`, `below`) | Hover Popover | Standard Colors (`box-late`, `box-ontime`, `box-neutral`) | Clean 24h & Zero Duplicates | Status |
+| Step | Provider Portal | Trains Identified | Badge Injected | Position Switching (`beside`, `right`, `below`) | Hover Popover | Standard Colors (`box-late`, `box-ontime`, `box-neutral`) | Clean 24h & Zero Duplicates | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Tab 1** | **Google Search (Live Scraper)** | 38 Trains | N/A | N/A | N/A | N/A | N/A | ✅ **PASSED** |
-| **Tab 2** | **MakeMyTrip (Live Search)** | 42 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **Tab 3** | **ConfirmTkt (Live Route)** | 85 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **Tab 4** | **RailYatri (Live Route)** | 121 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
-| **Tab 5** | **IRCTC NextGen (Live Official)** | 1 Portal | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[1/5]** | **Google Search (Live Scraper)** | 3 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[2/5]** | **MakeMyTrip (Live Search)** | 42 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[3/5]** | **ConfirmTkt (Live Route)** | 85 Cards | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[4/5]** | **RailYatri (Live Route)** | 121 Trains | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
+| **[5/5]** | **IRCTC NextGen (Live Official)** | 1 Portal | ✅ YES | ✅ ALL 3 POSITIONS | ✅ OPENED | ✅ RED / SLATE | ✅ 100% CLEAN | ✅ **PASSED** |
 
-> 📸 **Visual Test Evidence:** Timestamped screenshot artifacts for all live tabs are generated in [`tests/e2e/screenshots/`](tests/e2e/screenshots/).
+> 📸 **Visual Test Evidence:** Timestamped screenshot artifacts for all providers are generated in [`tests/e2e/screenshots/`](tests/e2e/screenshots/).
 
 ---
 

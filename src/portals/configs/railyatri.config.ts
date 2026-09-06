@@ -17,6 +17,7 @@ export const railYatriConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'div[class*="MuiPaper-root"]',
       'div[class*="train-block"]',
       'div[class*="train_details"]',
       '[class*="trainCard"]',
@@ -24,6 +25,7 @@ export const railYatriConfig: VendorPortalConfig = {
       '.train-info',
     ],
     titleSelectors: [
+      'a[href*="/time-table/"]',
       '.train-name',
       'h3',
       'h4',
@@ -33,6 +35,7 @@ export const railYatriConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'a[href*="/time-table/"]',
       '.train-name',
       'h3',
       'h4',
