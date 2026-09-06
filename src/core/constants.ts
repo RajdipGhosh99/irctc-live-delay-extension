@@ -98,7 +98,7 @@ export const DEFAULT_SETTINGS: MultiProviderSettings = {
   showFloatingHUD: true,
   termsAccepted: true, // Default: active immediately for seamless user experience
   recentSearches: ['12952', '12301', '12004'],
-  schemaVersion: '2.0.3',
+  schemaVersion: '2.0.4',
   providers: {
     'direct-rail-gateway': {
       enabled: true,

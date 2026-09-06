@@ -4,6 +4,17 @@ All notable changes to the **Live Train Delay Tracker** extension are documented
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] - 2026-09-06
+
+### 🚀 Added
+- **Default Auto-Check All Visible Trains**: Enabled real-time auto-checking of all visible train cards by default (`autoFetchAllTrains: true`) for instant delay visibility across all supported booking portals on page load.
+
+### 🐛 Fixed
+- **Single-Line Floating HUD Title**: Expanded floating HUD container width to 276px and added rigid `white-space: nowrap !important` and `flex-shrink: 0 !important` rules to keep "Train Delay Tracker" permanently on a single line.
+- **Controls Spacing**: Refined margins between HUD title badge and control action buttons.
+
+---
+
 ## [2.0.3] - 2026-09-06
 
 ### 🐛 Fixed
@@ -74,6 +85,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+[2.0.4]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.0...v2.0.1
