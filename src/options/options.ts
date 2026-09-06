@@ -90,10 +90,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
-  document.querySelectorAll<HTMLAnchorElement>('.nav-item').forEach((link) => {
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.nav-item');
+  navLinks.forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach((item) => item.classList.remove('active'));
+      navLinks.forEach((item) => item.classList.remove('active'));
       link.classList.add('active');
 
       const targetId = link.getAttribute('data-target');
@@ -105,6 +106,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       mobileMenuToggle.setAttribute('aria-expanded', 'false');
     });
   });
+
+  // IntersectionObserver scroll spy to keep sidebar active tab in sync with viewport
+  const contentSections = document.querySelectorAll<HTMLElement>('main.options-main section[id]');
+  if ('IntersectionObserver' in window && contentSections.length > 0) {
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            navLinks.forEach((item) => {
+              item.classList.toggle('active', item.getAttribute('data-target') === id);
+            });
+          }
+        });
+      },
+      {
+        rootMargin: '-15% 0px -65% 0px',
+        threshold: 0.05,
+      }
+    );
+    contentSections.forEach((sec) => sectionObserver.observe(sec));
+  }
+
 
   function renderUI() {
     const isGloballyActive = currentSettings.extensionEnabled !== false;
