@@ -1,29 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="glow5" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="adobeHeartGlow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <clipPath id="circleClip5">
-      <circle cx="256" cy="256" r="226"/>
-    </clipPath>
   </defs>
 
-  <!-- Circular Outer Frame -->
-  <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
+  <!-- Adobe Acrobat Red Outer Ring -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#F40F02" stroke-width="26"/>
 
-  <!-- Inside Clipped: Dynamic 3-Bar Indian Flag Horizon Waves -->
-  <g clip-path="url(#circleClip5)" opacity="0.2">
-    <rect x="30" y="30" width="452" height="150" fill="#FF7700"/>
-    <rect x="30" y="180" width="452" height="152" fill="#FFFFFF"/>
-    <circle cx="256" cy="256" r="48" fill="none" stroke="#003399" stroke-width="8"/>
-    <rect x="30" y="332" width="452" height="150" fill="#00E676"/>
-  </g>
+  <!-- Saffron & Green Accent Arcs -->
+  <path d="M 230 30 A 226 226 0 0 1 282 30" fill="none" stroke="#FF7700" stroke-width="26" stroke-linecap="round"/>
+  <path d="M 230 482 A 226 226 0 0 0 282 482" fill="none" stroke="#00E676" stroke-width="26" stroke-linecap="round"/>
 
-  <!-- Pure High-Contrast Solid Train Body (Razor Sharp Foreground) -->
+  <!-- Train Body in Deep Obsidian -->
   <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
   <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
 
@@ -31,31 +24,46 @@
   <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
 
   <!-- Headlights -->
-  <circle cx="198" cy="272" r="22" fill="#FFFFFF"/>
-  <circle cx="314" cy="272" r="22" fill="#FFFFFF"/>
+  <circle cx="198" cy="268" r="21" fill="#FFFFFF"/>
+  <circle cx="314" cy="268" r="21" fill="#FFFFFF"/>
 
-  <!-- 3 Radiator Pills in Navy Blue -->
-  <rect x="240" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
-  <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
-  <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- 3 Radiator Pills -->
+  <rect x="240" y="248" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <rect x="252" y="244" width="8" height="48" rx="4" fill="#FFFFFF"/>
+  <rect x="264" y="248" width="8" height="40" rx="4" fill="#FFFFFF"/>
 
-  <!-- Tricolor Nose Accent Fin -->
-  <line x1="216" y1="316" x2="242" y2="316" stroke="#FF7700" stroke-width="6" stroke-linecap="round"/>
-  <line x1="247" y1="316" x2="265" y2="316" stroke="#003399" stroke-width="6" stroke-linecap="round"/>
-  <line x1="270" y1="316" x2="296" y2="316" stroke="#00E676" stroke-width="6" stroke-linecap="round"/>
+  <!-- Indian Tricolor Bumper Decal -->
+  <g transform="translate(226, 308)">
+    <rect x="0" y="0" width="20" height="6" rx="2" fill="#FF7700"/>
+    <rect x="20" y="0" width="20" height="6" fill="#FFFFFF"/>
+    <rect x="40" y="0" width="20" height="6" rx="2" fill="#00E676"/>
+  </g>
 
-  <!-- Tracks & Sleepers -->
+  <!-- Tracks -->
   <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
   <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
   <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
   <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
   <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
 
-  <!-- Glowing Live Dot Beacon at 2 o'clock -->
+  <!-- ADOBE RED "LOVE DOT" BEACON (Glowing Heart in #F40F02 at 2 o'clock) -->
   <g transform="translate(422, 90)">
-    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow5)"/>
-    <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
-    <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
-    <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="0" cy="0" r="38" fill="#F40F02" opacity="0.25" filter="url(#adobeHeartGlow)"/>
+    <circle cx="0" cy="0" r="26" fill="#F40F02" opacity="0.4"/>
+    <path d="M 0 10 
+             C -16 -6, -26 -18, -26 -28 
+             C -26 -38, -16 -46, -5 -46 
+             C 1 -46, 7 -42, 10 -38 
+             C 13 -42, 19 -46, 25 -46 
+             C 36 -46, 46 -38, 46 -28 
+             C 46 -18, 36 -6, 20 10 
+             Z" 
+          transform="scale(0.55) translate(-10, 18)" 
+          fill="#F40F02" 
+          stroke="#FFFFFF" 
+          stroke-width="4.5"
+          filter="url(#adobeHeartGlow)"/>
+    <!-- Cute Highlight Sparkle -->
+    <circle cx="3" cy="-6" r="3" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>

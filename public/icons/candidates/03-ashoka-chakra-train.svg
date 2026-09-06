@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="glow3" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="adobeGlow3" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
@@ -9,32 +9,27 @@
     </filter>
   </defs>
 
-  <!-- Circular Outer Frame -->
+  <!-- Deep Obsidian Ring with Adobe Red Outer Accent -->
   <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
+  
+  <!-- Adobe Acrobat Red Orbit (Top Right to Bottom Left Arc) -->
+  <path d="M 120 70 A 226 226 0 0 1 482 256" fill="none" stroke="#F40F02" stroke-width="26" stroke-linecap="round"/>
 
-  <!-- Ashoka Chakra 24 Spokes Radial Watermark in Background -->
-  <g transform="translate(256, 256)" opacity="0.12" stroke="#003399" stroke-width="3">
-    <line x1="0" y1="-190" x2="0" y2="190"/>
-    <line x1="-190" y1="0" x2="190" y2="0"/>
-    <line x1="-134" y1="-134" x2="134" y2="134"/>
-    <line x1="-134" y1="134" x2="134" y2="-134"/>
-    <line x1="-72" y1="-176" x2="72" y2="176"/>
-    <line x1="-176" y1="-72" x2="176" y2="72"/>
-    <line x1="-72" y1="176" x2="72" y2="-176"/>
-    <line x1="-176" y1="72" x2="176" y2="-72"/>
-  </g>
+  <!-- Saffron & Green Accent Ticks -->
+  <path d="M 236 30 A 226 226 0 0 1 276 30" fill="none" stroke="#FF7700" stroke-width="26" stroke-linecap="round"/>
+  <path d="M 236 482 A 226 226 0 0 0 276 482" fill="none" stroke="#00E676" stroke-width="26" stroke-linecap="round"/>
 
-  <!-- Pure Obsidian Train Body -->
+  <!-- Pure Solid Reference Train Glyph -->
   <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
   <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
 
   <!-- Windshield -->
   <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
 
-  <!-- Headlights with Tricolor Soul: Left Lamp Saffron, Right Lamp Green! -->
-  <circle cx="198" cy="272" r="22" fill="#FF7700"/>
+  <!-- Headlights in Adobe Red Hot -->
+  <circle cx="198" cy="272" r="22" fill="#F40F02"/>
   <circle cx="198" cy="272" r="14" fill="#FFFFFF"/>
-  <circle cx="314" cy="272" r="22" fill="#00E676"/>
+  <circle cx="314" cy="272" r="22" fill="#F40F02"/>
   <circle cx="314" cy="272" r="14" fill="#FFFFFF"/>
 
   <!-- 3 Radiator Pills in Navy Blue -->
@@ -42,20 +37,16 @@
   <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
   <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
 
-  <!-- BOLD INDIAN TRICOLOR PERSPECTIVE TRACKS -->
-  <!-- Left Track: Saffron High-Speed Rail -->
-  <polygon points="196,344 216,344 182,442 160,442" fill="#FF7700"/>
-  <!-- Right Track: Emerald High-Speed Rail -->
-  <polygon points="296,344 316,344 352,442 330,442" fill="#00E676"/>
-
-  <!-- Center Sleepers: Clean Navy & White -->
+  <!-- Tracks in Obsidian -->
+  <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
+  <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
   <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
   <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
   <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
 
   <!-- Glowing Live Dot Beacon at 2 o'clock -->
   <g transform="translate(422, 90)">
-    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow3)"/>
+    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#adobeGlow3)"/>
     <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
     <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
     <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
