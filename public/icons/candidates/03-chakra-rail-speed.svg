@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Dark Tech Canvas Gradient -->
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080E21"/>
+      <stop offset="100%" stop-color="#141E36"/>
+    </linearGradient>
+
+    <!-- Tricolor Ring Gradients -->
+    <linearGradient id="saffronArc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF9933"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="greenArc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Train Silhouette Gradient -->
+    <linearGradient id="trainSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Squircle Canvas -->
+  <rect x="16" y="16" width="480" height="480" rx="110" fill="url(#bgGrad3)" stroke="#1E293B" stroke-width="4"/>
+
+  <!-- Orbital Speed Arcs (Tricolor) -->
+  <!-- Saffron Top Arc -->
+  <path d="M 120 180 A 170 170 0 0 1 392 180" fill="none" stroke="url(#saffronArc)" stroke-width="16" stroke-linecap="round"/>
+  <!-- White Accent Dash -->
+  <path d="M 405 210 A 170 170 0 0 1 415 260" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" opacity="0.9"/>
+  <!-- Emerald Green Bottom Arc -->
+  <path d="M 392 332 A 170 170 0 0 1 120 332" fill="none" stroke="url(#greenArc)" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Ashoka Chakra Spokes Hub (Navy Blue Wheel of Progress) -->
+  <g transform="translate(256, 256)" opacity="0.6">
+    <circle cx="0" cy="0" r="110" fill="none" stroke="#1D4ED8" stroke-width="4"/>
+    <circle cx="0" cy="0" r="22" fill="#1E3A8A"/>
+    <!-- 24 Precision Spokes -->
+    <g stroke="#3B82F6" stroke-width="3" stroke-linecap="round">
+      <line x1="0" y1="-22" x2="0" y2="-108" />
+      <line x1="0" y1="22" x2="0" y2="108" />
+      <line x1="-22" y1="0" x2="-108" y2="0" />
+      <line x1="22" y1="0" x2="108" y2="0" />
+      <line x1="15.5" y1="15.5" x2="76.4" y2="76.4" />
+      <line x1="-15.5" y1="-15.5" x2="-76.4" y2="-76.4" />
+      <line x1="15.5" y1="-15.5" x2="76.4" y2="-76.4" />
+      <line x1="-15.5" y1="15.5" x2="-76.4" y2="76.4" />
+      <!-- Intermediate spokes (15-deg increments) -->
+      <line x1="8.4" y1="-20.3" x2="41.4" y2="-99.8" />
+      <line x1="20.3" y1="-8.4" x2="99.8" y2="-41.4" />
+      <line x1="-8.4" y1="20.3" x2="-41.4" y2="99.8" />
+      <line x1="-20.3" y1="8.4" x2="-99.8" y2="41.4" />
+      <line x1="8.4" y1="20.3" x2="41.4" y2="99.8" />
+      <line x1="20.3" y1="8.4" x2="99.8" y2="41.4" />
+      <line x1="-8.4" y1="-20.3" x2="-41.4" y2="-99.8" />
+      <line x1="-20.3" y1="-8.4" x2="-99.8" y2="-41.4" />
+    </g>
+  </g>
+
+  <!-- High-Speed Modern Train Silhouette Charging Outward -->
+  <g transform="translate(256, 256)">
+    <!-- Aerodynamic Front Cone -->
+    <path d="M 0 -115 C 45 -115, 65 -50, 72 45 L 75 105 L -75 105 L -72 45 C -65 -50, -45 -115, 0 -115 Z" fill="url(#trainSilver)" stroke="#0F172A" stroke-width="4"/>
+    
+    <!-- Windshield Visor (Aerodynamic Tint) -->
+    <path d="M -42 -60 C -15 -80, 15 -80, 42 -60 L 48 -25 C 20 -40, -20 -40, -48 -25 Z" fill="#0F172A"/>
+    
+    <!-- Saffron Forehead Strip -->
+    <path d="M -28 -82 C -10 -90, 10 -90, 28 -82 L 25 -74 C 10 -80, -10 -80, -25 -74 Z" fill="#FF9933"/>
+
+    <!-- Navy Center Stripe (Indian Railways Identity) -->
+    <rect x="-8" y="-18" width="16" height="122" fill="#002B7F" rx="3"/>
+
+    <!-- Dual LED Headlights -->
+    <circle cx="-38" cy="45" r="9" fill="#FEF08A"/>
+    <circle cx="38" cy="45" r="9" fill="#FEF08A"/>
+
+    <!-- Lower Cowcatcher Grill -->
+    <path d="M -60 105 L 0 135 L 60 105 L 50 120 L 0 148 L -50 120 Z" fill="#475569"/>
+  </g>
+</svg>

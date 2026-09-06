@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Circular Outer Border Ring (Matching Reference Style) -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#000000" stroke-width="32"/>
+
+  <!-- Top Overhead Pantograph / Electrical Collector -->
+  <rect x="220" y="76" width="72" height="18" rx="8" fill="#000000"/>
+  <path d="M 230 94 L 256 128 L 282 94 Z" fill="#000000"/>
+  <line x1="256" y1="124" x2="256" y2="148" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Main Locomotive Cabin Body -->
+  <path d="M 172 148 C 172 136, 184 126, 198 126 L 314 126 C 328 126, 340 136, 340 148 L 348 296 C 348 310, 336 322, 322 322 L 190 322 C 176 322, 164 310, 164 296 Z" fill="#000000"/>
+
+  <!-- Windshield Cutout (Negative Space) -->
+  <rect x="188" y="152" width="136" height="54" rx="10" fill="#FFFFFF"/>
+  <!-- Center Windshield Divider Pillar -->
+  <rect x="251" y="152" width="10" height="54" fill="#000000"/>
+
+  <!-- Twin Big Headlights (Negative Space Cutouts) -->
+  <circle cx="204" cy="242" r="19" fill="#FFFFFF"/>
+  <circle cx="308" cy="242" r="19" fill="#FFFFFF"/>
+
+  <!-- Center IR Air Grill Slits (Negative Space) -->
+  <rect x="242" y="222" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <rect x="252" y="220" width="8" height="44" rx="4" fill="#FFFFFF"/>
+  <rect x="262" y="222" width="8" height="40" rx="4" fill="#FFFFFF"/>
+
+  <!-- Cowcatcher / Lower Buffer Plate Accent -->
+  <rect x="184" y="294" width="144" height="12" rx="6" fill="#FFFFFF"/>
+
+  <!-- Converging Railway Tracks Beneath -->
+  <!-- Left & Right Rails -->
+  <polygon points="204,332 222,332 178,442 156,442" fill="#000000"/>
+  <polygon points="290,332 308,332 356,442 334,442" fill="#000000"/>
+
+  <!-- Track Sleepers / Ties -->
+  <rect x="194" y="348" width="124" height="14" rx="4" fill="#000000"/>
+  <rect x="182" y="378" width="148" height="16" rx="4" fill="#000000"/>
+  <rect x="168" y="412" width="176" height="18" rx="4" fill="#000000"/>
+</svg>

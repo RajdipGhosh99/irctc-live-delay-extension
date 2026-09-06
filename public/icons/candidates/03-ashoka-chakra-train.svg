@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Circular Outer Border Ring -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#000000" stroke-width="32"/>
+
+  <!-- Ashoka Chakra Radiating Spokes in Upper Half -->
+  <g stroke="#000000" stroke-width="8" stroke-linecap="round">
+    <!-- Top 12 spokes radiating from center (256, 256) outward to radius 220 -->
+    <line x1="256" y1="160" x2="256" y2="36"/>
+    <line x1="225" y1="164" x2="198" y2="44"/>
+    <line x1="287" y1="164" x2="314" y2="44"/>
+    <line x1="196" y1="176" x2="144" y2="68"/>
+    <line x1="316" y1="176" x2="368" y2="68"/>
+    <line x1="172" y1="195" x2="98" y2="104"/>
+    <line x1="340" y1="195" x2="414" y2="104"/>
+    <line x1="154" y1="220" x2="64" y2="152"/>
+    <line x1="358" y1="220" x2="448" y2="152"/>
+    <line x1="144" y1="250" x2="42" y2="208"/>
+    <line x1="368" y1="250" x2="470" y2="208"/>
+  </g>
+
+  <!-- Central Ashoka Wheel Hub Ring -->
+  <circle cx="256" cy="256" r="140" fill="#FFFFFF" stroke="#000000" stroke-width="20"/>
+
+  <!-- Indian Train Engine Front Silhouette Inside Hub -->
+  <g id="train-symbol">
+    <!-- Engine Roof Horn / Pantograph Dome -->
+    <rect x="232" y="152" width="48" height="14" rx="6" fill="#000000"/>
+
+    <!-- Locomotive Body -->
+    <path d="M 186 196 C 186 172, 204 162, 256 162 C 308 162, 326 172, 326 196 L 328 322 C 328 334, 318 342, 304 342 L 208 342 C 194 342, 184 334, 184 322 Z" fill="#000000"/>
+
+    <!-- Wide Windshield Screen (Negative Cutout) -->
+    <rect x="202" y="184" width="108" height="46" rx="8" fill="#FFFFFF"/>
+    <rect x="252" y="184" width="8" height="46" fill="#000000"/>
+
+    <!-- Twin Round Headlights (Negative Cutouts) -->
+    <circle cx="216" cy="262" r="16" fill="#FFFFFF"/>
+    <circle cx="296" cy="262" r="16" fill="#FFFFFF"/>
+
+    <!-- Indian Railways 3-Bar Grill (Negative Cutouts) -->
+    <rect x="246" y="246" width="6" height="34" rx="3" fill="#FFFFFF"/>
+    <rect x="253" y="244" width="6" height="38" rx="3" fill="#FFFFFF"/>
+    <rect x="260" y="246" width="6" height="34" rx="3" fill="#FFFFFF"/>
+
+    <!-- Cowcatcher Slit -->
+    <rect x="202" y="316" width="108" height="10" rx="5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Ground Track Infrastructure -->
+  <polygon points="214,352 230,352 188,446 168,446" fill="#000000"/>
+  <polygon points="282,352 298,352 344,446 324,446" fill="#000000"/>
+  <rect x="202" y="368" width="108" height="14" rx="4" fill="#000000"/>
+  <rect x="190" y="396" width="132" height="15" rx="4" fill="#000000"/>
+  <rect x="176" y="424" width="160" height="16" rx="4" fill="#000000"/>
+</svg>

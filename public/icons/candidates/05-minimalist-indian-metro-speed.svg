@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Circular Outer Border Ring -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#000000" stroke-width="32"/>
+
+  <!-- Top Roof Dome / AC Unit -->
+  <rect x="208" y="104" width="96" height="24" rx="10" fill="#000000"/>
+
+  <!-- Main Train Silhouette Body -->
+  <rect x="156" y="128" width="200" height="196" rx="44" fill="#000000"/>
+
+  <!-- Large Windshield Screen (Negative Cutout) -->
+  <rect x="180" y="152" width="152" height="74" rx="14" fill="#FFFFFF"/>
+
+  <!-- Twin Big Express Headlights (Negative Space Cutouts) -->
+  <circle cx="196" cy="268" r="22" fill="#FFFFFF"/>
+  <circle cx="316" cy="268" r="22" fill="#FFFFFF"/>
+
+  <!-- Indian Railways Signature 3-Bar Grill (Negative Space Slits) -->
+  <rect x="238" y="244" width="9" height="48" rx="4.5" fill="#FFFFFF"/>
+  <rect x="251.5" y="240" width="9" height="56" rx="4.5" fill="#FFFFFF"/>
+  <rect x="265" y="244" width="9" height="48" rx="4.5" fill="#FFFFFF"/>
+
+  <!-- Heavy Converging Railway Tracks (Perspective Foundation) -->
+  <polygon points="196,336 218,336 174,444 148,444" fill="#000000"/>
+  <polygon points="294,336 316,336 364,444 338,444" fill="#000000"/>
+
+  <!-- Three Heavy Cross-Ties (Sleepers) -->
+  <rect x="190" y="352" width="132" height="18" rx="4" fill="#000000"/>
+  <rect x="176" y="386" width="160" height="20" rx="4" fill="#000000"/>
+  <rect x="160" y="420" width="192" height="22" rx="4" fill="#000000"/>
+</svg>

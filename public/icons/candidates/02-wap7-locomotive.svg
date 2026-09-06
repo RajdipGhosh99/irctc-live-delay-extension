@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+
+    <!-- WAP-7 Red Livery Gradient -->
+    <linearGradient id="wapRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#B91C1C"/>
+    </linearGradient>
+
+    <!-- Metallic Shading -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E2E8F0"/>
+      <stop offset="50%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
+    </linearGradient>
+
+    <!-- Headlight Beam Glow -->
+    <filter id="headlightGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="110" fill="url(#bgGrad2)" stroke="#334155" stroke-width="4"/>
+
+  <!-- Symmetrical Locomotive Assembly -->
+  <g id="wap7-engine" transform="translate(0, 15)">
+    <!-- Overhead Pantograph Rig -->
+    <path d="M 256 70 L 210 115 L 302 115 Z" fill="none" stroke="#94A3B8" stroke-width="6" stroke-linejoin="round"/>
+    <line x1="175" y1="70" x2="337" y2="70" stroke="#CBD5E1" stroke-width="8" stroke-linecap="round"/>
+    <line x1="256" y1="115" x2="256" y2="140" stroke="#94A3B8" stroke-width="8"/>
+    <!-- Insulators -->
+    <circle cx="230" cy="140" r="7" fill="#F59E0B"/>
+    <circle cx="282" cy="140" r="7" fill="#F59E0B"/>
+
+    <!-- Locomotive Upper Red Cabin Dome -->
+    <path d="M 140 210 C 140 160, 180 145, 256 145 C 332 145, 372 160, 372 210 L 372 245 L 140 245 Z" fill="url(#wapRed)"/>
+
+    <!-- Windshields (Triple Window Typical of IR Electric Locos) -->
+    <rect x="156" y="175" width="56" height="52" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="3"/>
+    <rect x="228" y="175" width="56" height="52" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="3"/>
+    <rect x="300" y="175" width="56" height="52" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="3"/>
+    <!-- Window Reflections -->
+    <path d="M 160 180 L 190 180 L 175 220 L 160 220 Z" fill="#38BDF8" opacity="0.3"/>
+    <path d="M 232 180 L 262 180 L 247 220 L 232 220 Z" fill="#38BDF8" opacity="0.3"/>
+    <path d="M 304 180 L 334 180 L 319 220 L 304 220 Z" fill="#38BDF8" opacity="0.3"/>
+
+    <!-- Central White Chevron Band -->
+    <rect x="136" y="245" width="240" height="60" fill="url(#metalGrad)"/>
+
+    <!-- Iconic IR Twin Headlight (Glowing Gold) -->
+    <rect x="234" y="248" width="44" height="26" rx="6" fill="#1E293B"/>
+    <circle cx="246" cy="261" r="8" fill="#FEF08A" filter="url(#headlightGlow)"/>
+    <circle cx="266" cy="261" r="8" fill="#FEF08A" filter="url(#headlightGlow)"/>
+
+    <!-- Middle Red Band -->
+    <rect x="136" y="305" width="240" height="25" fill="url(#wapRed)"/>
+
+    <!-- Lower Chassis (Dark Steel Blue) -->
+    <path d="M 136 330 L 376 330 L 366 385 L 146 385 Z" fill="#1E3A8A"/>
+
+    <!-- Round Marker Lights (Red & Amber) -->
+    <circle cx="165" cy="350" r="10" fill="#DC2626"/>
+    <circle cx="347" cy="350" r="10" fill="#DC2626"/>
+
+    <!-- Indian Tricolor Ribbon / Plaque on Chassis -->
+    <rect x="216" y="342" width="80" height="7" fill="#FF9933" rx="2"/>
+    <rect x="216" y="349" width="80" height="6" fill="#FFFFFF"/>
+    <rect x="216" y="355" width="80" height="7" fill="#138808" rx="2"/>
+    <!-- Ashoka Chakra Micro Dot -->
+    <circle cx="256" cy="352" r="2.5" fill="#000080"/>
+
+    <!-- Buffers & Coupler Assembly -->
+    <circle cx="170" cy="405" r="18" fill="#334155" stroke="#64748B" stroke-width="4"/>
+    <circle cx="342" cy="405" r="18" fill="#334155" stroke="#64748B" stroke-width="4"/>
+    <!-- Central CBC Coupler Knuckle -->
+    <rect x="240" y="385" width="32" height="35" rx="6" fill="#1E293B" stroke="#475569" stroke-width="3"/>
+
+    <!-- Cattle Guard / Cowcatcher V-Grill -->
+    <path d="M 175 425 L 256 445 L 337 425 L 345 440 L 256 462 L 167 440 Z" fill="#475569"/>
+  </g>
+</svg>
