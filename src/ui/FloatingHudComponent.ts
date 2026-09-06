@@ -1,5 +1,6 @@
 /**
  * Viewport-Pinned Floating Action Controller HUD
+ * Resilient DOM lifecycle, rich floating launcher pill, and multi-portal restore capability.
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
@@ -18,6 +19,12 @@ export class FloatingHudComponent {
   private static minimizedElement: HTMLElement | null = null;
   private static isMinimized = false;
   private static isDismissed = false;
+  private static vendorClass = '';
+  private static onFetchAllCallback: (() => void) | null = null;
+  private static onOpenSettingsCallback: (() => void) | null = null;
+  private static termsAccepted = true;
+  private static detectedCount = 0;
+  private static fetchedCount = 0;
 
   public static mount(
     vendorClass: string,
@@ -25,20 +32,44 @@ export class FloatingHudComponent {
     onOpenSettings: () => void,
     termsAccepted = true
   ): void {
-    if (this.isDismissed || document.getElementById('rail-live-hud')) {
+    this.vendorClass = vendorClass;
+    this.onFetchAllCallback = onFetchAll;
+    this.onOpenSettingsCallback = onOpenSettings;
+    this.termsAccepted = termsAccepted;
+
+    // If already mounted and in DOM, just update visibility and return
+    const host = document.body || document.documentElement;
+    if (!host) return;
+
+    if (this.hudElement && host.contains(this.hudElement) && this.minimizedElement && host.contains(this.minimizedElement)) {
+      this.applyVisibility();
       return;
     }
 
-    const host = document.body || document.documentElement;
+    // Clean up any stale orphaned elements with these IDs
+    document.getElementById('rail-live-hud')?.remove();
+    document.getElementById('rail-hud-minimized')?.remove();
 
-    // 1. Minimized Bubble
+    // 1. Minimized Floating Launcher Pill
     const minBubble = document.createElement('div');
     minBubble.id = 'rail-hud-minimized';
     minBubble.className = `rail-floating-hud-minimized ${vendorClass}`;
-    minBubble.title = 'Click to expand Live Train Delay HUD';
-    minBubble.innerHTML = `<span>${trainIcon({ size: 18 })}</span>`;
-    minBubble.style.display = this.isMinimized ? 'flex' : 'none';
+    minBubble.title = 'Live Train Delay Tracker — Click to expand (or press Alt+H)';
+    minBubble.setAttribute('role', 'button');
+    minBubble.setAttribute('tabindex', '0');
+    minBubble.innerHTML = `
+      <span class="rail-hud-min-icon">${trainIcon({ size: 16 })}</span>
+      <span class="rail-hud-min-label">Live Tracker</span>
+      <span class="rail-hud-min-badge" id="rail-hud-min-badge">${this.detectedCount > 0 ? `${this.detectedCount} Trains` : 'Live'}</span>
+    `;
+
     minBubble.addEventListener('click', () => this.expand());
+    minBubble.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.expand();
+      }
+    });
     this.minimizedElement = minBubble;
     host.appendChild(minBubble);
 
@@ -48,7 +79,6 @@ export class FloatingHudComponent {
     hud.className = `rail-floating-hud ${vendorClass}`;
     hud.setAttribute('role', 'region');
     hud.setAttribute('aria-label', 'Live Train Delay Controller');
-    hud.style.display = this.isMinimized ? 'none' : 'flex';
 
     hud.innerHTML = `
       <div class="rail-hud-header">
@@ -57,10 +87,10 @@ export class FloatingHudComponent {
           <strong>Train Delay Tracker</strong>
         </div>
         <div class="rail-hud-controls">
-          <button type="button" class="rail-hud-btn-mini" id="rail-hud-minimize-btn" title="Minimize to icon">
+          <button type="button" class="rail-hud-btn-mini" id="rail-hud-minimize-btn" title="Minimize to launcher pill">
             ${minusIcon({ size: 12 })}
           </button>
-          <button type="button" class="rail-hud-btn-close" id="rail-hud-close-btn" title="Dismiss for this tab">
+          <button type="button" class="rail-hud-btn-close" id="rail-hud-close-btn" title="Dismiss HUD (Restore anytime via extension popup or Alt+H)">
             ${xIcon({ size: 12 })}
           </button>
         </div>
@@ -91,17 +121,59 @@ export class FloatingHudComponent {
 
     this.hudElement = hud;
     host.appendChild(hud);
+
+    this.applyVisibility();
+    if (this.detectedCount > 0 || this.fetchedCount > 0) {
+      this.updateCount(this.detectedCount, this.fetchedCount);
+    }
+  }
+
+  /**
+   * Ensures the HUD is attached to document.body, re-attaching if an SPA re-render purged it.
+   */
+  public static ensureAttached(): void {
+    if (this.isDismissed) return;
+
+    const host = document.body || document.documentElement;
+    if (!host) return;
+
+    const hudAttached = this.hudElement && host.contains(this.hudElement);
+    const minAttached = this.minimizedElement && host.contains(this.minimizedElement);
+
+    if (!hudAttached || !minAttached) {
+      if (this.onFetchAllCallback && this.onOpenSettingsCallback) {
+        this.mount(
+          this.vendorClass,
+          this.onFetchAllCallback,
+          this.onOpenSettingsCallback,
+          this.termsAccepted
+        );
+      } else if (this.hudElement && this.minimizedElement) {
+        if (!minAttached) host.appendChild(this.minimizedElement);
+        if (!hudAttached) host.appendChild(this.hudElement);
+        this.applyVisibility();
+      }
+    }
   }
 
   public static updateCount(detectedCount: number, fetchedCount: number): void {
+    this.detectedCount = detectedCount;
+    this.fetchedCount = fetchedCount;
+
     const textEl = document.getElementById('rail-hud-count-text');
-    if (!textEl) return;
-    if (detectedCount === 0) {
-      textEl.textContent = 'Searching trains…';
-    } else if (fetchedCount >= detectedCount) {
-      textEl.textContent = `All ${detectedCount} trains updated`;
-    } else {
-      textEl.textContent = `${fetchedCount}/${detectedCount} trains loaded`;
+    if (textEl) {
+      if (detectedCount === 0) {
+        textEl.textContent = 'Searching trains…';
+      } else if (fetchedCount >= detectedCount) {
+        textEl.textContent = `All ${detectedCount} trains updated`;
+      } else {
+        textEl.textContent = `${fetchedCount}/${detectedCount} trains loaded`;
+      }
+    }
+
+    const minBadge = document.getElementById('rail-hud-min-badge');
+    if (minBadge) {
+      minBadge.textContent = detectedCount > 0 ? `${detectedCount} Trains` : 'Live';
     }
   }
 
@@ -129,6 +201,7 @@ export class FloatingHudComponent {
   }
 
   public static updateTermsStatus(accepted: boolean): void {
+    this.termsAccepted = accepted;
     const indicator = document.querySelector('.rail-hud-live-indicator');
     if (indicator) {
       indicator.textContent = accepted ? '● Active' : 'Terms Required';
@@ -140,22 +213,91 @@ export class FloatingHudComponent {
   }
 
   public static minimize(): void {
+    this.isDismissed = false;
     this.isMinimized = true;
-    if (this.hudElement) this.hudElement.style.display = 'none';
-    if (this.minimizedElement) this.minimizedElement.style.display = 'flex';
+    this.applyVisibility();
   }
 
   public static expand(): void {
+    this.isDismissed = false;
     this.isMinimized = false;
-    if (this.hudElement) this.hudElement.style.display = 'flex';
-    if (this.minimizedElement) this.minimizedElement.style.display = 'none';
+    this.applyVisibility();
   }
 
   public static dismiss(): void {
     this.isDismissed = true;
-    if (this.hudElement) this.hudElement.remove();
-    if (this.minimizedElement) this.minimizedElement.remove();
-    this.hudElement = null;
-    this.minimizedElement = null;
+    this.applyVisibility();
+  }
+
+  /**
+   * Restores HUD unconditionally, re-attaches to DOM if needed, and pulses highlight.
+   */
+  public static restore(): void {
+    this.isDismissed = false;
+    this.isMinimized = false;
+
+    this.ensureAttached();
+    this.applyVisibility();
+
+    if (this.hudElement) {
+      this.hudElement.classList.remove('rail-hud-highlight-pulse');
+      void this.hudElement.offsetWidth; // Force reflow
+      this.hudElement.classList.add('rail-hud-highlight-pulse');
+      setTimeout(() => {
+        this.hudElement?.classList.remove('rail-hud-highlight-pulse');
+      }, 1200);
+    }
+  }
+
+  public static toggle(): void {
+    if (this.isDismissed || this.isMinimized) {
+      this.restore();
+    } else {
+      this.minimize();
+    }
+  }
+
+  public static isCurrentlyVisible(): boolean {
+    return !this.isDismissed && !this.isMinimized;
+  }
+
+  private static applyVisibility(): void {
+    if (this.isDismissed) {
+      if (this.hudElement) {
+        this.hudElement.classList.add('rail-hud-hidden');
+        this.hudElement.classList.remove('rail-hud-visible');
+        this.hudElement.style.setProperty('display', 'none', 'important');
+      }
+      if (this.minimizedElement) {
+        this.minimizedElement.classList.add('rail-hud-hidden');
+        this.minimizedElement.classList.remove('rail-hud-visible');
+        this.minimizedElement.style.setProperty('display', 'none', 'important');
+      }
+      return;
+    }
+
+    if (this.isMinimized) {
+      if (this.hudElement) {
+        this.hudElement.classList.add('rail-hud-hidden');
+        this.hudElement.classList.remove('rail-hud-visible');
+        this.hudElement.style.setProperty('display', 'none', 'important');
+      }
+      if (this.minimizedElement) {
+        this.minimizedElement.classList.remove('rail-hud-hidden');
+        this.minimizedElement.classList.add('rail-hud-visible');
+        this.minimizedElement.style.setProperty('display', 'flex', 'important');
+      }
+    } else {
+      if (this.hudElement) {
+        this.hudElement.classList.remove('rail-hud-hidden');
+        this.hudElement.classList.add('rail-hud-visible');
+        this.hudElement.style.setProperty('display', 'flex', 'important');
+      }
+      if (this.minimizedElement) {
+        this.minimizedElement.classList.add('rail-hud-hidden');
+        this.minimizedElement.classList.remove('rail-hud-visible');
+        this.minimizedElement.style.setProperty('display', 'none', 'important');
+      }
+    }
   }
 }

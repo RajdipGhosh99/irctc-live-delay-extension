@@ -119,14 +119,26 @@
       </div>
 
       <div class="context-body" id="context-body" style="display: none;">
-        <button type="button" id="fetch-page-trains-btn" class="btn-fetch-all">
-          <span class="lightning-icon">
-            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-          </span>
-          <span>Fetch All Delays on This Page</span>
-        </button>
+        <div class="context-actions-row">
+          <button type="button" id="fetch-page-trains-btn" class="btn-fetch-all" title="Scan and fetch delays for all trains on page">
+            <span class="lightning-icon">
+              <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </span>
+            <span>Fetch All Delays</span>
+          </button>
+          <button type="button" id="toggle-hud-btn" class="btn-restore-hud" title="Show or Restore Floating HUD on this page (Shortcut: Alt+H)">
+            <span class="hud-icon">
+              <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                <path d="M3 9h18"/>
+                <path d="M9 21V9"/>
+              </svg>
+            </span>
+            <span id="restore-hud-btn-text">Restore HUD</span>
+          </button>
+        </div>
       </div>
 
       <div id="non-supported-tip" class="non-supported-banner" style="display: none;">

@@ -43,11 +43,23 @@ class ContentScriptOrchestrator {
       );
     }
 
-    // Listen for live setting updates (e.g. Terms acceptance, sitePositions change)
+    // Listen for live setting updates (e.g. Terms acceptance, sitePositions change, HUD toggle)
     chrome.storage?.onChanged?.addListener((changes, namespace) => {
       if (namespace === 'local' && changes['rail_delay_tracker_settings']?.newValue) {
         const oldSettings = this.settings;
         this.settings = changes['rail_delay_tracker_settings'].newValue as MultiProviderSettings;
+
+        // Terms acceptance status update
+        if (this.settings.termsAccepted && !oldSettings?.termsAccepted) {
+          FloatingHudComponent.updateTermsStatus(true);
+        }
+
+        // Floating HUD toggle from Options
+        if (this.settings.showFloatingHUD === false) {
+          FloatingHudComponent.dismiss();
+        } else if (this.settings.showFloatingHUD === true && oldSettings?.showFloatingHUD === false) {
+          FloatingHudComponent.restore();
+        }
 
         // If sitePositions changed for this domain, dynamically reposition all injected badges
         const domain = this.adapter.domains[0];
@@ -59,11 +71,25 @@ class ContentScriptOrchestrator {
       }
     });
 
-    // Listen for runtime messages (e.g. TRIGGER_FETCH_ALL from extension popup)
+    // Listen for runtime messages (e.g. TRIGGER_FETCH_ALL, RESTORE_FLOATING_HUD, TOGGLE_FLOATING_HUD)
     chrome.runtime?.onMessage?.addListener((message, _sender, sendResponse) => {
       if (message?.type === 'TRIGGER_FETCH_ALL') {
         this.fetchAllTrains(true);
         sendResponse({ success: true, count: this.injectedWidgets.size });
+      } else if (message?.type === 'RESTORE_FLOATING_HUD') {
+        FloatingHudComponent.restore();
+        sendResponse({ success: true, state: 'restored' });
+      } else if (message?.type === 'TOGGLE_FLOATING_HUD') {
+        FloatingHudComponent.toggle();
+        sendResponse({ success: true, visible: FloatingHudComponent.isCurrentlyVisible() });
+      }
+    });
+
+    // Keyboard shortcut: Alt+H (Option+H on Mac) to toggle / restore floating HUD
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey && (e.key === 'h' || e.key === 'H')) {
+        e.preventDefault();
+        FloatingHudComponent.toggle();
       }
     });
 
@@ -115,6 +141,11 @@ class ContentScriptOrchestrator {
   public scanAndInject(): void {
     if (this.isScanning) return;
     this.isScanning = true;
+
+    // Ensure HUD remains attached to DOM if portal SPA re-rendered
+    if (this.settings?.showFloatingHUD !== false) {
+      FloatingHudComponent.ensureAttached();
+    }
 
     try {
       const cards = this.adapter.getTrainCards(document);

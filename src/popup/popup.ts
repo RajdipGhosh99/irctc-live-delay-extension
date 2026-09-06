@@ -245,6 +245,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Restore Floating HUD Button
+  const toggleHudBtn = document.getElementById('toggle-hud-btn') as HTMLButtonElement | null;
+  const restoreHudBtnText = document.getElementById('restore-hud-btn-text') as HTMLElement | null;
+
+  if (toggleHudBtn) {
+    toggleHudBtn.addEventListener('click', () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'RESTORE_FLOATING_HUD' }, (res) => {
+            if (res?.success) {
+              if (restoreHudBtnText) restoreHudBtnText.textContent = 'HUD Restored!';
+              toggleHudBtn.classList.add('success');
+              setTimeout(() => {
+                if (restoreHudBtnText) restoreHudBtnText.textContent = 'Restore HUD';
+                toggleHudBtn.classList.remove('success');
+              }, 1800);
+            }
+          });
+        }
+      });
+    });
+  }
+
   // Quick Track Action
   quickTrainBtn?.addEventListener('click', () => handleQuickSearch());
   quickTrainInput?.addEventListener('keydown', (e) => {
