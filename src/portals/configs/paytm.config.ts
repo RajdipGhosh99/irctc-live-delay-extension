@@ -47,6 +47,21 @@ export const paytmConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/paytm',
+    getLiveUrl: (src, dest, date) =>
+      `https://tickets.paytm.com/trains/search/${encodeURIComponent(src)}/${encodeURIComponent(dest)}/${date.yyyymmdd}/1`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-paytm',
     extraBadgeWrapperClass: 'vendor-paytm',

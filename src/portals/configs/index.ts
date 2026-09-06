@@ -5,6 +5,7 @@
  */
 
 export * from './types';
+export * from './routing';
 export * from './confirmtkt.config';
 export * from './irctc.config';
 export * from './makemytrip.config';

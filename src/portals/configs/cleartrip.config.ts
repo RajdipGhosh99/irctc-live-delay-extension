@@ -40,6 +40,21 @@ export const clearTripConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/cleartrip',
+    getLiveUrl: (src, dest, date) =>
+      `https://www.cleartrip.com/trains/results?from_station=${encodeURIComponent(src)}&to_station=${encodeURIComponent(dest)}&date=${date.dd_mm_yyyy}`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-cleartrip',
     extraBadgeWrapperClass: 'vendor-cleartrip',

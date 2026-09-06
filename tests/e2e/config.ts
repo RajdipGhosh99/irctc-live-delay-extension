@@ -5,18 +5,27 @@
  */
 
 import path from 'path';
+import {
+  ALL_VENDOR_CONFIGS,
+  DEFAULT_GLOBAL_ROUTING,
+  formatRoutingDates,
+  VendorPortalConfig,
+} from '../../src/portals/configs';
 
 export interface ProviderRouteConfig {
   id: string;
   name: string;
   domain: string;
   mockPath: string;
+  config: VendorPortalConfig;
   getLiveUrl: (src: string, dest: string, dateIso: string) => string;
 }
 
 export interface E2ETestConfig {
   sourceStation: string;
+  sourceCity: string;
   destinationStation: string;
+  destCity: string;
   journeyDate: string; // ISO format: YYYY-MM-DD
   isHeadless: boolean;
   viewportWidth: number;
@@ -28,126 +37,41 @@ export interface E2ETestConfig {
   providers: ProviderRouteConfig[];
 }
 
-function getTomorrowDateIso(): string {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const yyyy = tomorrow.getFullYear();
-  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-  const dd = String(tomorrow.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
-
 export function formatDateFormats(dateIso: string) {
-  const [yyyy, mm, dd] = dateIso.split('-');
+  const dates = formatRoutingDates(dateIso);
   return {
-    iso: dateIso,
-    yyyymmdd: `${yyyy}${mm}${dd}`,
-    ddMmYyyy: `${dd}-${mm}-${yyyy}`,
-    slashDdMmYyyy: `${dd}/${mm}/${yyyy}`,
+    iso: dates.iso,
+    yyyymmdd: dates.yyyymmdd,
+    ddMmYyyy: dates.dd_mm_yyyy,
+    slashDdMmYyyy: dates.ddMmYyyySlash,
   };
 }
 
-const defaultDateIso = getTomorrowDateIso();
-
 export const DEFAULT_E2E_CONFIG: E2ETestConfig = {
-  sourceStation: process.env.TEST_SRC || 'KGP', // Kharagpur Junction
-  destinationStation: process.env.TEST_DEST || 'HWH', // Howrah Junction
-  journeyDate: process.env.TEST_DATE || defaultDateIso,
+  sourceStation: DEFAULT_GLOBAL_ROUTING.sourceCode,
+  sourceCity: DEFAULT_GLOBAL_ROUTING.sourceCity,
+  destinationStation: DEFAULT_GLOBAL_ROUTING.destCode,
+  destCity: DEFAULT_GLOBAL_ROUTING.destCity,
+  journeyDate: DEFAULT_GLOBAL_ROUTING.journeyDateIso,
   isHeadless: process.env.HEADLESS === 'true',
   viewportWidth: 1440,
   viewportHeight: 900,
   mockPort: 3456,
-  maxVerticalOffsetDeltaPx: 6, // Badge must be horizontally beside title within <= 6px Y delta
+  maxVerticalOffsetDeltaPx: 6,
   screenshotsDir: path.resolve(__dirname, 'screenshots'),
   distDir: path.resolve(__dirname, '../../dist'),
-  providers: [
-    {
-      id: 'confirmtkt',
-      name: 'ConfirmTkt',
-      domain: 'confirmtkt.com',
-      mockPath: '/confirmtkt',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { ddMmYyyy } = formatDateFormats(dateIso);
-        return `https://www.confirmtkt.com/rts/trains?from=${src}&to=${dest}&date=${ddMmYyyy}`;
-      },
+  providers: ALL_VENDOR_CONFIGS.map((vc) => ({
+    id: vc.id,
+    name: vc.name,
+    domain: vc.domains[0],
+    mockPath: vc.route?.mockPath || `/${vc.id}`,
+    config: vc,
+    getLiveUrl: (src, dest, dateIso) => {
+      const dates = formatRoutingDates(dateIso);
+      return vc.route
+        ? vc.route.getLiveUrl(src, dest, dates, DEFAULT_GLOBAL_ROUTING.sourceCity, DEFAULT_GLOBAL_ROUTING.destCity)
+        : `https://${vc.domains[0]}`;
     },
-    {
-      id: 'makemytrip',
-      name: 'MakeMyTrip',
-      domain: 'makemytrip.com',
-      mockPath: '/makemytrip',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { yyyymmdd } = formatDateFormats(dateIso);
-        return `https://www.makemytrip.com/railways/listing?srcCity=Kharagpur&destCity=Howrah&srcStn=${src}&destStn=${dest}&date=${yyyymmdd}&classType=ALL`;
-      },
-    },
-    {
-      id: 'ixigo',
-      name: 'Ixigo',
-      domain: 'ixigo.com',
-      mockPath: '/ixigo',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { yyyymmdd } = formatDateFormats(dateIso);
-        return `https://www.ixigo.com/trains/search/${src}/${dest}/${yyyymmdd}`;
-      },
-    },
-    {
-      id: 'paytm',
-      name: 'Paytm Trains',
-      domain: 'paytm.com',
-      mockPath: '/paytm',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { yyyymmdd } = formatDateFormats(dateIso);
-        return `https://tickets.paytm.com/trains/search/${src}/${dest}/${yyyymmdd}/1`;
-      },
-    },
-    {
-      id: 'cleartrip',
-      name: 'ClearTrip',
-      domain: 'cleartrip.com',
-      mockPath: '/cleartrip',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { ddMmYyyy } = formatDateFormats(dateIso);
-        return `https://www.cleartrip.com/trains/results?from_station=${src}&to_station=${dest}&date=${ddMmYyyy}`;
-      },
-    },
-    {
-      id: 'goibibo',
-      name: 'Goibibo',
-      domain: 'goibibo.com',
-      mockPath: '/goibibo',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { yyyymmdd } = formatDateFormats(dateIso);
-        return `https://www.goibibo.com/trains/search?src=${src}&dest=${dest}&date=${yyyymmdd}`;
-      },
-    },
-    {
-      id: 'easemytrip',
-      name: 'EaseMyTrip',
-      domain: 'easemytrip.com',
-      mockPath: '/easemytrip',
-      getLiveUrl: (src, dest, dateIso) => {
-        const { ddMmYyyy } = formatDateFormats(dateIso);
-        return `https://railways.easemytrip.com/train-list/${src}-to-${dest}?travelDate=${ddMmYyyy}`;
-      },
-    },
-    {
-      id: 'railyatri',
-      name: 'RailYatri',
-      domain: 'railyatri.in',
-      mockPath: '/railyatri',
-      getLiveUrl: (src, dest) => {
-        return `https://www.railyatri.in/train-booking/${src}-to-${dest}`;
-      },
-    },
-    {
-      id: 'irctc',
-      name: 'IRCTC NextGen',
-      domain: 'irctc.co.in',
-      mockPath: '/irctc',
-      getLiveUrl: () => {
-        return `https://www.irctc.co.in/nget/train-search`;
-      },
-    },
-  ],
+  })),
 };
+

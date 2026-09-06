@@ -52,6 +52,21 @@ export const confirmTktConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/confirmtkt',
+    getLiveUrl: (src, dest, date) =>
+      `https://www.confirmtkt.com/rbooking/trains/from/${encodeURIComponent(src)}/to/${encodeURIComponent(dest)}/${date.dd_mm_yyyy}`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-confirmtkt',
     extraBadgeWrapperClass: 'vendor-confirmtkt',

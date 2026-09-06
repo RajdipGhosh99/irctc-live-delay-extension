@@ -40,6 +40,21 @@ export const railYatriConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/railyatri',
+    getLiveUrl: (src, dest, _date, srcCity = 'kharagpur', destCity = 'howrah') =>
+      `https://www.railyatri.in/trains-between-stations/${encodeURIComponent(srcCity.toLowerCase())}-${encodeURIComponent(src.toLowerCase())}-to-${encodeURIComponent(destCity.toLowerCase())}-jn-${encodeURIComponent(dest.toLowerCase())}`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-railyatri',
     extraBadgeWrapperClass: 'vendor-railyatri',

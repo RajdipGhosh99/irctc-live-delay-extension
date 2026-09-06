@@ -40,6 +40,21 @@ export const easeMyTripConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/easemytrip',
+    getLiveUrl: (src, dest, date) =>
+      `https://railways.easemytrip.com/train-list/${encodeURIComponent(src)}-to-${encodeURIComponent(dest)}?travelDate=${date.dd_mm_yyyy}`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-easemytrip',
     extraBadgeWrapperClass: 'vendor-easemytrip',

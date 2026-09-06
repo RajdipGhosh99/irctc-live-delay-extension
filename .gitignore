@@ -29,3 +29,9 @@ lerna-debug.log*
 .env
 .env.local
 .env.*.local
+
+# Playwright Test Profiles
+.playwright*
+.pw*
+tests/e2e/.playwright*
+tests/e2e/.pw*

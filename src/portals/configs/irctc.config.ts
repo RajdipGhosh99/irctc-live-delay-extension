@@ -39,6 +39,20 @@ export const irctcConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/irctc',
+    getLiveUrl: () => 'https://www.irctc.co.in/nget/train-search',
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-irctc',
     extraBadgeWrapperClass: 'vendor-irctc',

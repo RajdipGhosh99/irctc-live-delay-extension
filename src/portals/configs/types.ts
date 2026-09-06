@@ -6,6 +6,52 @@
 
 export type BadgeInsertStrategy = 'after' | 'before' | 'append' | 'prepend' | 'custom';
 
+export interface FormattedDateValues {
+  iso: string; // YYYY-MM-DD
+  yyyymmdd: string; // YYYYMMDD
+  dd_mm_yyyy: string; // DD-MM-YYYY
+  ddMmYyyySlash: string; // DD/MM/YYYY
+}
+
+export interface VendorRouteConfig {
+  /** Mock server route path (e.g. '/makemytrip') */
+  mockPath: string;
+  /** Live portal URL generator given source, destination, and formatted date */
+  getLiveUrl: (
+    src: string,
+    dest: string,
+    date: FormattedDateValues,
+    srcCity?: string,
+    destCity?: string
+  ) => string;
+}
+
+export interface VendorBadgeConfig {
+  /** Preferred badge positioning beside title */
+  preferredPosition: 'beside-name' | 'after-card' | 'inline';
+  /** Max allowable vertical offset delta in pixels for strict alignment */
+  maxDeltaYPx: number;
+}
+
+export interface VendorPopupConfig {
+  /** Popover layout variant */
+  styleVariant?: 'standard' | 'compact';
+  /** Whether mouse hover automatically triggers the popover */
+  hoverEnabled: boolean;
+  /** Whether click toggles the popover */
+  clickEnabled: boolean;
+  /** Whether double-click forces a cache-busting live refresh */
+  doubleClickRefresh: boolean;
+}
+
+export interface GlobalStationRouteConfig {
+  sourceCode: string;
+  sourceCity: string;
+  destCode: string;
+  destCity: string;
+  journeyDateIso: string;
+}
+
 export interface VendorPortalConfig {
   /** Unique vendor identifier (e.g., 'confirmtkt', 'irctc') */
   id: string;
@@ -15,6 +61,15 @@ export interface VendorPortalConfig {
 
   /** List of domains/hostnames to match */
   domains: string[];
+
+  /** Live and mock route generation rules (single source of truth) */
+  route?: VendorRouteConfig;
+
+  /** Provider-specific badge placement expectations */
+  badge?: VendorBadgeConfig;
+
+  /** Provider-specific popover interaction rules */
+  popup?: VendorPopupConfig;
 
   /** Vendor detection strategies (scripts, global markers, container elements) */
   detection: {

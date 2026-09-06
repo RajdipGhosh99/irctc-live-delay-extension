@@ -40,6 +40,21 @@ export const goibiboConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/goibibo',
+    getLiveUrl: (src, dest, date) =>
+      `https://www.goibibo.com/trains/search?src=${encodeURIComponent(src)}&dest=${encodeURIComponent(dest)}&date=${date.yyyymmdd}`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-goibibo',
     extraBadgeWrapperClass: 'vendor-goibibo',

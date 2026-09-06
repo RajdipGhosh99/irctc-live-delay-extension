@@ -55,6 +55,21 @@ export const makeMyTripConfig: VendorPortalConfig = {
     ],
     insertStrategy: 'after',
   },
+  route: {
+    mockPath: '/makemytrip',
+    getLiveUrl: (src, dest, date, srcCity = 'Kharagpur', destCity = 'Howrah') =>
+      `https://www.makemytrip.com/railways/listing?srcCity=${encodeURIComponent(srcCity)}&destCity=${encodeURIComponent(destCity)}&srcStn=${encodeURIComponent(src)}&destStn=${encodeURIComponent(dest)}&date=${date.yyyymmdd}&classType=ALL`,
+  },
+  badge: {
+    preferredPosition: 'beside-name',
+    maxDeltaYPx: 6,
+  },
+  popup: {
+    styleVariant: 'standard',
+    hoverEnabled: true,
+    clickEnabled: true,
+    doubleClickRefresh: true,
+  },
   styling: {
     customCssClass: 'vendor-makemytrip',
     extraBadgeWrapperClass: 'vendor-makemytrip',
