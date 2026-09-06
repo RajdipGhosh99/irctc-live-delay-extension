@@ -17,15 +17,9 @@ export const confirmTktConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
-      '[id^="train-"]',
+      // Exclude #train-card-list (the wrapper) so only individual train cards are returned
+      '[id^="train-"]:not(#train-card-list)',
       '.border-b.border-tertiary',
-      'div.rounded-10',
-      '[class*="train-card"]',
-      '[class*="trainCard"]',
-      '[class*="TrainCard"]',
-      '.route-link-container',
-      '.train-update',
-      '.well',
     ],
     titleSelectors: [
       '.truncate',

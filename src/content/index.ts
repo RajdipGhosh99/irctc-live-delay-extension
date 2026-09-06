@@ -251,11 +251,60 @@ class ContentScriptOrchestrator {
     if (this.activePopoverWidget && this.activePopoverWidget !== widget) {
       this.closeActivePopover();
     }
-    if (widget.popover) {
-      widget.popover.style.display = 'block';
-      widget.popover.classList.add('is-open');
-      this.activePopoverWidget = widget;
+    if (!widget.popover) return;
+
+    const popover = widget.popover;
+
+    // --- Dynamic viewport-aware positioning (fixed, not relative-to-wrapper) ---
+    const POPOVER_WIDTH = 290;
+    const POPOVER_HEIGHT = 340; // generous estimate; actual may be smaller
+    const GAP = 8;
+    const VIEWPORT_MARGIN = 8;
+    const vpW = window.innerWidth;
+    const vpH = window.innerHeight;
+
+    // Measure the badge button (the trigger) in viewport coords
+    const badgeRect = widget.badge.getBoundingClientRect();
+
+    // Horizontal: align left edge of popover with left edge of badge, clamp within viewport
+    let left = badgeRect.left;
+    if (left + POPOVER_WIDTH > vpW - VIEWPORT_MARGIN) {
+      left = vpW - VIEWPORT_MARGIN - POPOVER_WIDTH;
     }
+    if (left < VIEWPORT_MARGIN) left = VIEWPORT_MARGIN;
+
+    // Vertical: prefer bottom; flip to top if not enough room below
+    const spaceBelow = vpH - badgeRect.bottom;
+    const spaceAbove = badgeRect.top;
+    let top: number;
+    let flipToTop = false;
+
+    if (spaceBelow >= POPOVER_HEIGHT || spaceBelow >= spaceAbove) {
+      // Position BELOW badge
+      top = badgeRect.bottom + GAP;
+      flipToTop = false;
+    } else {
+      // Not enough space below — position ABOVE badge
+      top = badgeRect.top - GAP - POPOVER_HEIGHT;
+      flipToTop = true;
+      // If calculated top would go off the screen, clamp it
+      if (top < VIEWPORT_MARGIN) top = VIEWPORT_MARGIN;
+    }
+
+    // Apply position as fixed so it breaks out of any overflow:hidden ancestor
+    popover.style.position = 'fixed';
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.top = `${Math.round(top)}px`;
+    popover.style.bottom = 'auto';
+    if (flipToTop) {
+      popover.classList.add('popover-flip-top');
+    } else {
+      popover.classList.remove('popover-flip-top');
+    }
+
+    popover.style.display = 'block';
+    popover.classList.add('is-open');
+    this.activePopoverWidget = widget;
   }
 
   private handleBadgeClick(widget: InjectedWidget): void {
@@ -308,18 +357,19 @@ class ContentScriptOrchestrator {
       () => this.closeActivePopover()
     );
 
-    if (wasOpen) {
-      popover.style.display = 'block';
-      popover.classList.add('is-open');
-      this.activePopoverWidget = widget;
-    } else {
-      popover.style.display = 'none';
-      popover.classList.remove('is-open');
-    }
+    // Always start hidden; openPopover() will compute position + show
+    popover.style.display = 'none';
+    popover.classList.remove('is-open');
+    if (wasOpen) this.activePopoverWidget = null; // reset so openPopover won't early-close
 
     widget.wrapper.appendChild(popover);
     widget.popover = popover;
     widget.wrapper.classList.add('has-data');
+
+    // If it was open before the refresh, re-open with correct positioning
+    if (wasOpen) {
+      this.openPopover(widget);
+    }
   }
 
   private togglePopover(widget: InjectedWidget): void {

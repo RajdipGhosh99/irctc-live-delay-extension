@@ -250,11 +250,53 @@ class ContentScriptOrchestrator {
     if (this.activePopoverWidget && this.activePopoverWidget !== widget) {
       this.closeActivePopover();
     }
-    if (widget.popover) {
-      widget.popover.style.display = 'block';
-      widget.popover.classList.add('is-open');
-      this.activePopoverWidget = widget;
+    if (!widget.popover) return;
+
+    const popover = widget.popover;
+
+    // --- Dynamic viewport-aware positioning (fixed, not relative-to-wrapper) ---
+    const POPOVER_WIDTH = 290;
+    const POPOVER_HEIGHT = 340;
+    const GAP = 8;
+    const VIEWPORT_MARGIN = 8;
+    const vpW = window.innerWidth;
+    const vpH = window.innerHeight;
+
+    const badgeRect = widget.badge.getBoundingClientRect();
+
+    let left = badgeRect.left;
+    if (left + POPOVER_WIDTH > vpW - VIEWPORT_MARGIN) {
+      left = vpW - VIEWPORT_MARGIN - POPOVER_WIDTH;
     }
+    if (left < VIEWPORT_MARGIN) left = VIEWPORT_MARGIN;
+
+    const spaceBelow = vpH - badgeRect.bottom;
+    const spaceAbove = badgeRect.top;
+    let top: number;
+    let flipToTop = false;
+
+    if (spaceBelow >= POPOVER_HEIGHT || spaceBelow >= spaceAbove) {
+      top = badgeRect.bottom + GAP;
+      flipToTop = false;
+    } else {
+      top = badgeRect.top - GAP - POPOVER_HEIGHT;
+      flipToTop = true;
+      if (top < VIEWPORT_MARGIN) top = VIEWPORT_MARGIN;
+    }
+
+    popover.style.position = 'fixed';
+    popover.style.left = `${Math.round(left)}px`;
+    popover.style.top = `${Math.round(top)}px`;
+    popover.style.bottom = 'auto';
+    if (flipToTop) {
+      popover.classList.add('popover-flip-top');
+    } else {
+      popover.classList.remove('popover-flip-top');
+    }
+
+    popover.style.display = 'block';
+    popover.classList.add('is-open');
+    this.activePopoverWidget = widget;
   }
 
   private handleBadgeClick(widget: InjectedWidget): void {
@@ -319,6 +361,12 @@ class ContentScriptOrchestrator {
     widget.wrapper.appendChild(popover);
     widget.popover = popover;
     widget.wrapper.classList.add('has-data');
+
+    // If it was open, re-open via openPopover so fixed-position coords are recalculated
+    if (wasOpen) {
+      this.activePopoverWidget = null;
+      this.openPopover(widget);
+    }
   }
 
   private togglePopover(widget: InjectedWidget): void {
