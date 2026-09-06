@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Live Train Delay Tracker",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Real-time live train delay tracker & historical punctuality across ConfirmTkt, MakeMyTrip, ClearTrip & Ixigo.",
   "homepage_url": "https://github.com/RajdipGhosh99",
   "icons": {

@@ -4,6 +4,17 @@ All notable changes to the **Live Train Delay Tracker** extension are documented
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2026-09-06
+
+### 🐛 Fixed
+- **Settings Navigation Linking**: Fixed broken sidebar links for "Data Providers & Keys" (`#providers`) and "Caching & Performance" (`#caching`) on the options dashboard by assigning matching section element IDs.
+- **Settings Card Decoupling**: Separated background on-demand controls from local memory cache TTL retention into dedicated, focused cards.
+
+### 🚀 Added
+- **IntersectionObserver Scroll-Spy**: Added responsive scroll-spy to automatically synchronize the active sidebar tab as users scroll through settings cards.
+
+---
+
 ## [2.0.2] - 2026-09-06
 
 ### 🚀 Added
@@ -63,6 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+[2.0.3]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v1.5.0...v2.0.0
