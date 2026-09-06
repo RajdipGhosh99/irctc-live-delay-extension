@@ -42,8 +42,7 @@ export const goibiboConfig: VendorPortalConfig = {
   },
   route: {
     mockPath: '/goibibo',
-    getLiveUrl: (src, dest, date) =>
-      `https://www.goibibo.com/trains/search?src=${encodeURIComponent(src)}&dest=${encodeURIComponent(dest)}&date=${date.yyyymmdd}`,
+    getLiveUrl: () => 'https://www.goibibo.com/trains/',
   },
   badge: {
     preferredPosition: 'beside-name',

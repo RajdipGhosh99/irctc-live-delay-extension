@@ -185,15 +185,32 @@ export class BasePortalAdapter implements PortalAdapter {
     }
 
     if (position === 'card-header-right') {
-      const header = card.querySelector('header, .header, [class*="header"], [class*="top"]') || anchor;
-      header.appendChild(badgeWrapper);
+      const headerCandidate = card.querySelector('header, .header, [class*="header"], [class*="top"]');
+      let targetContainer: HTMLElement = card;
+      if (headerCandidate instanceof HTMLElement && headerCandidate !== badgeWrapper && !badgeWrapper.contains(headerCandidate)) {
+        targetContainer = headerCandidate;
+      } else if (anchor instanceof HTMLElement && anchor !== badgeWrapper && !badgeWrapper.contains(anchor)) {
+        targetContainer = anchor.parentElement || card;
+      }
+
+      // Detach before moving to prevent circular hierarchy
+      if (badgeWrapper.parentNode) {
+        badgeWrapper.parentNode.removeChild(badgeWrapper);
+      }
+      targetContainer.appendChild(badgeWrapper);
       return;
     }
 
     if (position === 'below-name') {
-      if (anchor.parentNode) {
+      if (anchor.parentNode && anchor !== badgeWrapper && !badgeWrapper.contains(anchor)) {
+        if (badgeWrapper.parentNode) {
+          badgeWrapper.parentNode.removeChild(badgeWrapper);
+        }
         anchor.parentNode.insertBefore(badgeWrapper, anchor.nextSibling);
       } else {
+        if (badgeWrapper.parentNode) {
+          badgeWrapper.parentNode.removeChild(badgeWrapper);
+        }
         card.appendChild(badgeWrapper);
       }
       return;

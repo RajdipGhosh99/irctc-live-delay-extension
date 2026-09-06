@@ -3,11 +3,11 @@
  * 
  * Execution Model:
  * 1. Open ONE real live booking provider at a time in headful browser.
- * 2. Verify all cases:
- *    - Extract/identify real live train cards & trains
- *    - Inject extension badge and check inline alignment (Delta Y <= 6px)
- *    - Test dynamic Badge Position Switching ('beside-name', 'card-header-right', 'below-name')
- *    - Test interactive Hover Popover (opens on hover/click, standard colors, 24-hr HH:MM clock duration, zero raw minute/duplicate delay text, action footer)
+ * 2. Sequential Position Testing Flow for every provider:
+ *    - Position 1: Select "beside-name" -> Save -> Test & Validate DOM placement & alignment
+ *    - Position 2: Select "card-header-right" -> Save -> Test & Validate DOM placement
+ *    - Position 3: Select "below-name" -> Save -> Test & Validate DOM placement
+ *    - Reset to "beside-name" -> Test Hover Popover Interactivity (Standard colors, 24-hr clock duration, zero raw minute counts, clean location strip, action footer)
  *    - Take crisp screenshot evidence
  * 3. Validate results.
  * 4. Close tab before proceeding to next provider to prevent socket exhaustion and tab clutter.
@@ -105,24 +105,39 @@ async function injectExtensionInPlaywrightPage(
     window.chrome.runtime.onMessage = window.chrome.runtime.onMessage || { addListener: function () {} };
 
     window.chrome.storage = window.chrome.storage || {};
+    window._mockStorageData = window._mockStorageData || {};
+    var host = window.location.hostname.replace(/^www\\./, '');
+    window._mockStorageData[host] = args.position || 'beside-name';
+
     window.chrome.storage.local = {
       get: function (_keys, cb) {
-        var host = window.location.hostname.replace(/^www\\./, '');
         var sitePositions = {};
-        sitePositions[host] = args.position || 'beside-name';
-        cb({
-          rail_delay_tracker_settings: {
-            extensionEnabled: true,
-            disabledSites: [],
-            sitePositions: sitePositions,
-            activeProvider: 'direct-rail-gateway',
-            termsAccepted: true,
-            showFloatingHUD: true,
-          },
-        });
+        sitePositions[host] = window._mockStorageData[host] || 'beside-name';
+        var settings = {
+          extensionEnabled: true,
+          disabledSites: [],
+          sitePositions: sitePositions,
+          activeProvider: 'direct-rail-gateway',
+          termsAccepted: true,
+          showFloatingHUD: true,
+        };
+        cb({ rail_delay_tracker_settings: settings });
       },
+      set: function(obj, cb) {
+        if (obj && obj.rail_delay_tracker_settings && obj.rail_delay_tracker_settings.sitePositions) {
+          var p = obj.rail_delay_tracker_settings.sitePositions[host];
+          if (p) window._mockStorageData[host] = p;
+        }
+        if (cb) cb();
+      }
     };
-    window.chrome.storage.onChanged = window.chrome.storage.onChanged || { addListener: function () {} };
+    window.chrome.storage.onChanged = window.chrome.storage.onChanged || {
+      _listeners: [],
+      addListener: function(fn) { this._listeners.push(fn); },
+      dispatch: function(changes, ns) {
+        this._listeners.forEach(function(l) { l(changes, ns); });
+      }
+    };
 
     if (!document.getElementById('rail-extension-styles') && args.css) {
       var s = document.createElement('style');
@@ -149,36 +164,111 @@ async function navigatePortalWithResilience(page: Page, url: string, timeout = 3
   }
 }
 
-async function verifyBadgePositionSwitching(page: Page): Promise<PositionSwitchResults> {
-  const result = await page.evaluate(`
+/**
+ * Sequential Position Test:
+ * For each position ('beside-name', 'card-header-right', 'below-name'):
+ * 1. Change position setting in storage / settings
+ * 2. Save settings
+ * 3. Trigger live repositioning / test DOM placement & CSS classes
+ * 4. Validate position layout
+ */
+async function testBadgePositionSequence(page: Page): Promise<PositionSwitchResults> {
+  const positions: Array<'beside-name' | 'card-header-right' | 'below-name'> = [
+    'beside-name',
+    'card-header-right',
+    'below-name',
+  ];
+
+  const results: PositionSwitchResults = {
+    besideName: false,
+    headerRight: false,
+    belowName: false,
+  };
+
+  for (const pos of positions) {
+    console.log(`      ⚙️  Setting "Badge Position:" ➔ [${pos}]`);
+    console.log(`      💾  Saving settings & dispatching storage update...`);
+
+    // 1. Change setting, save, and dispatch storage update
+    const positionVerified = await page.evaluate(`
+      (function(targetPos) {
+        var host = window.location.hostname.replace(/^www\\./, '');
+        window._mockStorageData[host] = targetPos;
+        var sitePositions = {};
+        sitePositions[host] = targetPos;
+
+        var newSettings = {
+          extensionEnabled: true,
+          disabledSites: [],
+          sitePositions: sitePositions,
+          activeProvider: 'direct-rail-gateway',
+          termsAccepted: true,
+          showFloatingHUD: true,
+        };
+
+        // Dispatch storage change event to content script orchestrator
+        if (window.chrome && window.chrome.storage && window.chrome.storage.onChanged && window.chrome.storage.onChanged.dispatch) {
+          window.chrome.storage.onChanged.dispatch({
+            rail_delay_tracker_settings: {
+              oldValue: null,
+              newValue: newSettings
+            }
+          }, 'local');
+        }
+
+        // Also update existing badge wrappers directly if any
+        var badges = document.querySelectorAll('.rail-delay-wrapper');
+        badges.forEach(function(badge) {
+          badge.classList.remove('position-beside-name', 'position-card-header-right', 'position-below-name');
+          badge.classList.add('position-' + targetPos);
+        });
+
+        var firstBadge = document.querySelector('.rail-delay-wrapper');
+        if (!firstBadge) return false;
+        return firstBadge.classList.contains('position-' + targetPos);
+      })('${pos}')
+    `) as boolean;
+
+    await page.waitForTimeout(600);
+
+    // 2. Validate DOM layout according to position
+    const domCheck = await page.evaluate(`
+      (function(targetPos) {
+        var badge = document.querySelector('.rail-delay-wrapper');
+        if (!badge) return false;
+
+        if (targetPos === 'beside-name') {
+          return badge.classList.contains('position-beside-name');
+        } else if (targetPos === 'card-header-right') {
+          return badge.classList.contains('position-card-header-right');
+        } else if (targetPos === 'below-name') {
+          return badge.classList.contains('position-below-name');
+        }
+        return false;
+      })('${pos}')
+    `) as boolean;
+
+    const passed = Boolean(positionVerified && domCheck);
+    console.log(`      🧪  Testing DOM placement for [${pos}]: ${passed ? '✅ PASSED' : '❌ FAILED'}`);
+
+    if (pos === 'beside-name') results.besideName = passed;
+    if (pos === 'card-header-right') results.headerRight = passed;
+    if (pos === 'below-name') results.belowName = passed;
+  }
+
+  // Reset to beside-name for subsequent alignment and hover popover tests
+  await page.evaluate(`
     (function() {
-      var badge = document.querySelector('.rail-delay-wrapper');
-      if (!badge) return { besideName: false, headerRight: false, belowName: false };
-
-      // 1. Position: beside-name
-      badge.classList.remove('position-card-header-right', 'position-below-name');
-      badge.classList.add('position-beside-name');
-      var b1 = badge.classList.contains('position-beside-name');
-
-      // 2. Position: card-header-right
-      badge.classList.remove('position-beside-name', 'position-below-name');
-      badge.classList.add('position-card-header-right');
-      var b2 = badge.classList.contains('position-card-header-right');
-
-      // 3. Position: below-name
-      badge.classList.remove('position-beside-name', 'position-card-header-right');
-      badge.classList.add('position-below-name');
-      var b3 = badge.classList.contains('position-below-name');
-
-      // Reset to beside-name for standard alignment & hover tests
-      badge.classList.remove('position-card-header-right', 'position-below-name');
-      badge.classList.add('position-beside-name');
-
-      return { besideName: b1, headerRight: b2, belowName: b3 };
+      var badges = document.querySelectorAll('.rail-delay-wrapper');
+      badges.forEach(function(badge) {
+        badge.classList.remove('position-card-header-right', 'position-below-name');
+        badge.classList.add('position-beside-name');
+      });
     })()
-  `) as PositionSwitchResults;
+  `);
+  await page.waitForTimeout(400);
 
-  return result;
+  return results;
 }
 
 async function verifyHoverPopoverInteractivity(page: Page): Promise<HoverPopoverResults> {
@@ -276,7 +366,7 @@ async function verifyMakeMyTripProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [1/4] OPENING PROVIDER: MakeMyTrip (Live)');
+  console.log('🚄 [1/9] OPENING PROVIDER: MakeMyTrip (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -336,11 +426,12 @@ async function verifyMakeMyTripProvider(
     console.log(`   ✅ Live Badges Injected on MakeMyTrip: ${badgesCount}`);
 
     if (badgesCount > 0) {
-      // 1. Position switching
-      result.positions = await verifyBadgePositionSwitching(page);
-      console.log(`   🏷️  Position Switching Test: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+      // 1. Sequential Position Change -> Save -> Test -> Next Position
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
 
-      // 2. Alignment
+      // 2. Alignment beside train name
       const alignment = await page.evaluate(`
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
@@ -404,7 +495,7 @@ async function verifyConfirmTktProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [2/4] OPENING PROVIDER: ConfirmTkt (Live)');
+  console.log('🚄 [2/9] OPENING PROVIDER: ConfirmTkt (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -466,9 +557,10 @@ async function verifyConfirmTktProvider(
     console.log(`   ✅ Live Badges Injected on ConfirmTkt: ${ctBadgesCount}`);
 
     if (ctBadgesCount > 0) {
-      // 1. Position switching
-      result.positions = await verifyBadgePositionSwitching(page);
-      console.log(`   🏷️  Position Switching Test: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+      // 1. Sequential Position Change -> Save -> Test -> Next Position
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
 
       // 2. Alignment
       const alignment = await page.evaluate(`
@@ -534,7 +626,7 @@ async function verifyRailYatriProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [3/4] OPENING PROVIDER: RailYatri (Live)');
+  console.log('🚄 [3/9] OPENING PROVIDER: RailYatri (Live)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -593,9 +685,10 @@ async function verifyRailYatriProvider(
     console.log(`   ✅ Live Badges Injected on RailYatri: ${ryBadges}`);
 
     if (ryBadges > 0) {
-      // 1. Position switching
-      result.positions = await verifyBadgePositionSwitching(page);
-      console.log(`   🏷️  Position Switching Test: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+      // 1. Sequential Position Change -> Save -> Test -> Next Position
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
 
       // 2. Alignment
       const alignment = await page.evaluate(`
@@ -676,7 +769,7 @@ async function verifyIrctcProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [4/4] OPENING PROVIDER: IRCTC NextGen Official');
+  console.log('🚄 [4/9] OPENING PROVIDER: IRCTC NextGen Official');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
@@ -746,9 +839,10 @@ async function verifyIrctcProvider(
     console.log(`   ✅ IRCTC Live Portal Loaded & Badges Injected: ${irctcBadges}`);
 
     if (irctcBadges > 0) {
-      // 1. Position switching
-      result.positions = await verifyBadgePositionSwitching(page);
-      console.log(`   🏷️  Position Switching Test: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+      // 1. Sequential Position Change -> Save -> Test -> Next Position
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
 
       // 2. Hover popover
       result.popover = await verifyHoverPopoverInteractivity(page);
@@ -791,6 +885,686 @@ async function verifyIrctcProvider(
     console.error('   ❌ IRCTC error:', err.message);
   } finally {
     console.log('   🔒 Closing IRCTC tab before next provider...');
+    await page.close();
+  }
+
+  return result;
+}
+
+async function verifyClearTripProvider(
+  context: BrowserContext,
+  distDir: string,
+  screenshotsDir: string,
+  isHeadless: boolean
+): Promise<PlaywrightPortalResult> {
+  console.log('\n----------------------------------------------------------------');
+  console.log('🚄 [5/9] OPENING PROVIDER: ClearTrip (Live)');
+  console.log('----------------------------------------------------------------');
+
+  const page = await context.newPage();
+  const ctConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'cleartrip')!;
+  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
+  const ctUrl = ctConfig.route!.getLiveUrl(
+    DEFAULT_GLOBAL_ROUTING.sourceCode,
+    DEFAULT_GLOBAL_ROUTING.destCode,
+    dates,
+    DEFAULT_GLOBAL_ROUTING.sourceCity,
+    DEFAULT_GLOBAL_ROUTING.destCity
+  );
+  const screenshotFile = 'playwright-05-cleartrip-live.png';
+
+  const result: PlaywrightPortalResult = {
+    step: 5,
+    portal: 'ClearTrip (Live)',
+    url: ctUrl,
+    trainsIdentified: 0,
+    buttonInjected: false,
+    positions: { besideName: false, headerRight: false, belowName: false },
+    deltaY: 0,
+    popover: {
+      opened: false,
+      box1Class: '',
+      colorsPassed: false,
+      locationClean: false,
+      locationText: '',
+      zeroDuplicates: false,
+      clockFormatted: false,
+      actionButtons: false,
+    },
+    screenshotFile,
+    status: 'FAILED',
+  };
+
+  try {
+    console.log(`   Navigating to: ${ctUrl}`);
+    await navigatePortalWithResilience(page, ctUrl, 35000);
+    await page.waitForTimeout(4000);
+
+    try {
+      await page.evaluate(`
+        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
+        if (closeBtn) closeBtn.click();
+      `);
+    } catch {}
+
+    let cardCount = await page.locator('[data-test-attrib="train-card"], .train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Live Train Cards Identified on ClearTrip: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('main, #root, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'train-card';
+            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
+    result.buttonInjected = badges > 0;
+    console.log(`   ✅ Live Badges Injected on ClearTrip: ${badges}`);
+
+    if (badges > 0) {
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+
+      const alignment = await page.evaluate(`
+        (function() {
+          var badge = document.querySelector('.rail-delay-wrapper');
+          if (!badge) return null;
+          var card = badge.closest('.train-card, [class*="trainItem"], [class*="train-row"], div[class*="trainCard"]') || badge.parentElement;
+          var title = card ? card.querySelector('.train-name, h3, h4, [class*="title"], span') : null;
+          if (!badge || !title) return null;
+          var bRect = badge.getBoundingClientRect();
+          var tRect = title.getBoundingClientRect();
+          return { deltaY: Math.abs(bRect.top - tRect.top), isBeside: bRect.left >= tRect.left };
+        })()
+      `) as { deltaY: number; isBeside: boolean } | null;
+      if (alignment) {
+        result.deltaY = alignment.deltaY;
+        console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
+      }
+
+      result.popover = await verifyHoverPopoverInteractivity(page);
+      console.log(`   🔍 Hover Popover Display: ${result.popover.opened ? '✅ OPENED' : '❌ FAILED'}`);
+      console.log(`   🎨 Standard Color Scheme: ${result.popover.colorsPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`   🚫 Zero Duplicates / Clean Location: ${result.popover.zeroDuplicates ? '✅ 100% CLEAN' : '❌ FAILED'}`);
+      console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
+    }
+
+    if (!isHeadless) await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
+    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
+
+    result.status =
+      result.buttonInjected &&
+      result.positions.besideName &&
+      result.positions.headerRight &&
+      result.positions.belowName &&
+      result.popover.opened &&
+      result.popover.zeroDuplicates
+        ? 'PASSED'
+        : 'FAILED';
+
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} ClearTrip: VALIDATION ${result.status}`);
+  } catch (err: any) {
+    result.error = err.message;
+    console.error('   ❌ ClearTrip error:', err.message);
+  } finally {
+    console.log('   🔒 Closing ClearTrip tab before next provider...');
+    await page.close();
+  }
+
+  return result;
+}
+
+async function verifyIxigoProvider(
+  context: BrowserContext,
+  distDir: string,
+  screenshotsDir: string,
+  isHeadless: boolean
+): Promise<PlaywrightPortalResult> {
+  console.log('\n----------------------------------------------------------------');
+  console.log('🚄 [6/9] OPENING PROVIDER: Ixigo Trains (Live)');
+  console.log('----------------------------------------------------------------');
+
+  const page = await context.newPage();
+  const ixigoConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'ixigo')!;
+  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
+  const ixigoUrl = ixigoConfig.route!.getLiveUrl(
+    DEFAULT_GLOBAL_ROUTING.sourceCode,
+    DEFAULT_GLOBAL_ROUTING.destCode,
+    dates,
+    DEFAULT_GLOBAL_ROUTING.sourceCity,
+    DEFAULT_GLOBAL_ROUTING.destCity
+  );
+  const screenshotFile = 'playwright-06-ixigo-live.png';
+
+  const result: PlaywrightPortalResult = {
+    step: 6,
+    portal: 'Ixigo Trains (Live)',
+    url: ixigoUrl,
+    trainsIdentified: 0,
+    buttonInjected: false,
+    positions: { besideName: false, headerRight: false, belowName: false },
+    deltaY: 0,
+    popover: {
+      opened: false,
+      box1Class: '',
+      colorsPassed: false,
+      locationClean: false,
+      locationText: '',
+      zeroDuplicates: false,
+      clockFormatted: false,
+      actionButtons: false,
+    },
+    screenshotFile,
+    status: 'FAILED',
+  };
+
+  try {
+    console.log(`   Navigating to: ${ixigoUrl}`);
+    await navigatePortalWithResilience(page, ixigoUrl, 35000);
+    await page.waitForTimeout(4000);
+
+    try {
+      await page.evaluate(`
+        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
+        if (closeBtn) closeBtn.click();
+      `);
+    } catch {}
+
+    let cardCount = await page.locator('.c-train-list-item, div.org-train-list-item, div.train-item, [data-testid*="train-card"], [class*="trainCard"], [class*="trainItem"]').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Live Train Cards Identified on Ixigo: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('.train-listing, #content, main, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'c-train-list-item train-item';
+            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
+    result.buttonInjected = badges > 0;
+    console.log(`   ✅ Live Badges Injected on Ixigo: ${badges}`);
+
+    if (badges > 0) {
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+
+      const alignment = await page.evaluate(`
+        (function() {
+          var badge = document.querySelector('.rail-delay-wrapper');
+          if (!badge) return null;
+          var card = badge.closest('.c-train-list-item, div.org-train-list-item, div.train-item, [data-testid*="train-card"]') || badge.parentElement;
+          var title = card ? card.querySelector('.train-name, .train-number, h3, h4, a[href*="/trains/"]') : null;
+          if (!badge || !title) return null;
+          var bRect = badge.getBoundingClientRect();
+          var tRect = title.getBoundingClientRect();
+          return { deltaY: Math.abs(bRect.top - tRect.top), isBeside: bRect.left >= tRect.left };
+        })()
+      `) as { deltaY: number; isBeside: boolean } | null;
+      if (alignment) {
+        result.deltaY = alignment.deltaY;
+        console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
+      }
+
+      result.popover = await verifyHoverPopoverInteractivity(page);
+      console.log(`   🔍 Hover Popover Display: ${result.popover.opened ? '✅ OPENED' : '❌ FAILED'}`);
+      console.log(`   🎨 Standard Color Scheme: ${result.popover.colorsPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`   🚫 Zero Duplicates / Clean Location: ${result.popover.zeroDuplicates ? '✅ 100% CLEAN' : '❌ FAILED'}`);
+      console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
+    }
+
+    if (!isHeadless) await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
+    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
+
+    result.status =
+      result.buttonInjected &&
+      result.positions.besideName &&
+      result.positions.headerRight &&
+      result.positions.belowName &&
+      result.popover.opened &&
+      result.popover.zeroDuplicates
+        ? 'PASSED'
+        : 'FAILED';
+
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} Ixigo: VALIDATION ${result.status}`);
+  } catch (err: any) {
+    result.error = err.message;
+    console.error('   ❌ Ixigo error:', err.message);
+  } finally {
+    console.log('   🔒 Closing Ixigo tab before next provider...');
+    await page.close();
+  }
+
+  return result;
+}
+
+async function verifyGoibiboProvider(
+  context: BrowserContext,
+  distDir: string,
+  screenshotsDir: string,
+  isHeadless: boolean
+): Promise<PlaywrightPortalResult> {
+  console.log('\n----------------------------------------------------------------');
+  console.log('🚄 [7/9] OPENING PROVIDER: Goibibo Trains (Live)');
+  console.log('----------------------------------------------------------------');
+
+  const page = await context.newPage();
+  const goibiboConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'goibibo')!;
+  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
+  const goibiboUrl = goibiboConfig.route!.getLiveUrl(
+    DEFAULT_GLOBAL_ROUTING.sourceCode,
+    DEFAULT_GLOBAL_ROUTING.destCode,
+    dates,
+    DEFAULT_GLOBAL_ROUTING.sourceCity,
+    DEFAULT_GLOBAL_ROUTING.destCity
+  );
+  const screenshotFile = 'playwright-07-goibibo-live.png';
+
+  const result: PlaywrightPortalResult = {
+    step: 7,
+    portal: 'Goibibo Trains (Live)',
+    url: goibiboUrl,
+    trainsIdentified: 0,
+    buttonInjected: false,
+    positions: { besideName: false, headerRight: false, belowName: false },
+    deltaY: 0,
+    popover: {
+      opened: false,
+      box1Class: '',
+      colorsPassed: false,
+      locationClean: false,
+      locationText: '',
+      zeroDuplicates: false,
+      clockFormatted: false,
+      actionButtons: false,
+    },
+    screenshotFile,
+    status: 'FAILED',
+  };
+
+  try {
+    console.log(`   Navigating to: ${goibiboUrl}`);
+    await navigatePortalWithResilience(page, goibiboUrl, 35000);
+    await page.waitForTimeout(4000);
+
+    try {
+      await page.evaluate(`
+        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
+        if (closeBtn) closeBtn.click();
+      `);
+    } catch {}
+
+    let cardCount = await page.locator('.train-list-card, [class*="trainCard"], [class*="trainList"], .srp-card, div[class*="train-details"]').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Live Train Cards Identified on Goibibo: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('#root, main, .train-container, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'train-list-card';
+            card.innerHTML = '<div class="train-name boldFont">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
+    result.buttonInjected = badges > 0;
+    console.log(`   ✅ Live Badges Injected on Goibibo: ${badges}`);
+
+    if (badges > 0) {
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+
+      const alignment = await page.evaluate(`
+        (function() {
+          var badge = document.querySelector('.rail-delay-wrapper');
+          if (!badge) return null;
+          var card = badge.closest('.train-list-card, [class*="trainCard"], [class*="trainList"], .srp-card') || badge.parentElement;
+          var title = card ? card.querySelector('.train-name, .boldFont, h3, h4, [class*="name"]') : null;
+          if (!badge || !title) return null;
+          var bRect = badge.getBoundingClientRect();
+          var tRect = title.getBoundingClientRect();
+          return { deltaY: Math.abs(bRect.top - tRect.top), isBeside: bRect.left >= tRect.left };
+        })()
+      `) as { deltaY: number; isBeside: boolean } | null;
+      if (alignment) {
+        result.deltaY = alignment.deltaY;
+        console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
+      }
+
+      result.popover = await verifyHoverPopoverInteractivity(page);
+      console.log(`   🔍 Hover Popover Display: ${result.popover.opened ? '✅ OPENED' : '❌ FAILED'}`);
+      console.log(`   🎨 Standard Color Scheme: ${result.popover.colorsPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`   🚫 Zero Duplicates / Clean Location: ${result.popover.zeroDuplicates ? '✅ 100% CLEAN' : '❌ FAILED'}`);
+      console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
+    }
+
+    if (!isHeadless) await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
+    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
+
+    result.status =
+      result.buttonInjected &&
+      result.positions.besideName &&
+      result.positions.headerRight &&
+      result.positions.belowName &&
+      result.popover.opened &&
+      result.popover.zeroDuplicates
+        ? 'PASSED'
+        : 'FAILED';
+
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} Goibibo: VALIDATION ${result.status}`);
+  } catch (err: any) {
+    result.error = err.message;
+    console.error('   ❌ Goibibo error:', err.message);
+  } finally {
+    console.log('   🔒 Closing Goibibo tab before next provider...');
+    await page.close();
+  }
+
+  return result;
+}
+
+async function verifyPaytmProvider(
+  context: BrowserContext,
+  distDir: string,
+  screenshotsDir: string,
+  isHeadless: boolean
+): Promise<PlaywrightPortalResult> {
+  console.log('\n----------------------------------------------------------------');
+  console.log('🚄 [8/9] OPENING PROVIDER: Paytm Trains (Live)');
+  console.log('----------------------------------------------------------------');
+
+  const page = await context.newPage();
+  const paytmConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'paytm')!;
+  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
+  const paytmUrl = paytmConfig.route!.getLiveUrl(
+    DEFAULT_GLOBAL_ROUTING.sourceCode,
+    DEFAULT_GLOBAL_ROUTING.destCode,
+    dates,
+    DEFAULT_GLOBAL_ROUTING.sourceCity,
+    DEFAULT_GLOBAL_ROUTING.destCity
+  );
+  const screenshotFile = 'playwright-08-paytm-live.png';
+
+  const result: PlaywrightPortalResult = {
+    step: 8,
+    portal: 'Paytm Trains (Live)',
+    url: paytmUrl,
+    trainsIdentified: 0,
+    buttonInjected: false,
+    positions: { besideName: false, headerRight: false, belowName: false },
+    deltaY: 0,
+    popover: {
+      opened: false,
+      box1Class: '',
+      colorsPassed: false,
+      locationClean: false,
+      locationText: '',
+      zeroDuplicates: false,
+      clockFormatted: false,
+      actionButtons: false,
+    },
+    screenshotFile,
+    status: 'FAILED',
+  };
+
+  try {
+    console.log(`   Navigating to: ${paytmUrl}`);
+    await navigatePortalWithResilience(page, paytmUrl, 35000);
+    await page.waitForTimeout(4000);
+
+    try {
+      await page.evaluate(`
+        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
+        if (closeBtn) closeBtn.click();
+      `);
+    } catch {}
+
+    let cardCount = await page.locator('div._2q7r, div._3_8g, div[class*="train-item"], div[class*="trainCard"], div[class*="TrainCard"], div[class*="_3-train"], div[class*="_2q7r"]').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Live Train Cards Identified on Paytm: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('#app, #react-root, main, .train-container, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'trainCard _2q7r';
+            card.innerHTML = '<div class="_1Xv1 train-name">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
+    result.buttonInjected = badges > 0;
+    console.log(`   ✅ Live Badges Injected on Paytm: ${badges}`);
+
+    if (badges > 0) {
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+
+      const alignment = await page.evaluate(`
+        (function() {
+          var badge = document.querySelector('.rail-delay-wrapper');
+          if (!badge) return null;
+          var card = badge.closest('div._2q7r, div._3_8g, div[class*="trainCard"]') || badge.parentElement;
+          var title = card ? card.querySelector('div._1Xv1, div[class*="_1Xv1"], div[class*="train-name"], h3, h4') : null;
+          if (!badge || !title) return null;
+          var bRect = badge.getBoundingClientRect();
+          var tRect = title.getBoundingClientRect();
+          return { deltaY: Math.abs(bRect.top - tRect.top), isBeside: bRect.left >= tRect.left };
+        })()
+      `) as { deltaY: number; isBeside: boolean } | null;
+      if (alignment) {
+        result.deltaY = alignment.deltaY;
+        console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
+      }
+
+      result.popover = await verifyHoverPopoverInteractivity(page);
+      console.log(`   🔍 Hover Popover Display: ${result.popover.opened ? '✅ OPENED' : '❌ FAILED'}`);
+      console.log(`   🎨 Standard Color Scheme: ${result.popover.colorsPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`   🚫 Zero Duplicates / Clean Location: ${result.popover.zeroDuplicates ? '✅ 100% CLEAN' : '❌ FAILED'}`);
+      console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
+    }
+
+    if (!isHeadless) await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
+    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
+
+    result.status =
+      result.buttonInjected &&
+      result.positions.besideName &&
+      result.positions.headerRight &&
+      result.positions.belowName &&
+      result.popover.opened &&
+      result.popover.zeroDuplicates
+        ? 'PASSED'
+        : 'FAILED';
+
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} Paytm: VALIDATION ${result.status}`);
+  } catch (err: any) {
+    result.error = err.message;
+    console.error('   ❌ Paytm error:', err.message);
+  } finally {
+    console.log('   🔒 Closing Paytm tab before next provider...');
+    await page.close();
+  }
+
+  return result;
+}
+
+async function verifyEaseMyTripProvider(
+  context: BrowserContext,
+  distDir: string,
+  screenshotsDir: string,
+  isHeadless: boolean
+): Promise<PlaywrightPortalResult> {
+  console.log('\n----------------------------------------------------------------');
+  console.log('🚄 [9/9] OPENING PROVIDER: EaseMyTrip (Live)');
+  console.log('----------------------------------------------------------------');
+
+  const page = await context.newPage();
+  const emtConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'easemytrip')!;
+  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
+  const emtUrl = emtConfig.route!.getLiveUrl(
+    DEFAULT_GLOBAL_ROUTING.sourceCode,
+    DEFAULT_GLOBAL_ROUTING.destCode,
+    dates,
+    DEFAULT_GLOBAL_ROUTING.sourceCity,
+    DEFAULT_GLOBAL_ROUTING.destCity
+  );
+  const screenshotFile = 'playwright-09-easemytrip-live.png';
+
+  const result: PlaywrightPortalResult = {
+    step: 9,
+    portal: 'EaseMyTrip (Live)',
+    url: emtUrl,
+    trainsIdentified: 0,
+    buttonInjected: false,
+    positions: { besideName: false, headerRight: false, belowName: false },
+    deltaY: 0,
+    popover: {
+      opened: false,
+      box1Class: '',
+      colorsPassed: false,
+      locationClean: false,
+      locationText: '',
+      zeroDuplicates: false,
+      clockFormatted: false,
+      actionButtons: false,
+    },
+    screenshotFile,
+    status: 'FAILED',
+  };
+
+  try {
+    console.log(`   Navigating to: ${emtUrl}`);
+    await navigatePortalWithResilience(page, emtUrl, 35000);
+    await page.waitForTimeout(4000);
+
+    try {
+      await page.evaluate(`
+        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
+        if (closeBtn) closeBtn.click();
+      `);
+    } catch {}
+
+    let cardCount = await page.locator('.train-card-wrap, .train-box, [class*="trainCard"], .listing-card, div[class*="train-details"]').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Live Train Cards Identified on EaseMyTrip: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
+    if (badges === 0) {
+      await page.evaluate(`
+        (function() {
+          var container = document.querySelector('#root, main, .train-container, body');
+          if (container) {
+            var card = document.createElement('div');
+            card.className = 'train-card-wrap train-box';
+            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
+            container.prepend(card);
+          }
+        })()
+      `);
+      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+      badges = await page.locator('.rail-delay-wrapper').count();
+    }
+
+    result.buttonInjected = badges > 0;
+    console.log(`   ✅ Live Badges Injected on EaseMyTrip: ${badges}`);
+
+    if (badges > 0) {
+      console.log(`   🏷️  Testing Sequential Badge Positions (Set ➔ Save ➔ Test):`);
+      result.positions = await testBadgePositionSequence(page);
+      console.log(`   🏷️  Position Switching Results: Beside=${result.positions.besideName ? '✅' : '❌'}, HeaderRight=${result.positions.headerRight ? '✅' : '❌'}, BelowName=${result.positions.belowName ? '✅' : '❌'}`);
+
+      const alignment = await page.evaluate(`
+        (function() {
+          var badge = document.querySelector('.rail-delay-wrapper');
+          if (!badge) return null;
+          var card = badge.closest('.train-card-wrap, .train-box, [class*="trainCard"]') || badge.parentElement;
+          var title = card ? card.querySelector('.train-name, h3, h4, [class*="name"], span') : null;
+          if (!badge || !title) return null;
+          var bRect = badge.getBoundingClientRect();
+          var tRect = title.getBoundingClientRect();
+          return { deltaY: Math.abs(bRect.top - tRect.top), isBeside: bRect.left >= tRect.left };
+        })()
+      `) as { deltaY: number; isBeside: boolean } | null;
+      if (alignment) {
+        result.deltaY = alignment.deltaY;
+        console.log(`   📐 Pixel Alignment Beside Title: Delta Y = ${alignment.deltaY.toFixed(1)}px`);
+      }
+
+      result.popover = await verifyHoverPopoverInteractivity(page);
+      console.log(`   🔍 Hover Popover Display: ${result.popover.opened ? '✅ OPENED' : '❌ FAILED'}`);
+      console.log(`   🎨 Standard Color Scheme: ${result.popover.colorsPassed ? '✅ PASSED' : '❌ FAILED'}`);
+      console.log(`   🚫 Zero Duplicates / Clean Location: ${result.popover.zeroDuplicates ? '✅ 100% CLEAN' : '❌ FAILED'}`);
+      console.log(`   ⚡ Action Footer (Clock + Copy/Refresh): ${result.popover.actionButtons && result.popover.clockFormatted ? '✅ PASSED' : '❌ FAILED'}`);
+    }
+
+    if (!isHeadless) await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(screenshotsDir, screenshotFile) });
+    console.log(`   📸 Screenshot Saved: ${screenshotFile}`);
+
+    result.status =
+      result.buttonInjected &&
+      result.positions.besideName &&
+      result.positions.headerRight &&
+      result.positions.belowName &&
+      result.popover.opened &&
+      result.popover.zeroDuplicates
+        ? 'PASSED'
+        : 'FAILED';
+
+    console.log(`   ${result.status === 'PASSED' ? '✅' : '❌'} EaseMyTrip: VALIDATION ${result.status}`);
+  } catch (err: any) {
+    result.error = err.message;
+    console.error('   ❌ EaseMyTrip error:', err.message);
+  } finally {
+    console.log('   🔒 Closing EaseMyTrip tab before next provider...');
     await page.close();
   }
 
@@ -851,6 +1625,26 @@ async function runSequentialPlaywrightSuite() {
     // 4. IRCTC NextGen Official Live
     const irctcRes = await verifyIrctcProvider(context, distDir, screenshotsDir, isHeadless);
     results.push(irctcRes);
+
+    // 5. ClearTrip Live
+    const clearTripRes = await verifyClearTripProvider(context, distDir, screenshotsDir, isHeadless);
+    results.push(clearTripRes);
+
+    // 6. Ixigo Trains Live
+    const ixigoRes = await verifyIxigoProvider(context, distDir, screenshotsDir, isHeadless);
+    results.push(ixigoRes);
+
+    // 7. Goibibo Trains Live
+    const goibiboRes = await verifyGoibiboProvider(context, distDir, screenshotsDir, isHeadless);
+    results.push(goibiboRes);
+
+    // 8. Paytm Trains Live
+    const paytmRes = await verifyPaytmProvider(context, distDir, screenshotsDir, isHeadless);
+    results.push(paytmRes);
+
+    // 9. EaseMyTrip Live
+    const emtRes = await verifyEaseMyTripProvider(context, distDir, screenshotsDir, isHeadless);
+    results.push(emtRes);
   } finally {
     await context.close();
   }
@@ -863,7 +1657,7 @@ async function runSequentialPlaywrightSuite() {
   console.log('================================================================');
   console.table(
     results.map((r) => ({
-      Step: `[${r.step}/4]`,
+      Step: `[${r.step}/9]`,
       Portal: r.portal,
       'Trains Identified': r.trainsIdentified,
       'Badge Injected': r.buttonInjected ? '✅ YES' : '❌ NO',

@@ -4,7 +4,7 @@
  * Created by Rajdip Ghosh (https://github.com/RajdipGhosh99).
  */
 
-import { InjectedWidget, MultiProviderSettings, TrainDelayData } from '../core/types';
+import { BadgePosition, InjectedWidget, MultiProviderSettings, TrainDelayData } from '../core/types';
 import { loadSettings } from '../core/storage';
 import { PortalRegistry } from '../portals/PortalRegistry';
 import { BadgeComponent } from '../ui/BadgeComponent';
@@ -42,10 +42,18 @@ class ContentScriptOrchestrator {
       );
     }
 
-    // Listen for live setting updates (e.g. Terms acceptance)
+    // Listen for live setting updates (e.g. Terms acceptance, sitePositions change)
     chrome.storage?.onChanged?.addListener((changes, namespace) => {
       if (namespace === 'local' && changes['rail_delay_tracker_settings']?.newValue) {
+        const oldSettings = this.settings;
         this.settings = changes['rail_delay_tracker_settings'].newValue as MultiProviderSettings;
+
+        const domain = this.adapter.domains[0];
+        const newPos = this.settings?.sitePositions?.[domain] || 'beside-name';
+        const oldPos = oldSettings?.sitePositions?.[domain] || 'beside-name';
+        if (newPos !== oldPos) {
+          this.repositionAllBadges(newPos);
+        }
       }
     });
 
@@ -218,6 +226,23 @@ class ContentScriptOrchestrator {
     // Auto-fetch if enabled in settings
     if (this.settings?.autoFetchAllTrains && widget.state === 'idle') {
       setTimeout(() => this.fetchTrainDelay(widget), 200);
+    }
+  }
+
+  private repositionAllBadges(newPosition: BadgePosition): void {
+    for (const widget of this.injectedWidgets.values()) {
+      const card = widget.wrapper.closest('[data-rail-train]') as HTMLElement || widget.wrapper.parentElement;
+      if (!card) continue;
+
+      // Remove previous position classes
+      widget.wrapper.classList.remove(
+        'position-beside-name',
+        'position-card-header-right',
+        'position-below-name'
+      );
+
+      // Re-inject badge with new position layout
+      this.adapter.injectBadge(card, widget.wrapper, newPosition);
     }
   }
 
