@@ -151,6 +151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    // Dynamic Manifest Version
+    const manifestVer = chrome.runtime?.getManifest?.()?.version;
+    if (manifestVer) {
+      document.querySelectorAll('.version-tag').forEach((el) => {
+        el.textContent = `v${manifestVer}`;
+      });
+    }
+
     renderSitesGrid();
     renderProviderPools();
     updateStorageMeter();

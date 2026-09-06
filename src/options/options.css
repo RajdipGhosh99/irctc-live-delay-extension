@@ -1128,3 +1128,152 @@ body {
     min-width: unset;
   }
 }
+
+/* ==========================================================================
+   Release History & Versions Hub
+   ========================================================================== */
+.version-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.version-item {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.version-item:hover {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.version-item.current {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.version-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.version-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.version-badge-pill {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.version-badge-pill.latest {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.version-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.version-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.version-link-btn:hover {
+  text-decoration: underline;
+}
+
+.version-changelog {
+  margin: 0 0 14px 20px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+.version-changelog li {
+  margin-bottom: 4px;
+}
+
+.version-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 12.5px;
+}
+
+.version-download-link {
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+}
+
+.version-download-link:hover {
+  text-decoration: underline;
+}
+
+.version-sha {
+  font-family: ui-monospace, monospace;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.releases-external-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-external-releases {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.btn-external-releases:hover {
+  background: #1d4ed8;
+}
+
+.btn-external-releases.secondary {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid var(--card-border);
+}
+
+.btn-external-releases.secondary:hover {
+  background: #f1f5f9;
+}
+

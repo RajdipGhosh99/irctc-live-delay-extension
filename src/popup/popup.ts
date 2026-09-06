@@ -47,6 +47,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const termsModal = document.getElementById('terms-modal') as HTMLElement;
   const termsAgreeCheckbox = document.getElementById('terms-agree-checkbox') as HTMLInputElement;
   const termsAcceptBtn = document.getElementById('terms-accept-btn') as HTMLButtonElement;
+  const popupVersionChip = document.getElementById('popup-version-chip') as HTMLElement;
+
+  const manifestVersion = chrome.runtime?.getManifest?.()?.version;
+  if (popupVersionChip && manifestVersion) {
+    popupVersionChip.textContent = `v${manifestVersion}`;
+  }
 
   let loadedSettings: MultiProviderSettings | null = null;
   let currentHostname = '';

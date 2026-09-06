@@ -35,7 +35,7 @@
         <div>
           <h2>Train Delay Tracker</h2>
           <div class="brand-version-row">
-            <span class="version-tag">v2.0.0</span>
+            <span class="version-tag">v2.0.1</span>
             <span class="fair-use-tag">Community Edition</span>
           </div>
         </div>
@@ -58,29 +58,46 @@
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
           </span>
-          <span>Data Saver & Memory</span>
+          <span>On-Demand Fetching</span>
         </a>
-        <a href="#tokens" class="nav-item" data-target="tokens">
+        <a href="#providers" class="nav-item" data-target="providers">
           <span class="nav-icon">
             <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="7.5" cy="15.5" r="5.5"/>
-              <path d="m21 2-9.6 9.6"/>
-              <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <path d="M3 9h18"/>
+              <path d="M9 21V9"/>
             </svg>
           </span>
-          <span>Data Sources & Keys</span>
+          <span>Data Providers & Keys</span>
+        </a>
+        <a href="#caching" class="nav-item" data-target="caching">
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M16 21h5v-5"/>
+            </svg>
+          </span>
+          <span>Caching & Performance</span>
         </a>
         <a href="#compliance" class="nav-item" data-target="compliance">
           <span class="nav-icon">
             <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-              <path d="M7 21h10"/>
-              <path d="M12 3v18"/>
-              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
             </svg>
           </span>
           <span>Fair Use & Terms</span>
+        </a>
+        <a href="#releases" class="nav-item" data-target="releases">
+          <span class="nav-icon">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m20.59 13.41-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+          </span>
+          <span>Release History</span>
         </a>
       </nav>
 
@@ -419,6 +436,132 @@
           <button type="button" id="reaccept-terms-btn" class="btn-reaccept-terms" style="display: none;">
             Review & Accept Terms
           </button>
+        </div>
+      </section>
+
+      <!-- Release History & Versions Hub -->
+      <section class="settings-card" id="releases">
+        <div class="card-header">
+          <div class="card-header-text">
+            <h3>Release History & Versions Hub</h3>
+            <p>Archive of current and previous production releases, downloadable CRX/ZIP packages, and changelog highlights.</p>
+          </div>
+          <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases" target="_blank" rel="noopener noreferrer" class="link-btn-external">
+            GitHub Releases
+            <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17 17 7"/>
+              <path d="M7 7h10v10"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="version-history-list">
+          <!-- v2.0.1 (Current Stable) -->
+          <div class="version-item current">
+            <div class="version-header">
+              <div class="version-meta">
+                <span class="version-badge-pill latest">v2.0.1</span>
+                <span class="version-status-tag" style="background:#dbeafe; color:#1e40af; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px;">Latest Stable</span>
+                <span class="version-date">September 6, 2026</span>
+              </div>
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.1" target="_blank" rel="noopener noreferrer" class="version-link-btn">
+                Release Notes
+                <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17 17 7"/>
+                  <path d="M7 7h10v10"/>
+                </svg>
+              </a>
+            </div>
+            <ul class="version-changelog">
+              <li><strong>Brand Identity:</strong> Redesigned icon system inspired by Adobe Acrobat red palette with Indian locomotive badge in saffron, white, and green.</li>
+              <li><strong>Modular E2E Test Suite:</strong> Reorganized Playwright tests into domain modules (<code>e2e/makemytrip/</code>, <code>e2e/ixigo/</code>, <code>e2e/confirmtkt/</code>).</li>
+              <li><strong>Release History Hub:</strong> In-extension version archive with direct download links and release notes navigation.</li>
+            </ul>
+            <div class="version-footer-row">
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.1/train-delay-tracker-v2.0.1.zip" class="version-download-link">
+                📥 Download v2.0.1 (.zip)
+              </a>
+              <span class="version-sha">Git Tag: v2.0.1</span>
+            </div>
+          </div>
+
+          <!-- v2.0.0 -->
+          <div class="version-item">
+            <div class="version-header">
+              <div class="version-meta">
+                <span class="version-badge-pill">v2.0.0</span>
+                <span class="version-date">September 5, 2026</span>
+              </div>
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.0" target="_blank" rel="noopener noreferrer" class="version-link-btn">
+                Release Notes
+                <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17 17 7"/>
+                  <path d="M7 7h10v10"/>
+                </svg>
+              </a>
+            </div>
+            <ul class="version-changelog">
+              <li><strong>Multi-Site Expansion:</strong> Added full support for ConfirmTkt, MakeMyTrip, Ixigo, ClearTrip, and Goibibo alongside IRCTC.</li>
+              <li><strong>Storage Quota Guard:</strong> Enforced hard 50 MB limit with LRU eviction and memory quota meter.</li>
+              <li><strong>Compliance Banner:</strong> Added non-commercial fair-use consent modal and anti-abuse safeguards.</li>
+              <li><strong>Modern Options UI:</strong> Redesigned tabbed settings dashboard with live search and memory diagnostics.</li>
+            </ul>
+            <div class="version-footer-row">
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.0/train-delay-tracker-v2.0.0.zip" class="version-download-link">
+                📥 Download v2.0.0 (.zip)
+              </a>
+              <span class="version-sha">Git Tag: v2.0.0</span>
+            </div>
+          </div>
+
+          <!-- v1.5.0 -->
+          <div class="version-item">
+            <div class="version-header">
+              <div class="version-meta">
+                <span class="version-badge-pill">v1.5.0</span>
+                <span class="version-date">August 29, 2026</span>
+              </div>
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0" target="_blank" rel="noopener noreferrer" class="version-link-btn">
+                Release Notes
+                <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17 17 7"/>
+                  <path d="M7 7h10v10"/>
+                </svg>
+              </a>
+            </div>
+            <ul class="version-changelog">
+              <li><strong>IRCTC Live Delay:</strong> Automatic badge injection into IRCTC Train Search results.</li>
+              <li><strong>Caching Layer:</strong> IndexedDB / chrome.storage.local caching with customizable TTL.</li>
+              <li><strong>Popup Tracker:</strong> Quick single-train search and recent lookup chips.</li>
+            </ul>
+            <div class="version-footer-row">
+              <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v1.5.0/train-delay-tracker-v1.5.0.zip" class="version-download-link">
+                📥 Download v1.5.0 (.zip)
+              </a>
+              <span class="version-sha">Git Tag: v1.5.0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="releases-external-links">
+          <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases" target="_blank" rel="noopener noreferrer" class="btn-external-releases">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h6v6"/>
+              <path d="M10 14 21 3"/>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            </svg>
+            View All Releases on GitHub
+          </a>
+          <a href="https://github.com/RajdipGhosh99/irctc-live-delay-extension/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="btn-external-releases secondary">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Full CHANGELOG.md
+          </a>
         </div>
       </section>
     </main>

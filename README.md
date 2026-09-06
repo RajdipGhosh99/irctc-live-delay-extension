@@ -26,6 +26,16 @@ Install with one click on **Microsoft Edge** or any Chromium browser:
 2. **Unzip:** Extract the archive into a permanent folder on your computer.
 3. **Load:** Open `chrome://extensions/` (or `edge://extensions/`), enable **Developer mode** (top-right), click **Load unpacked**, and select the extracted folder.
 
+### 📦 Release History & Downloads
+
+| Version | Release Date | Archive Package | Highlights | Release Notes |
+| :--- | :---: | :---: | :--- | :---: |
+| **`v2.0.1`** (Latest) | `2026-09-06` | [📥 `v2.0.1.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.1/train-delay-tracker-v2.0.1.zip) | New Indian Flag Squircle vector identity, modular Playwright E2E suite, layout fixes | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.1) |
+| **`v2.0.0`** | `2026-09-05` | [📥 `v2.0.0.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v2.0.0/train-delay-tracker-v2.0.0.zip) | Manifest V3 complete rewrite, 50 MB strict cache limit, multi-portal engine | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v2.0.0) |
+| **`v1.5.0`** | `2026-08-29` | [📥 `v1.5.0.zip`](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/download/v1.5.0/train-delay-tracker-v1.5.0.zip) | Initial public release with 3-metric statistics and Quick Search popup | [Release Notes](https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0) |
+
+> 📜 **Detailed Changelog:** Review [CHANGELOG.md](CHANGELOG.md) for the complete semantic change log and commit diffs across all versions.
+
 ---
 
 ## ✨ Features

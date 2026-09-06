@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.0.1] - 2026-09-06
+
+### 🚀 Added
+- **Official Extension Identity (Option 1D)**: New modern Squircle app icon featuring deep obsidian canvas, vibrant Indian Tricolor perimeter gradient, overhead Navy Ashoka Chakra punctuality dial, and a real-time live status beacon.
+- **Modular Playwright E2E Suite**: Decoupled monolithic test suite into dedicated provider packages under `tests/e2e/providers/` (`makemytrip/`, `confirmtkt/`, `railyatri/`, `irctc/`, `cleartrip/`, `ixigo/`, `goibibo/`, `paytm/`, `easemytrip/`).
+- **Standalone Provider Test Execution**: Added direct execution capability (`npx tsx tests/e2e/providers/<provider>`) for isolated local validation.
+
+### 🔄 Changed
+- **Asset Re-generation**: Re-rendered master vector SVG and all resolution icons (`16px`, `32px`, `48px`, `128px`, `512px`) with crisp transparency and high DPI.
+- **Workflow & Command Standardization**: Harmonized npm build, release, and E2E automation scripts.
+
+### 🐛 Fixed
+- **Clean Git Tracking**: Untracked runtime test screenshot artifacts from git into `.gitignore`.
+- **Portal Popover Alignment**: Enhanced popover transform stability and zero-duplicate containment across booking portals.
+
+---
+
 ## [2.0.0] - 2026-09-05
 
 ### 🚀 Added
@@ -31,3 +48,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Real-time live train delay tracking with 3-metric statistical cards (Live delay, Day-of-week average, 30-day punctuality rate).
 - Quick Search popup toolbar for instantaneous 5-digit train number lookups.
 - Options settings dashboard with token configuration and custom badge positions.
+
+---
+
+[2.0.1]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v1.5.0...v2.0.0
+[1.5.0]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0

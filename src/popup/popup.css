@@ -145,6 +145,14 @@ body {
   color: #475569;
   border-radius: 9999px;
   line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.version-chip:hover {
+  background: #2563eb;
+  color: #ffffff;
 }
 
 .brand-sub {
@@ -802,6 +810,34 @@ body {
   display: inline-flex;
   align-items: center;
   color: #64748b;
+}
+
+.popup-sub-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 0 2px;
+  font-size: 9.5px;
+}
+
+.popup-sub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.popup-sub-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.popup-sub-dot {
+  color: #cbd5e1;
 }
 
 /* ==========================================================================
