@@ -17,6 +17,9 @@ export const goibiboConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'tr:has(p.font18)',
+      'tbody tr',
+      'table tr',
       '.train-list-card',
       '[class*="trainCard"]',
       '[class*="trainList"]',
@@ -24,6 +27,8 @@ export const goibiboConfig: VendorPortalConfig = {
       'div[class*="train-details"]',
     ],
     titleSelectors: [
+      'p.font18',
+      'p[class*="blueText"]',
       '.train-name',
       '.boldFont',
       'h3',
@@ -33,6 +38,8 @@ export const goibiboConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'p.font18',
+      'p[class*="blueText"]',
       '.train-name',
       '.boldFont',
       'h3',
@@ -42,7 +49,11 @@ export const goibiboConfig: VendorPortalConfig = {
   },
   route: {
     mockPath: '/goibibo',
-    getLiveUrl: () => 'https://www.goibibo.com/trains/',
+    getLiveUrl: (_src, _dest, _date, srcCity, destCity) => {
+      const s = (srcCity || 'New Delhi').toLowerCase().replace(/\s+/g, '-');
+      const d = (destCity || 'Kanpur').toLowerCase().replace(/\s+/g, '-');
+      return `https://www.goibibo.com/trains/${s}-to-${d}-trains/`;
+    },
   },
   badge: {
     preferredPosition: 'beside-name',

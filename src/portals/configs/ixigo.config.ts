@@ -17,6 +17,9 @@ export const ixigoConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'div.pt-15.px-15.pb-0',
+      'div[class*="rounded-10"]',
+      'div[class*="pt-15"]',
       '.c-train-list-item',
       'div.org-train-list-item',
       'div.train-item',
@@ -25,6 +28,9 @@ export const ixigoConfig: VendorPortalConfig = {
       '[class*="trainItem"]',
     ],
     titleSelectors: [
+      'div.body-sm',
+      '[class*="body-sm"]',
+      '[class*="truncate"]',
       '.train-name',
       '.train-number',
       'h3',
@@ -35,6 +41,8 @@ export const ixigoConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'div.body-sm',
+      '[class*="body-sm"]',
       '.train-name',
       '.train-number',
       'h3',
@@ -45,7 +53,8 @@ export const ixigoConfig: VendorPortalConfig = {
   },
   route: {
     mockPath: '/ixigo',
-    getLiveUrl: () => 'https://www.ixigo.com/trains',
+    getLiveUrl: (src, dest, date) =>
+      `https://www.ixigo.com/trains/search-pwa/from/${encodeURIComponent(src || 'NDLS')}/to/${encodeURIComponent(dest || 'CNB')}/${date.dd_mm_yyyy}`,
   },
   badge: {
     preferredPosition: 'beside-name',

@@ -17,6 +17,8 @@ export const easeMyTripConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'li:has(a[href*="/railways/train-coach/"])',
+      'div:has(> a[href*="/railways/train-coach/"])',
       '.train-card-wrap',
       '.train-box',
       '[class*="trainCard"]',
@@ -24,7 +26,9 @@ export const easeMyTripConfig: VendorPortalConfig = {
       'div[class*="train-details"]',
     ],
     titleSelectors: [
+      'a[href*="/railways/train-coach/"]',
       '.train-name',
+      'h2.bs-pra',
       'h3',
       'h4',
       '[class*="name"]',
@@ -33,7 +37,9 @@ export const easeMyTripConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'a[href*="/railways/train-coach/"]',
       '.train-name',
+      'h2.bs-pra',
       'h3',
       'h4',
       '[class*="name"]',
@@ -42,8 +48,11 @@ export const easeMyTripConfig: VendorPortalConfig = {
   },
   route: {
     mockPath: '/easemytrip',
-    getLiveUrl: (src, dest, date) =>
-      `https://railways.easemytrip.com/train-list/${encodeURIComponent(src)}-to-${encodeURIComponent(dest)}?travelDate=${date.dd_mm_yyyy}`,
+    getLiveUrl: (_src, _dest, _date, srcCity, destCity) => {
+      const s = (srcCity || 'Delhi').toLowerCase().replace(/\s+/g, '-');
+      const d = (destCity || 'Kanpur').toLowerCase().replace(/\s+/g, '-');
+      return `https://www.easemytrip.com/railways/${s}-to-${d}-train-distance/`;
+    },
   },
   badge: {
     preferredPosition: 'beside-name',

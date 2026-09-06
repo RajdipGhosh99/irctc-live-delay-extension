@@ -272,8 +272,10 @@ async function testBadgePositionSequence(page: Page): Promise<PositionSwitchResu
 }
 
 async function verifyHoverPopoverInteractivity(page: Page): Promise<HoverPopoverResults> {
-  const firstBadge = page.locator('.rail-delay-wrapper').first();
-  await firstBadge.scrollIntoViewIfNeeded();
+  try {
+    const firstBadge = page.locator('.rail-delay-wrapper:visible, .rail-delay-wrapper').first();
+    await firstBadge.scrollIntoViewIfNeeded({ timeout: 5000 }).catch(() => {});
+  } catch {}
 
   // 1. Dispatch hover and click to trigger live fetch and popover open
   await page.evaluate(`
@@ -1034,25 +1036,17 @@ async function verifyIxigoProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [6/9] OPENING PROVIDER: Ixigo Trains (Live)');
+  console.log('🚄 [6/9] OPENING PROVIDER: Ixigo Trains (Live Search)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
-  const ixigoConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'ixigo')!;
-  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
-  const ixigoUrl = ixigoConfig.route!.getLiveUrl(
-    DEFAULT_GLOBAL_ROUTING.sourceCode,
-    DEFAULT_GLOBAL_ROUTING.destCode,
-    dates,
-    DEFAULT_GLOBAL_ROUTING.sourceCity,
-    DEFAULT_GLOBAL_ROUTING.destCity
-  );
+  const searchPageUrl = 'https://www.ixigo.com/trains';
   const screenshotFile = 'playwright-06-ixigo-live.png';
 
   const result: PlaywrightPortalResult = {
     step: 6,
     portal: 'Ixigo Trains (Live)',
-    url: ixigoUrl,
+    url: searchPageUrl,
     trainsIdentified: 0,
     buttonInjected: false,
     positions: { besideName: false, headerRight: false, belowName: false },
@@ -1072,39 +1066,52 @@ async function verifyIxigoProvider(
   };
 
   try {
-    console.log(`   Navigating to: ${ixigoUrl}`);
-    await navigatePortalWithResilience(page, ixigoUrl, 35000);
-    await page.waitForTimeout(4000);
+    console.log(`   Navigating to search page: ${searchPageUrl}`);
+    await navigatePortalWithResilience(page, searchPageUrl, 35000);
+    await page.waitForTimeout(3000);
 
+    // Enter origin station
+    console.log('   Entering origin station: New Delhi (NDLS)...');
+    const origin = page.locator('input[placeholder*="Origin"]').first();
+    await origin.click();
+    await origin.fill('New Delhi');
+    await page.waitForTimeout(1000);
     try {
-      await page.evaluate(`
-        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
-        if (closeBtn) closeBtn.click();
-      `);
-    } catch {}
-
-    let cardCount = await page.locator('.c-train-list-item, div.org-train-list-item, div.train-item, [data-testid*="train-card"], [class*="trainCard"], [class*="trainItem"]').count();
-    result.trainsIdentified = cardCount;
-    console.log(`   ✅ Live Train Cards Identified on Ixigo: ${cardCount}`);
-
-    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-    let badges = await page.locator('.rail-delay-wrapper').count();
-    if (badges === 0) {
-      await page.evaluate(`
-        (function() {
-          var container = document.querySelector('.train-listing, #content, main, body');
-          if (container) {
-            var card = document.createElement('div');
-            card.className = 'c-train-list-item train-item';
-            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
-            container.prepend(card);
-          }
-        })()
-      `);
-      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-      badges = await page.locator('.rail-delay-wrapper').count();
+      await page.locator('text=NDLS').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
     }
+    await page.waitForTimeout(1000);
 
+    // Enter destination station
+    console.log('   Entering destination station: Kanpur (CNB)...');
+    const dest = page.locator('input[placeholder*="Destination"]').first();
+    await dest.click();
+    await dest.fill('Kanpur');
+    await page.waitForTimeout(1000);
+    try {
+      await page.locator('text=CNB').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForTimeout(1000);
+
+    // Click Search
+    console.log('   Clicking "Search" button...');
+    await page.locator('button:has-text("Search")').first().click();
+    await page.waitForTimeout(7000);
+
+    result.url = page.url();
+    console.log(`   Navigated to live results: ${result.url}`);
+
+    let cardCount = await page.locator('div.pt-15.px-15.pb-0, div[class*="rounded-10"], div[class*="pt-15"], .c-train-list-item').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Real Live Train Cards Identified on Ixigo: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '20434', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
     result.buttonInjected = badges > 0;
     console.log(`   ✅ Live Badges Injected on Ixigo: ${badges}`);
 
@@ -1117,8 +1124,8 @@ async function verifyIxigoProvider(
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
           if (!badge) return null;
-          var card = badge.closest('.c-train-list-item, div.org-train-list-item, div.train-item, [data-testid*="train-card"]') || badge.parentElement;
-          var title = card ? card.querySelector('.train-name, .train-number, h3, h4, a[href*="/trains/"]') : null;
+          var card = badge.closest('div.pt-15, div[class*="rounded-10"], .c-train-list-item') || badge.parentElement;
+          var title = card ? card.querySelector('div.body-sm, [class*="truncate"], .train-name, h3, h4') : null;
           if (!badge || !title) return null;
           var bRect = badge.getBoundingClientRect();
           var tRect = title.getBoundingClientRect();
@@ -1219,28 +1226,12 @@ async function verifyGoibiboProvider(
       `);
     } catch {}
 
-    let cardCount = await page.locator('.train-list-card, [class*="trainCard"], [class*="trainList"], .srp-card, div[class*="train-details"]').count();
+    let cardCount = await page.locator('tr:has(p.font18), table tr, tbody tr, .train-list-card').count();
     result.trainsIdentified = cardCount;
-    console.log(`   ✅ Live Train Cards Identified on Goibibo: ${cardCount}`);
+    console.log(`   ✅ Real Live Train Cards Identified on Goibibo: ${cardCount}`);
 
-    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    await injectExtensionInPlaywrightPage(page, distDir, '22426', 'beside-name');
     let badges = await page.locator('.rail-delay-wrapper').count();
-    if (badges === 0) {
-      await page.evaluate(`
-        (function() {
-          var container = document.querySelector('#root, main, .train-container, body');
-          if (container) {
-            var card = document.createElement('div');
-            card.className = 'train-list-card';
-            card.innerHTML = '<div class="train-name boldFont">12842 COROMANDEL EXPRESS</div>';
-            container.prepend(card);
-          }
-        })()
-      `);
-      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-      badges = await page.locator('.rail-delay-wrapper').count();
-    }
-
     result.buttonInjected = badges > 0;
     console.log(`   ✅ Live Badges Injected on Goibibo: ${badges}`);
 
@@ -1306,25 +1297,17 @@ async function verifyPaytmProvider(
   isHeadless: boolean
 ): Promise<PlaywrightPortalResult> {
   console.log('\n----------------------------------------------------------------');
-  console.log('🚄 [8/9] OPENING PROVIDER: Paytm Trains (Live)');
+  console.log('🚄 [8/9] OPENING PROVIDER: Paytm Trains (Live Search)');
   console.log('----------------------------------------------------------------');
 
   const page = await context.newPage();
-  const paytmConfig = ALL_VENDOR_CONFIGS.find((v) => v.id === 'paytm')!;
-  const dates = formatRoutingDates(DEFAULT_GLOBAL_ROUTING.journeyDateIso);
-  const paytmUrl = paytmConfig.route!.getLiveUrl(
-    DEFAULT_GLOBAL_ROUTING.sourceCode,
-    DEFAULT_GLOBAL_ROUTING.destCode,
-    dates,
-    DEFAULT_GLOBAL_ROUTING.sourceCity,
-    DEFAULT_GLOBAL_ROUTING.destCity
-  );
+  const searchPageUrl = 'https://tickets.paytm.com/trains/';
   const screenshotFile = 'playwright-08-paytm-live.png';
 
   const result: PlaywrightPortalResult = {
     step: 8,
     portal: 'Paytm Trains (Live)',
-    url: paytmUrl,
+    url: searchPageUrl,
     trainsIdentified: 0,
     buttonInjected: false,
     positions: { besideName: false, headerRight: false, belowName: false },
@@ -1344,39 +1327,48 @@ async function verifyPaytmProvider(
   };
 
   try {
-    console.log(`   Navigating to: ${paytmUrl}`);
-    await navigatePortalWithResilience(page, paytmUrl, 35000);
-    await page.waitForTimeout(4000);
+    console.log(`   Navigating to search page: ${searchPageUrl}`);
+    await navigatePortalWithResilience(page, searchPageUrl, 35000);
+    await page.waitForTimeout(3000);
 
+    // Enter source station (NDLS)
+    console.log('   Entering source station: New Delhi (NDLS)...');
+    await page.locator('[data-testid="sourceInput"], #sourceInput').fill('New Delhi');
+    await page.waitForTimeout(1000);
     try {
-      await page.evaluate(`
-        var closeBtn = document.querySelector('.close, [data-testid="close"], .modal-close');
-        if (closeBtn) closeBtn.click();
-      `);
-    } catch {}
-
-    let cardCount = await page.locator('div._2q7r, div._3_8g, div[class*="train-item"], div[class*="trainCard"], div[class*="TrainCard"], div[class*="_3-train"], div[class*="_2q7r"]').count();
-    result.trainsIdentified = cardCount;
-    console.log(`   ✅ Live Train Cards Identified on Paytm: ${cardCount}`);
-
-    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-    let badges = await page.locator('.rail-delay-wrapper').count();
-    if (badges === 0) {
-      await page.evaluate(`
-        (function() {
-          var container = document.querySelector('#app, #react-root, main, .train-container, body');
-          if (container) {
-            var card = document.createElement('div');
-            card.className = 'trainCard _2q7r';
-            card.innerHTML = '<div class="_1Xv1 train-name">12842 COROMANDEL EXPRESS</div>';
-            container.prepend(card);
-          }
-        })()
-      `);
-      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-      badges = await page.locator('.rail-delay-wrapper').count();
+      await page.locator('text=NDLS').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
     }
+    await page.waitForTimeout(1000);
 
+    // Enter destination station (CNB)
+    console.log('   Entering destination station: Kanpur (CNB)...');
+    await page.locator('[data-testid="destinationInput"], #destinationInput').fill('Kanpur');
+    await page.waitForTimeout(1000);
+    try {
+      await page.locator('text=CNB').first().click();
+    } catch {
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForTimeout(1000);
+
+    // Click Search Trains
+    console.log('   Clicking "Search Trains" button...');
+    await page.locator('button:has-text("Search Trains")').click();
+    await page.waitForTimeout(7000);
+
+    result.url = page.url();
+    console.log(`   Navigated to live results: ${result.url}`);
+
+    let cardCount = await page.locator('div.b6HHQ, div[class*="b6HHQ"], div._2q7r, div._3_8g').count();
+    result.trainsIdentified = cardCount;
+    console.log(`   ✅ Real Live Train Cards Identified on Paytm: ${cardCount}`);
+
+    await injectExtensionInPlaywrightPage(page, distDir, '12556', 'beside-name');
+    let badges = await page.locator('.rail-delay-wrapper').count();
     result.buttonInjected = badges > 0;
     console.log(`   ✅ Live Badges Injected on Paytm: ${badges}`);
 
@@ -1389,8 +1381,8 @@ async function verifyPaytmProvider(
         (function() {
           var badge = document.querySelector('.rail-delay-wrapper');
           if (!badge) return null;
-          var card = badge.closest('div._2q7r, div._3_8g, div[class*="trainCard"]') || badge.parentElement;
-          var title = card ? card.querySelector('div._1Xv1, div[class*="_1Xv1"], div[class*="train-name"], h3, h4') : null;
+          var card = badge.closest('div.b6HHQ, div[class*="b6HHQ"], div._2q7r') || badge.parentElement;
+          var title = card ? card.querySelector('div.k9j0o, div[class*="k9j0o"], div.MNRXF, div._1Xv1, h3, h4') : null;
           if (!badge || !title) return null;
           var bRect = badge.getBoundingClientRect();
           var tRect = title.getBoundingClientRect();
@@ -1491,28 +1483,12 @@ async function verifyEaseMyTripProvider(
       `);
     } catch {}
 
-    let cardCount = await page.locator('.train-card-wrap, .train-box, [class*="trainCard"], .listing-card, div[class*="train-details"]').count();
+    let cardCount = await page.locator('li:has(a[href*="/railways/train-coach/"]), a[href*="/railways/train-coach/"], .train-card-wrap, .train-box').count();
     result.trainsIdentified = cardCount;
-    console.log(`   ✅ Live Train Cards Identified on EaseMyTrip: ${cardCount}`);
+    console.log(`   ✅ Real Live Train Cards Identified on EaseMyTrip: ${cardCount}`);
 
-    await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
+    await injectExtensionInPlaywrightPage(page, distDir, '12378', 'beside-name');
     let badges = await page.locator('.rail-delay-wrapper').count();
-    if (badges === 0) {
-      await page.evaluate(`
-        (function() {
-          var container = document.querySelector('#root, main, .train-container, body');
-          if (container) {
-            var card = document.createElement('div');
-            card.className = 'train-card-wrap train-box';
-            card.innerHTML = '<div class="train-name">12842 COROMANDEL EXPRESS</div>';
-            container.prepend(card);
-          }
-        })()
-      `);
-      await injectExtensionInPlaywrightPage(page, distDir, '12842', 'beside-name');
-      badges = await page.locator('.rail-delay-wrapper').count();
-    }
-
     result.buttonInjected = badges > 0;
     console.log(`   ✅ Live Badges Injected on EaseMyTrip: ${badges}`);
 

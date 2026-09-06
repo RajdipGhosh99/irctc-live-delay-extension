@@ -17,6 +17,8 @@ export const paytmConfig: VendorPortalConfig = {
   },
   selectors: {
     cardSelectors: [
+      'div.b6HHQ',
+      'div[class*="b6HHQ"]',
       'div._2q7r',
       'div._3_8g',
       'div[class*="train-item"]',
@@ -26,6 +28,10 @@ export const paytmConfig: VendorPortalConfig = {
       'div[class*="_2q7r"]',
     ],
     titleSelectors: [
+      'div.k9j0o',
+      'div[class*="k9j0o"]',
+      'div.MNRXF',
+      'div[class*="MNRXF"]',
       'div._1Xv1',
       'div[class*="_1Xv1"]',
       'div[class*="train-name"]',
@@ -38,6 +44,9 @@ export const paytmConfig: VendorPortalConfig = {
     trainNumberAttributes: ['id', 'data-train-number', 'data-trainno'],
     dateSelectors: ['[data-date]', '.journey-date', '[class*="date"]'],
     badgeAnchorSelectors: [
+      'div.k9j0o',
+      'div[class*="k9j0o"]',
+      'div.MNRXF',
       'div._1Xv1',
       'div[class*="_1Xv1"]',
       'div[class*="train-name"]',
@@ -49,8 +58,8 @@ export const paytmConfig: VendorPortalConfig = {
   },
   route: {
     mockPath: '/paytm',
-    getLiveUrl: (src, dest, date) =>
-      `https://tickets.paytm.com/trains/search/${encodeURIComponent(src)}/${encodeURIComponent(dest)}/${date.yyyymmdd}/1`,
+    getLiveUrl: (src, dest, date, srcCity, destCity) =>
+      `https://tickets.paytm.com/trains/searchTrains?srccode=${encodeURIComponent(src || 'NDLS')}&srcname=${encodeURIComponent(srcCity || 'New Delhi')}&dstcode=${encodeURIComponent(dest || 'CNB')}&dstname=${encodeURIComponent(destCity || 'Kanpur Central')}&date=${date.yyyymmdd}`,
   },
   badge: {
     preferredPosition: 'beside-name',
