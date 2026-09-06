@@ -294,6 +294,7 @@ class ContentScriptOrchestrator {
 
     // Apply position as fixed so it breaks out of any overflow:hidden ancestor
     popover.style.position = 'fixed';
+    popover.style.transform = 'none';
     popover.style.left = `${Math.round(left)}px`;
     popover.style.top = `${Math.round(top)}px`;
     popover.style.bottom = 'auto';

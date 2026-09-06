@@ -287,6 +287,7 @@ class ContentScriptOrchestrator {
     }
 
     popover.style.position = 'fixed';
+    popover.style.transform = 'none';
     popover.style.left = `${Math.round(left)}px`;
     popover.style.top = `${Math.round(top)}px`;
     popover.style.bottom = 'auto';

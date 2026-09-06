@@ -20,6 +20,7 @@
   font-family: var(--rail-font-family) !important;
   /* Max z-index so popover renders above any modal, drawer, or sticky header */
   z-index: 2147483647 !important;
+  transform: none !important;
   animation: rail-fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   box-sizing: border-box !important;
 }
