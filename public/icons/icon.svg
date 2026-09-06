@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="glow4" x="-40%" y="-40%" width="180%" height="180%">
+    <linearGradient id="squircleTricolor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7700"/>
+      <stop offset="50%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#00E676"/>
+    </linearGradient>
+    <filter id="glowDot4" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
@@ -9,52 +14,49 @@
     </filter>
   </defs>
 
-  <!-- Circular Outer Frame with 3-Band Split (Saffron Top / Navy Border / Green Base) -->
-  <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
-  <!-- Saffron Top Halo Arc -->
-  <path d="M 80 150 A 226 226 0 0 1 432 150" fill="none" stroke="#FF7700" stroke-width="26" stroke-linecap="round"/>
-  <!-- Green Bottom Foundation Arc -->
-  <path d="M 432 362 A 226 226 0 0 1 80 362" fill="none" stroke="#00E676" stroke-width="26" stroke-linecap="round"/>
+  <!-- Deep Obsidian Squircle with Bold Tricolor Gradient Border -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#0B0F19" stroke="url(#squircleTricolor)" stroke-width="18"/>
 
-  <!-- Ashoka Chakra Dial Emblem floating gracefully in top canopy -->
-  <g transform="translate(256, 88)">
-    <circle cx="0" cy="0" r="18" fill="none" stroke="#003399" stroke-width="3"/>
-    <circle cx="0" cy="0" r="4" fill="#003399"/>
-    <!-- 8 Primary Spokes -->
-    <line x1="0" y1="-17" x2="0" y2="17" stroke="#003399" stroke-width="2"/>
-    <line x1="-17" y1="0" x2="17" y2="0" stroke="#003399" stroke-width="2"/>
-    <line x1="-12" y1="-12" x2="12" y2="12" stroke="#003399" stroke-width="2"/>
-    <line x1="-12" y1="12" x2="12" y2="-12" stroke="#003399" stroke-width="2"/>
+  <!-- Ashoka Chakra Dial overhead -->
+  <g transform="translate(256, 96)">
+    <circle cx="0" cy="0" r="20" fill="none" stroke="#003399" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="5" fill="#003399"/>
+    <line x1="0" y1="-19" x2="0" y2="19" stroke="#003399" stroke-width="2"/>
+    <line x1="-19" y1="0" x2="19" y2="0" stroke="#003399" stroke-width="2"/>
+    <line x1="-13" y1="-13" x2="13" y2="13" stroke="#003399" stroke-width="2"/>
+    <line x1="-13" y1="13" x2="13" y2="-13" stroke="#003399" stroke-width="2"/>
   </g>
 
-  <!-- Train Body -->
-  <rect x="206" y="122" width="100" height="22" rx="9" fill="#0F172A"/>
-  <rect x="156" y="136" width="200" height="196" rx="36" fill="#0F172A"/>
+  <!-- Train Glyph in Pure Snow White -->
+  <g transform="translate(0, 4)">
+    <!-- Roof Cap -->
+    <rect x="208" y="120" width="96" height="22" rx="9" fill="#FF7700"/>
+    <!-- Cabin -->
+    <rect x="160" y="134" width="192" height="192" rx="36" fill="#FFFFFF"/>
+    <!-- Windshield -->
+    <rect x="180" y="152" width="152" height="70" rx="12" fill="#0B0F19"/>
 
-  <!-- Windshield -->
-  <rect x="178" y="154" width="156" height="72" rx="14" fill="#FFFFFF"/>
+    <!-- Headlights -->
+    <circle cx="200" cy="270" r="20" fill="#0B0F19"/>
+    <circle cx="312" cy="270" r="20" fill="#0B0F19"/>
 
-  <!-- Headlights -->
-  <circle cx="198" cy="274" r="22" fill="#FFFFFF"/>
-  <circle cx="314" cy="274" r="22" fill="#FFFFFF"/>
+    <!-- 3 Radiator Pills in Ashoka Navy -->
+    <rect x="242" y="250" width="8" height="38" rx="4" fill="#003399"/>
+    <rect x="252" y="246" width="8" height="46" rx="4" fill="#003399"/>
+    <rect x="262" y="250" width="8" height="38" rx="4" fill="#003399"/>
 
-  <!-- 3 Radiator Pills -->
-  <rect x="240" y="254" width="8" height="38" rx="4" fill="#FFFFFF"/>
-  <rect x="252" y="250" width="8" height="46" rx="4" fill="#FFFFFF"/>
-  <rect x="264" y="254" width="8" height="38" rx="4" fill="#FFFFFF"/>
+    <!-- Tracks in India Green -->
+    <polygon points="200,338 218,338 186,432 166,432" fill="#00E676"/>
+    <polygon points="294,338 312,338 346,432 326,432" fill="#00E676"/>
+    <rect x="198" y="352" width="116" height="14" rx="7" fill="#FFFFFF"/>
+    <rect x="184" y="382" width="144" height="15" rx="7.5" fill="#FFFFFF"/>
+    <rect x="170" y="414" width="172" height="16" rx="8" fill="#FFFFFF"/>
+  </g>
 
-  <!-- Tracks & Sleepers -->
-  <polygon points="196,346 216,346 182,442 160,442" fill="#0F172A"/>
-  <polygon points="296,346 316,346 352,442 330,442" fill="#0F172A"/>
-  <rect x="194" y="360" width="124" height="14" rx="7" fill="#0F172A"/>
-  <rect x="180" y="390" width="152" height="15" rx="7.5" fill="#0F172A"/>
-  <rect x="164" y="422" width="184" height="16" rx="8" fill="#0F172A"/>
-
-  <!-- Glowing Live Dot Beacon at 2 o'clock -->
-  <g transform="translate(422, 90)">
-    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow4)"/>
-    <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
-    <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
+  <!-- Glowing Live Dot Beacon at Top-Right Corner -->
+  <g transform="translate(418, 94)">
+    <circle cx="0" cy="0" r="32" fill="#00E676" opacity="0.35" filter="url(#glowDot4)"/>
+    <circle cx="0" cy="0" r="20" fill="#00E676" stroke="#0B0F19" stroke-width="4.5"/>
     <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>
