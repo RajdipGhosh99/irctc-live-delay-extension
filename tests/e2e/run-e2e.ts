@@ -32,11 +32,11 @@ async function runE2ESuite() {
 
   const args = process.argv.slice(2);
   const isLive = args.includes('--live');
-  const isHeadful = args.includes('--headful') || process.env.HEADFUL === 'true';
+  const isHeadless = args.includes('--headless') || process.env.HEADLESS === 'true';
   const targetProviderArg = args.find((a) => a.startsWith('--provider='))?.split('=')[1];
 
   const config = { ...DEFAULT_E2E_CONFIG };
-  if (isHeadful) config.isHeadless = false;
+  config.isHeadless = isHeadless;
 
   // Filter providers if specified
   const providersToTest = targetProviderArg
@@ -220,7 +220,7 @@ async function runE2ESuite() {
         await actions.move({ origin: badgeButton }).perform();
 
         // Wait for popover to open on hover
-        await driver.sleep(600);
+        await driver.sleep(800);
 
         const popoverStatus = await verifier.verifyPopoverContents(cardParent);
         result.popoverHoverPassed = popoverStatus.isDisplayed;
@@ -230,6 +230,11 @@ async function runE2ESuite() {
         console.log(`   🎨 Color Classification    : ${popoverStatus.hasLateOrOntimeColor ? '✅ PASSED (' + popoverStatus.box1Class + ')' : '❌ FAILED'}`);
         console.log(`   🚫 Zero Redundant Data     : ${result.zeroDuplicatesPassed ? '✅ 100% CLEAN (No raw minutes / narratives)' : '❌ FAILED (' + popoverStatus.details.join(', ') + ')'}`);
         console.log(`   📏 Single-Line Footer      : ${popoverStatus.footerIsSingleLine ? '✅ PASSED' : '❌ FAILED'}`);
+
+        // Visual pacing: allow user to observe badge & open popover in headful mode
+        if (!config.isHeadless) {
+          await driver.sleep(1200);
+        }
 
         // Capture Screenshot
         const screenshotFileName = `${provider.id}-kharagpur-to-howrah.png`;

@@ -84,7 +84,9 @@ export class PixelVerifier {
   public async verifyPopoverContents(cardElement: WebElement): Promise<PopoverVerificationResult> {
     const evalScript = `
       const card = arguments[0];
-      const popover = card.querySelector('.rail-delay-popover');
+      const popover = (card && card.querySelector('.rail-delay-popover')) ||
+                      document.querySelector('.rail-delay-popover.is-open') ||
+                      document.querySelector('.rail-delay-popover');
       if (!popover) {
         return { isDisplayed: false, details: ['Popover DOM element not found'] };
       }

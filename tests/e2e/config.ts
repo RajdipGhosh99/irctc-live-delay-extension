@@ -53,7 +53,7 @@ export const DEFAULT_E2E_CONFIG: E2ETestConfig = {
   sourceStation: process.env.TEST_SRC || 'KGP', // Kharagpur Junction
   destinationStation: process.env.TEST_DEST || 'HWH', // Howrah Junction
   journeyDate: process.env.TEST_DATE || defaultDateIso,
-  isHeadless: process.env.HEADFUL !== 'true',
+  isHeadless: process.env.HEADLESS === 'true',
   viewportWidth: 1440,
   viewportHeight: 900,
   mockPort: 3456,

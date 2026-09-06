@@ -308,6 +308,7 @@ export function cleanLiveLocation(
       .replace(/(?:,\s*)?(?:and\s+)?\b(?:running|is\s+running)\s+[\d\w\s]+(?:late|early|behind|ahead|right\s*time|on\s*time)[^.]*\.?/gi, '')
       .replace(/(?:,\s*)?\b(?:delay|delayed|late|early)\s*(?:by)?\s*[\d\w\s]+(?:mins?|minutes?|hours?|hrs?)[^.]*\.?/gi, '')
       .replace(/(?:,\s*)?\b(?:right\s*time|on\s*time|rt|ontime)\b[^.]*\.?/gi, '')
+      .replace(/\b(?:running|is\s+running)\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim()
       .replace(/[,\-\.]\s*$/, '');
