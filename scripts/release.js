@@ -42,7 +42,7 @@ function main() {
   // 4. Git commit & Tag
   console.log(`🏷️ Creating Git Commit and Tag for ${tag}...`);
   try {
-    run(`git add package.json package-lock.json manifest.json src/core/constants.ts release/ train-delay-tracker-*.zip`);
+    run(`git add package.json package-lock.json manifest.json src/core/constants.ts`);
     run(`git commit -m "chore(release): ${tag}"`);
   } catch (e) {
     console.log(`ℹ️ Working tree clean or already committed.`);
