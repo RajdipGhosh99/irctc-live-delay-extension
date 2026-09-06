@@ -25,11 +25,10 @@
 .rail-train-title-row > [class*="listName"],
 .rail-train-title-row > [data-testid="train-name"] {
   white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
   display: inline-block !important;
   width: auto !important;
-  max-width: fit-content !important;
+  max-width: none !important;
+  flex-shrink: 0 !important;
   margin: 0 !important;
 }
 

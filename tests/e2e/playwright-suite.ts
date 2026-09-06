@@ -1568,6 +1568,9 @@ async function runSequentialPlaywrightSuite() {
     fs.mkdirSync(screenshotsDir, { recursive: true });
   }
 
+  const providerArg = args.find((a) => a.startsWith('--provider='));
+  const targetProvider = providerArg ? providerArg.split('=')[1].toLowerCase() : null;
+
   // Launch Playwright Context with Extension Loaded
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: isHeadless,
@@ -1587,40 +1590,58 @@ async function runSequentialPlaywrightSuite() {
 
   try {
     // 1. MakeMyTrip Live
-    const mmtRes = await verifyMakeMyTripProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(mmtRes);
+    if (!targetProvider || targetProvider === 'makemytrip' || targetProvider === 'mmt') {
+      const mmtRes = await verifyMakeMyTripProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(mmtRes);
+    }
 
     // 2. ConfirmTkt Live
-    const ctRes = await verifyConfirmTktProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(ctRes);
+    if (!targetProvider || targetProvider === 'confirmtkt') {
+      const ctRes = await verifyConfirmTktProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(ctRes);
+    }
 
     // 3. RailYatri Live
-    const ryRes = await verifyRailYatriProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(ryRes);
+    if (!targetProvider || targetProvider === 'railyatri') {
+      const ryRes = await verifyRailYatriProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(ryRes);
+    }
 
     // 4. IRCTC NextGen Official Live
-    const irctcRes = await verifyIrctcProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(irctcRes);
+    if (!targetProvider || targetProvider === 'irctc') {
+      const irctcRes = await verifyIrctcProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(irctcRes);
+    }
 
     // 5. ClearTrip Live
-    const clearTripRes = await verifyClearTripProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(clearTripRes);
+    if (!targetProvider || targetProvider === 'cleartrip') {
+      const clearTripRes = await verifyClearTripProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(clearTripRes);
+    }
 
     // 6. Ixigo Trains Live
-    const ixigoRes = await verifyIxigoProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(ixigoRes);
+    if (!targetProvider || targetProvider === 'ixigo') {
+      const ixigoRes = await verifyIxigoProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(ixigoRes);
+    }
 
     // 7. Goibibo Trains Live
-    const goibiboRes = await verifyGoibiboProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(goibiboRes);
+    if (!targetProvider || targetProvider === 'goibibo') {
+      const goibiboRes = await verifyGoibiboProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(goibiboRes);
+    }
 
     // 8. Paytm Trains Live
-    const paytmRes = await verifyPaytmProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(paytmRes);
+    if (!targetProvider || targetProvider === 'paytm') {
+      const paytmRes = await verifyPaytmProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(paytmRes);
+    }
 
     // 9. EaseMyTrip Live
-    const emtRes = await verifyEaseMyTripProvider(context, distDir, screenshotsDir, isHeadless);
-    results.push(emtRes);
+    if (!targetProvider || targetProvider === 'easemytrip') {
+      const emtRes = await verifyEaseMyTripProvider(context, distDir, screenshotsDir, isHeadless);
+      results.push(emtRes);
+    }
   } finally {
     await context.close();
   }

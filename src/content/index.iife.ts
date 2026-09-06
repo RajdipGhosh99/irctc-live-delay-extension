@@ -270,16 +270,18 @@ class ContentScriptOrchestrator {
     }
     if (left < VIEWPORT_MARGIN) left = VIEWPORT_MARGIN;
 
+    // Vertical: prefer bottom; flip to top if not enough room below
+    const actualHeight = popover.offsetHeight > 50 ? popover.offsetHeight : POPOVER_HEIGHT;
     const spaceBelow = vpH - badgeRect.bottom;
     const spaceAbove = badgeRect.top;
     let top: number;
     let flipToTop = false;
 
-    if (spaceBelow >= POPOVER_HEIGHT || spaceBelow >= spaceAbove) {
+    if (spaceBelow >= actualHeight + GAP || spaceBelow >= spaceAbove) {
       top = badgeRect.bottom + GAP;
       flipToTop = false;
     } else {
-      top = badgeRect.top - GAP - POPOVER_HEIGHT;
+      top = badgeRect.top - GAP - actualHeight;
       flipToTop = true;
       if (top < VIEWPORT_MARGIN) top = VIEWPORT_MARGIN;
     }
@@ -296,6 +298,12 @@ class ContentScriptOrchestrator {
 
     popover.style.display = 'block';
     popover.classList.add('is-open');
+
+    if (flipToTop && popover.offsetHeight > 50 && Math.abs(popover.offsetHeight - actualHeight) > 5) {
+      top = Math.max(VIEWPORT_MARGIN, badgeRect.top - GAP - popover.offsetHeight);
+      popover.style.top = `${Math.round(top)}px`;
+    }
+
     this.activePopoverWidget = widget;
   }
 

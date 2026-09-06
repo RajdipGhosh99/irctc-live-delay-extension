@@ -20,33 +20,27 @@ export class ConfirmTktAdapter extends BasePortalAdapter {
     // ConfirmTkt has a truncate div with max-w-[215px] and overflow:hidden, or route-link elements
     const anchor = card.querySelector('.truncate, [class*="max-w-"], .body-sm, a.route-link, .train-name, h2, h3, h4');
     if (anchor && anchor.parentElement) {
-      if (anchor.parentElement.classList.contains('rail-train-title-row')) {
-        anchor.parentElement.appendChild(badgeWrapper);
-        return;
-      }
-      const parent = anchor.parentElement;
-      if (parent.classList.contains('flex') || parent.classList.contains('makeFlex')) {
-        parent.style.alignItems = 'center';
-        parent.style.flexWrap = 'nowrap';
-        parent.insertBefore(badgeWrapper, anchor.nextSibling);
+      if (position === 'beside-name') {
+        if (anchor.parentElement.classList.contains('rail-train-title-row')) {
+          anchor.parentElement.appendChild(badgeWrapper);
+          return;
+        }
+
+        const parent = anchor.parentElement;
+        // Wrap anchor and badge in rail-train-title-row so justify-between does not push them apart
+        const titleRow = document.createElement('div');
+        titleRow.className = 'rail-train-title-row';
+        titleRow.style.cssText =
+          'display: inline-flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; max-width: 100% !important; vertical-align: middle !important;';
+
+        parent.insertBefore(titleRow, anchor);
+        titleRow.appendChild(anchor);
+        titleRow.appendChild(badgeWrapper);
+
         badgeWrapper.style.flexShrink = '0';
         badgeWrapper.style.whiteSpace = 'nowrap';
         return;
       }
-
-      // Wrap in inline-flex nowrap row
-      const titleRow = document.createElement('div');
-      titleRow.className = 'rail-train-title-row';
-      titleRow.style.cssText =
-        'display: inline-flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; max-width: 100% !important; vertical-align: middle !important;';
-
-      parent.insertBefore(titleRow, anchor);
-      titleRow.appendChild(anchor);
-      titleRow.appendChild(badgeWrapper);
-
-      badgeWrapper.style.flexShrink = '0';
-      badgeWrapper.style.whiteSpace = 'nowrap';
-      return;
     }
 
     super.injectBadge(card, badgeWrapper, position);

@@ -29,7 +29,7 @@ export class MakeMyTripAdapter extends BasePortalAdapter {
     badgeWrapper.classList.add('vendor-makemytrip');
 
     const anchor = this.getBadgeAnchor(card);
-    if (anchor && anchor !== card && anchor.parentElement) {
+    if (anchor && anchor !== card && anchor.parentElement && position === 'beside-name') {
       // If already wrapped in our dedicated title row, append directly
       if (anchor.parentElement.classList.contains('rail-train-title-row')) {
         anchor.parentElement.appendChild(badgeWrapper);
@@ -48,13 +48,14 @@ export class MakeMyTripAdapter extends BasePortalAdapter {
         nextTarget = sib;
       }
 
-      // Ensure anchor does not force a full-width line break
+      // Ensure anchor does not force a full-width line break and does NOT shrink
       anchor.style.display = 'inline-block';
       anchor.style.width = 'auto';
-      anchor.style.maxWidth = 'fit-content';
+      anchor.style.maxWidth = 'none';
+      anchor.style.flexShrink = '0';
       anchor.style.margin = '0';
 
-      // To guarantee the badge is NEVER pushed below longer train names,
+      // To guarantee the badge is beside the train name,
       // wrap the train title and badge together in an inline-flex nowrap row.
       const titleRow = document.createElement('div');
       titleRow.className = 'rail-train-title-row';
