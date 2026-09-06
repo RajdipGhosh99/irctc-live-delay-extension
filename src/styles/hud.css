@@ -8,7 +8,9 @@
   position: fixed !important;
   bottom: 24px !important;
   right: 24px !important;
-  width: 240px !important;
+  width: 276px !important;
+  min-width: 276px !important;
+  max-width: 320px !important;
   background: var(--rail-glass-bg) !important;
   backdrop-filter: var(--rail-glass-blur) !important;
   -webkit-backdrop-filter: var(--rail-glass-blur) !important;
@@ -30,15 +32,32 @@
   justify-content: space-between !important;
   align-items: center !important;
   margin-bottom: 6px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .rail-hud-title {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  font-size: 12px !important;
+  gap: 5px !important;
+  font-size: 11.5px !important;
   font-weight: 700 !important;
   color: #0f172a !important;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.rail-hud-brand-name,
+.rail-hud-title strong {
+  white-space: nowrap !important;
+  display: inline-block !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.01em !important;
+  line-height: normal !important;
 }
 
 .rail-hud-version-badge {
@@ -49,18 +68,23 @@
   color: #475569 !important;
   border-radius: 9999px !important;
   line-height: 1.1 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .rail-hud-icon {
   display: inline-flex !important;
   align-items: center !important;
   color: var(--rail-primary) !important;
+  flex-shrink: 0 !important;
 }
 
 .rail-hud-controls {
   display: flex !important;
   align-items: center !important;
   gap: 4px !important;
+  flex-shrink: 0 !important;
+  margin-left: 6px !important;
 }
 
 .rail-hud-btn-mini,

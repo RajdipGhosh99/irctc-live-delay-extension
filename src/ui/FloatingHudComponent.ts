@@ -89,7 +89,7 @@ export class FloatingHudComponent {
       <div class="rail-hud-header">
         <div class="rail-hud-title">
           <span class="rail-hud-icon">${trainIcon({ size: 14 })}</span>
-          <strong>Train Delay Tracker</strong>
+          <strong class="rail-hud-brand-name">Train Delay Tracker</strong>
           <span class="rail-hud-version-badge" id="rail-hud-version-badge">${manifestVersion}</span>
         </div>
         <div class="rail-hud-controls">
