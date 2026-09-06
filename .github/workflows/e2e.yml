@@ -1,0 +1,62 @@
+name: Automated E2E Portal Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: 'Target Portal Provider for E2E validation'
+        required: true
+        default: 'confirmtkt'
+        type: choice
+        options:
+          - 'confirmtkt'
+          - 'makemytrip'
+          - 'ixigo'
+          - 'irctc'
+          - 'all'
+  schedule:
+    # Run every Sunday at 06:00 UTC
+    - cron: '0 6 * * 0'
+
+jobs:
+  e2e:
+    name: E2E Portal Smoke & Playwright Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium & System Deps
+        run: npx playwright install --with-deps chromium
+
+      - name: Typecheck & Build Extension Bundle
+        run: npm run build
+
+      - name: Execute Playwright E2E Suite
+        run: |
+          PROVIDER="${{ github.event.inputs.provider || 'confirmtkt' }}"
+          echo "Executing E2E tests for provider: $PROVIDER"
+          if [ "$PROVIDER" = "all" ]; then
+            npm run test:e2e:all
+          else
+            npm run test:e2e:$PROVIDER
+          fi
+
+      - name: Upload Test Evidence Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: tests/e2e/screenshots/*.png
+          retention-days: 14
