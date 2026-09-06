@@ -151,12 +151,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // Dynamic Manifest Version
-    const manifestVer = chrome.runtime?.getManifest?.()?.version;
-    if (manifestVer) {
-      document.querySelectorAll('.version-tag').forEach((el) => {
-        el.textContent = `v${manifestVer}`;
-      });
+    // Dynamic Manifest Version & Extension ID
+    const manifestVer = chrome.runtime?.getManifest?.()?.version || '2.0.1';
+    document.querySelectorAll('.version-tag, #app-version-tag').forEach((el) => {
+      el.textContent = `v${manifestVer}`;
+    });
+    const latestBadge = document.querySelector('.version-badge-pill.latest');
+    if (latestBadge) {
+      latestBadge.textContent = `v${manifestVer}`;
+    }
+
+    const extIdVal = document.getElementById('options-ext-id-val');
+    if (extIdVal) {
+      extIdVal.textContent = chrome.runtime?.id || 'unpacked-extension';
+      extIdVal.title = `Extension ID: ${chrome.runtime?.id || 'unpacked'}`;
     }
 
     renderSitesGrid();

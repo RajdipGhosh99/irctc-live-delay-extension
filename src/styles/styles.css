@@ -564,6 +564,16 @@
   color: #0f172a !important;
 }
 
+.rail-hud-version-badge {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  padding: 1px 5px !important;
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  border-radius: 9999px !important;
+  line-height: 1.1 !important;
+}
+
 .rail-hud-icon {
   display: inline-flex !important;
   align-items: center !important;

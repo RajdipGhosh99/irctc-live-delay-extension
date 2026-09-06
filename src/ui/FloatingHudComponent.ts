@@ -50,11 +50,16 @@ export class FloatingHudComponent {
     document.getElementById('rail-live-hud')?.remove();
     document.getElementById('rail-hud-minimized')?.remove();
 
+    const manifestVersion =
+      typeof chrome !== 'undefined' && chrome.runtime?.getManifest?.()?.version
+        ? `v${chrome.runtime.getManifest().version}`
+        : 'v2.0.1';
+
     // 1. Minimized Floating Launcher Pill
     const minBubble = document.createElement('div');
     minBubble.id = 'rail-hud-minimized';
     minBubble.className = `rail-floating-hud-minimized ${vendorClass}`;
-    minBubble.title = 'Live Train Delay Tracker — Click to expand (or press Alt+H)';
+    minBubble.title = `Live Train Delay Tracker ${manifestVersion} — Click to expand (or press Alt+H)`;
     minBubble.setAttribute('role', 'button');
     minBubble.setAttribute('tabindex', '0');
     minBubble.innerHTML = `
@@ -85,6 +90,7 @@ export class FloatingHudComponent {
         <div class="rail-hud-title">
           <span class="rail-hud-icon">${trainIcon({ size: 14 })}</span>
           <strong>Train Delay Tracker</strong>
+          <span class="rail-hud-version-badge" id="rail-hud-version-badge">${manifestVersion}</span>
         </div>
         <div class="rail-hud-controls">
           <button type="button" class="rail-hud-btn-mini" id="rail-hud-minimize-btn" title="Minimize to launcher pill">

@@ -49,9 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const termsAcceptBtn = document.getElementById('terms-accept-btn') as HTMLButtonElement;
   const popupVersionChip = document.getElementById('popup-version-chip') as HTMLElement;
 
-  const manifestVersion = chrome.runtime?.getManifest?.()?.version;
-  if (popupVersionChip && manifestVersion) {
+  const manifestVersion = chrome.runtime?.getManifest?.()?.version || '2.0.1';
+  if (popupVersionChip) {
     popupVersionChip.textContent = `v${manifestVersion}`;
+    const extId = chrome.runtime?.id ? ` • ID: ${chrome.runtime.id}` : '';
+    popupVersionChip.title = `Train Delay Tracker v${manifestVersion}${extId} (Click for Releases)`;
   }
 
   let loadedSettings: MultiProviderSettings | null = null;
