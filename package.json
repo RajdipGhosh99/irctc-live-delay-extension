@@ -1,6 +1,6 @@
 {
   "name": "live-train-delay-tracker",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "High-performance, open-source real-time live train delay tracker across ConfirmTkt, MakeMyTrip, ClearTrip, Ixigo, Goibibo, and Paytm.",
   "author": "Rajdip Ghosh <https://github.com/RajdipGhosh99>",
   "license": "GPL-3.0-or-later",

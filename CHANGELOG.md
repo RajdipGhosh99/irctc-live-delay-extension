@@ -4,6 +4,18 @@ All notable changes to the **Live Train Delay Tracker** extension are documented
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-09-06
+
+### 🚀 Added
+- **Universal Floating HUD Restore Action**: Added a dedicated "Restore HUD" action button in the extension popup context card and a global keyboard shortcut (`Alt + H` / `Option + H`) to resurrect or toggle the HUD on any supported booking portal.
+- **High-Visibility Minimized Launcher Pill**: Replaced minimal bubble with an informative floating badge (`[ 🚄 Live Tracker | X Trains ]`) featuring live train counter badge, hover illumination, and keyboard accessibility.
+- **Version & Extension ID Badges**: Embedded manifest version tags and extension IDs across the in-page Floating HUD header, popup toolbar, and options dashboard.
+- **Deep-Linkable Release Anchors**: Added direct anchor targets (`#v2.0.2`, `#v2.0.1`, etc.) in the options release history hub.
+
+### 🐛 Fixed
+- **HUD Auto-Hiding on SPA Route Transitions**: Integrated `FloatingHudComponent.ensureAttached()` into the `MutationObserver` scan cycle to automatically re-attach the HUD when single-page portals (ConfirmTkt, MakeMyTrip, Ixigo, ClearTrip) wipe non-React DOM nodes on filter changes or route navigations.
+- **CSS Specificity for Minimizing**: Swapped inline style toggles with explicit utility classes (`.rail-hud-visible`, `.rail-hud-hidden`) and `!important` priority to eliminate stylesheet specificity conflicts.
+
 ---
 
 ## [2.0.1] - 2026-09-06
@@ -51,6 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+[2.0.2]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/RajdipGhosh99/irctc-live-delay-extension/releases/tag/v1.5.0
