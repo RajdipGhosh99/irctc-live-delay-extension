@@ -1,26 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <filter id="pulseGlow5" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="glow5" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="8" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+    <clipPath id="circleClip5">
+      <circle cx="256" cy="256" r="226"/>
+    </clipPath>
   </defs>
 
-  <!-- Exact Pure Reference Ring with Sleek Micro Tricolor Accents -->
-  <circle cx="256" cy="256" r="226" fill="none" stroke="#000000" stroke-width="28"/>
-  
-  <!-- Saffron Accent Tick (Top 12 o'clock) -->
-  <path d="M 230 30 A 226 226 0 0 1 282 30" fill="none" stroke="#FF7700" stroke-width="28" stroke-linecap="round"/>
+  <!-- Circular Outer Frame -->
+  <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
 
-  <!-- Green Accent Tick (Bottom 6 o'clock) -->
-  <path d="M 230 482 A 226 226 0 0 0 282 482" fill="none" stroke="#00E676" stroke-width="28" stroke-linecap="round"/>
+  <!-- Inside Clipped: Dynamic 3-Bar Indian Flag Horizon Waves -->
+  <g clip-path="url(#circleClip5)" opacity="0.2">
+    <rect x="30" y="30" width="452" height="150" fill="#FF7700"/>
+    <rect x="30" y="180" width="452" height="152" fill="#FFFFFF"/>
+    <circle cx="256" cy="256" r="48" fill="none" stroke="#003399" stroke-width="8"/>
+    <rect x="30" y="332" width="452" height="150" fill="#00E676"/>
+  </g>
 
-  <!-- High-Contrast Reference Train Body -->
-  <rect x="206" y="112" width="100" height="24" rx="10" fill="#000000"/>
-  <rect x="156" y="128" width="200" height="200" rx="36" fill="#000000"/>
+  <!-- Pure High-Contrast Solid Train Body (Razor Sharp Foreground) -->
+  <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
+  <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
 
   <!-- Windshield -->
   <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
@@ -29,24 +34,28 @@
   <circle cx="198" cy="272" r="22" fill="#FFFFFF"/>
   <circle cx="314" cy="272" r="22" fill="#FFFFFF"/>
 
-  <!-- 3 Radiator Pills -->
+  <!-- 3 Radiator Pills in Navy Blue -->
   <rect x="240" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
   <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
   <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
 
-  <!-- Tracks & Sleepers -->
-  <polygon points="196,344 216,344 182,442 160,442" fill="#000000"/>
-  <polygon points="296,344 316,344 352,442 330,442" fill="#000000"/>
-  <rect x="194" y="358" width="124" height="14" rx="7" fill="#000000"/>
-  <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#000000"/>
-  <rect x="164" y="420" width="184" height="16" rx="8" fill="#000000"/>
+  <!-- Tricolor Nose Accent Fin -->
+  <line x1="216" y1="316" x2="242" y2="316" stroke="#FF7700" stroke-width="6" stroke-linecap="round"/>
+  <line x1="247" y1="316" x2="265" y2="316" stroke="#003399" stroke-width="6" stroke-linecap="round"/>
+  <line x1="270" y1="316" x2="296" y2="316" stroke="#00E676" stroke-width="6" stroke-linecap="round"/>
 
-  <!-- Glowing Radar Wave Live Dot Beacon -->
+  <!-- Tracks & Sleepers -->
+  <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
+  <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
+  <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
+  <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
+  <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
+
+  <!-- Glowing Live Dot Beacon at 2 o'clock -->
   <g transform="translate(422, 90)">
-    <!-- Expanding Radar Wave Arc -->
-    <path d="M -18 -18 A 26 26 0 0 1 18 -18" fill="none" stroke="#00E676" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
-    <circle cx="0" cy="0" r="32" fill="#00E676" opacity="0.2" filter="url(#pulseGlow5)"/>
-    <circle cx="0" cy="0" r="18" fill="#00E676" stroke="#FFFFFF" stroke-width="4"/>
+    <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow5)"/>
+    <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
+    <circle cx="0" cy="0" r="16" fill="#00E676" stroke="#FFFFFF" stroke-width="4.5"/>
     <circle cx="-3.5" cy="-3.5" r="4" fill="#FFFFFF" opacity="0.9"/>
   </g>
 </svg>

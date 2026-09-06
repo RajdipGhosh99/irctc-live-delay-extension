@@ -7,45 +7,54 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <linearGradient id="saffron1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF7700"/>
-      <stop offset="100%" stop-color="#FF4800"/>
+    <linearGradient id="saffronGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A00"/>
+      <stop offset="100%" stop-color="#FF5500"/>
     </linearGradient>
-    <linearGradient id="green1" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="greenGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#00E676"/>
-      <stop offset="100%" stop-color="#00C853"/>
+      <stop offset="100%" stop-color="#00B248"/>
     </linearGradient>
   </defs>
 
-  <!-- Outer Ring with Tricolor Energy Arcs -->
+  <!-- Deep Obsidian Outer Circle Frame -->
   <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
-  <path d="M 256 30 A 226 226 0 0 1 458 154" fill="none" stroke="url(#saffron1)" stroke-width="26" stroke-linecap="round"/>
-  <path d="M 256 482 A 226 226 0 0 1 54 358" fill="none" stroke="url(#green1)" stroke-width="26" stroke-linecap="round"/>
 
-  <!-- Train Glyph Body -->
-  <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
-  <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
+  <!-- Saffron Top Roof Cap & Upper Canopy -->
+  <rect x="206" y="112" width="100" height="24" rx="10" fill="url(#saffronGrad1)"/>
+  <path d="M 156 180 C 156 142, 180 128, 216 128 L 296 128 C 332 128, 356 142, 356 180 L 356 200 L 156 200 Z" fill="url(#saffronGrad1)"/>
 
-  <!-- Windshield Cutout -->
-  <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
+  <!-- Crisp White Middle Cockpit Band (Clean Flag Center) -->
+  <rect x="156" y="200" width="200" height="74" fill="#FFFFFF" stroke="#0F172A" stroke-width="8"/>
 
-  <!-- Headlights -->
-  <circle cx="198" cy="272" r="22" fill="#FFFFFF"/>
-  <circle cx="314" cy="272" r="22" fill="#FFFFFF"/>
+  <!-- Navy Blue Windshield Glass & Ashoka Navy Accents -->
+  <rect x="178" y="148" width="156" height="66" rx="12" fill="#0F172A"/>
 
-  <!-- 3 Radiator Pills -->
-  <rect x="240" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
-  <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
-  <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <!-- Twin Big Headlights in Middle White Band -->
+  <circle cx="198" cy="242" r="22" fill="#0F172A"/>
+  <circle cx="198" cy="242" r="14" fill="#FFFFFF"/>
+  <circle cx="314" cy="242" r="22" fill="#0F172A"/>
+  <circle cx="314" cy="242" r="14" fill="#FFFFFF"/>
 
-  <!-- Tracks & Ties -->
-  <polygon points="196,344 216,344 182,442 160,442" fill="#0F172A"/>
-  <polygon points="296,344 316,344 352,442 330,442" fill="#0F172A"/>
-  <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
-  <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
-  <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
+  <!-- Center Ashoka Navy 3-Pill Grill -->
+  <rect x="242" y="222" width="7" height="38" rx="3.5" fill="#003399"/>
+  <rect x="252" y="218" width="8" height="46" rx="4" fill="#003399"/>
+  <rect x="263" y="222" width="7" height="38" rx="3.5" fill="#003399"/>
 
-  <!-- Glowing Live Dot Beacon -->
+  <!-- Green Lower Bumper & Cowcatcher (Bottom Flag Stripe) -->
+  <path d="M 156 274 L 356 274 L 348 326 C 348 340, 334 348, 316 348 L 196 348 C 178 348, 164 340, 164 326 Z" fill="url(#greenGrad1)"/>
+
+  <!-- Obsidian Outline Border on Train Body for High Contrast -->
+  <path d="M 206 112 L 306 112 M 156 180 C 156 142, 180 128, 216 128 L 296 128 C 332 128, 356 142, 356 180 L 356 326 C 356 344, 340 354, 316 354 L 196 354 C 172 354, 156 344, 156 326 Z" fill="none" stroke="#0F172A" stroke-width="12" stroke-linejoin="round"/>
+
+  <!-- Converging Dynamic Speed Tracks -->
+  <polygon points="196,358 216,358 182,442 160,442" fill="#0F172A"/>
+  <polygon points="296,358 316,358 352,442 330,442" fill="#0F172A"/>
+  <rect x="194" y="368" width="124" height="14" rx="7" fill="#0F172A"/>
+  <rect x="180" y="396" width="152" height="15" rx="7.5" fill="#0F172A"/>
+  <rect x="164" y="424" width="184" height="16" rx="8" fill="#0F172A"/>
+
+  <!-- Glowing Live Dot Beacon at 2 o'clock -->
   <g transform="translate(422, 90)">
     <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow1)"/>
     <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>

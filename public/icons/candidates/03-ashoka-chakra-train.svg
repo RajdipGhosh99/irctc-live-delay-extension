@@ -7,58 +7,53 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <linearGradient id="saffron3" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#FF9100"/>
-      <stop offset="100%" stop-color="#FF5500"/>
-    </linearGradient>
-    <linearGradient id="bodyGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1E293B"/>
-      <stop offset="100%" stop-color="#0F172A"/>
-    </linearGradient>
   </defs>
 
   <!-- Circular Outer Frame -->
   <circle cx="256" cy="256" r="226" fill="none" stroke="#0F172A" stroke-width="26"/>
 
-  <!-- Vande Bharat Aerodynamic Bullet Nose -->
-  <path d="M 256 100 
-           C 200 100, 164 150, 164 220 
-           L 164 326 
-           C 164 344, 180 356, 200 356 
-           L 312 356 
-           C 332 356, 348 344, 348 326 
-           L 348 220 
-           C 348 150, 312 100, 256 100 Z" 
-        fill="url(#bodyGrad3)"/>
+  <!-- Ashoka Chakra 24 Spokes Radial Watermark in Background -->
+  <g transform="translate(256, 256)" opacity="0.12" stroke="#003399" stroke-width="3">
+    <line x1="0" y1="-190" x2="0" y2="190"/>
+    <line x1="-190" y1="0" x2="190" y2="0"/>
+    <line x1="-134" y1="-134" x2="134" y2="134"/>
+    <line x1="-134" y1="134" x2="134" y2="-134"/>
+    <line x1="-72" y1="-176" x2="72" y2="176"/>
+    <line x1="-176" y1="-72" x2="176" y2="72"/>
+    <line x1="-72" y1="176" x2="72" y2="-176"/>
+    <line x1="-176" y1="72" x2="176" y2="-72"/>
+  </g>
 
-  <!-- Saffron Forehead Visor Fin -->
-  <path d="M 216 116 C 238 108, 274 108, 296 116 L 284 130 C 268 124, 244 124, 228 130 Z" fill="url(#saffron3)"/>
+  <!-- Pure Obsidian Train Body -->
+  <rect x="206" y="112" width="100" height="24" rx="10" fill="#0F172A"/>
+  <rect x="156" y="128" width="200" height="200" rx="36" fill="#0F172A"/>
 
-  <!-- Panoramic Dark Tint Visor Glass -->
-  <path d="M 186 168 
-           C 206 148, 240 142, 256 142 
-           C 272 142, 306 148, 326 168 
-           C 334 176, 332 198, 326 216 
-           C 306 226, 274 230, 256 230 
-           C 238 230, 206 226, 186 216 
-           C 180 198, 178 176, 186 168 Z" 
-        fill="#FFFFFF"/>
+  <!-- Windshield -->
+  <rect x="178" y="148" width="156" height="74" rx="14" fill="#FFFFFF"/>
 
-  <!-- Cyber Angular Headlights -->
-  <polygon points="186,270 220,284 196,298 180,284" fill="#FFFFFF"/>
-  <polygon points="326,270 292,284 316,298 332,284" fill="#FFFFFF"/>
+  <!-- Headlights with Tricolor Soul: Left Lamp Saffron, Right Lamp Green! -->
+  <circle cx="198" cy="272" r="22" fill="#FF7700"/>
+  <circle cx="198" cy="272" r="14" fill="#FFFFFF"/>
+  <circle cx="314" cy="272" r="22" fill="#00E676"/>
+  <circle cx="314" cy="272" r="14" fill="#FFFFFF"/>
 
-  <!-- Cyber Aerodynamic Front Nose Line -->
-  <path d="M 240 316 L 256 328 L 272 316" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 3 Radiator Pills in Navy Blue -->
+  <rect x="240" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
+  <rect x="252" y="248" width="8" height="48" rx="4" fill="#FFFFFF"/>
+  <rect x="264" y="252" width="8" height="40" rx="4" fill="#FFFFFF"/>
 
-  <!-- High-Speed Perspective Tracks in Neon Tricolor -->
-  <polygon points="208,374 226,374 186,446 166,446" fill="#FF7700"/>
-  <polygon points="286,374 304,374 346,446 326,446" fill="#00E676"/>
-  <rect x="200" y="386" width="112" height="12" rx="6" fill="#0F172A"/>
-  <rect x="184" y="412" width="144" height="14" rx="7" fill="#0F172A"/>
-  <rect x="168" y="438" width="176" height="15" rx="7.5" fill="#0F172A"/>
+  <!-- BOLD INDIAN TRICOLOR PERSPECTIVE TRACKS -->
+  <!-- Left Track: Saffron High-Speed Rail -->
+  <polygon points="196,344 216,344 182,442 160,442" fill="#FF7700"/>
+  <!-- Right Track: Emerald High-Speed Rail -->
+  <polygon points="296,344 316,344 352,442 330,442" fill="#00E676"/>
 
-  <!-- Glowing Live Dot Beacon -->
+  <!-- Center Sleepers: Clean Navy & White -->
+  <rect x="194" y="358" width="124" height="14" rx="7" fill="#0F172A"/>
+  <rect x="180" y="388" width="152" height="15" rx="7.5" fill="#0F172A"/>
+  <rect x="164" y="420" width="184" height="16" rx="8" fill="#0F172A"/>
+
+  <!-- Glowing Live Dot Beacon at 2 o'clock -->
   <g transform="translate(422, 90)">
     <circle cx="0" cy="0" r="36" fill="#00E676" opacity="0.25" filter="url(#glow3)"/>
     <circle cx="0" cy="0" r="24" fill="#00E676" opacity="0.4"/>
