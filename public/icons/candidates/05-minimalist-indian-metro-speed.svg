@@ -1,17 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Circular Outer Border Ring -->
-  <circle cx="256" cy="256" r="236" fill="none" stroke="#000000" stroke-width="32"/>
+  <defs>
+    <filter id="liveDotGlow5" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Circular Outer Border Ring with Indian Tricolor Segment -->
+  <!-- Upper Half Saffron Arc -->
+  <path d="M 20 256 A 236 236 0 0 1 492 256" fill="none" stroke="#FF9933" stroke-width="28" stroke-linecap="round"/>
+  <!-- Lower Half India Green Arc -->
+  <path d="M 492 256 A 236 236 0 0 1 20 256" fill="none" stroke="#138808" stroke-width="28" stroke-linecap="round"/>
+  <!-- Inner Black Frame -->
+  <circle cx="256" cy="256" r="222" fill="none" stroke="#000000" stroke-width="6"/>
 
   <!-- Top Roof Dome / AC Unit -->
   <rect x="208" y="104" width="96" height="24" rx="10" fill="#000000"/>
 
-  <!-- Main Train Silhouette Body -->
+  <!-- Main Train Silhouette Body (Matching Reference) -->
   <rect x="156" y="128" width="200" height="196" rx="44" fill="#000000"/>
 
   <!-- Large Windshield Screen (Negative Cutout) -->
   <rect x="180" y="152" width="152" height="74" rx="14" fill="#FFFFFF"/>
 
-  <!-- Twin Big Express Headlights (Negative Space Cutouts) -->
+  <!-- Twin Big Express Headlights -->
   <circle cx="196" cy="268" r="22" fill="#FFFFFF"/>
   <circle cx="316" cy="268" r="22" fill="#FFFFFF"/>
 
@@ -19,6 +34,11 @@
   <rect x="238" y="244" width="9" height="48" rx="4.5" fill="#FFFFFF"/>
   <rect x="251.5" y="240" width="9" height="56" rx="4.5" fill="#FFFFFF"/>
   <rect x="265" y="244" width="9" height="48" rx="4.5" fill="#FFFFFF"/>
+
+  <!-- Tricolor Decal on Lower Train Face -->
+  <rect x="190" y="306" width="132" height="4" fill="#FF9933" rx="1"/>
+  <rect x="190" y="310" width="132" height="4" fill="#FFFFFF"/>
+  <rect x="190" y="314" width="132" height="4" fill="#138808" rx="1"/>
 
   <!-- Heavy Converging Railway Tracks (Perspective Foundation) -->
   <polygon points="196,336 218,336 174,444 148,444" fill="#000000"/>
@@ -28,4 +48,11 @@
   <rect x="190" y="352" width="132" height="18" rx="4" fill="#000000"/>
   <rect x="176" y="386" width="160" height="20" rx="4" fill="#000000"/>
   <rect x="160" y="420" width="192" height="22" rx="4" fill="#000000"/>
+
+  <!-- LIVE STATUS DOT BEACON (Emerald Green Glow with White Border) -->
+  <g transform="translate(412, 100)">
+    <circle cx="0" cy="0" r="32" fill="#10B981" opacity="0.28" filter="url(#liveDotGlow5)"/>
+    <circle cx="0" cy="0" r="22" fill="#10B981" stroke="#FFFFFF" stroke-width="4"/>
+    <circle cx="-5" cy="-5" r="5" fill="#FFFFFF" opacity="0.8"/>
+  </g>
 </svg>
